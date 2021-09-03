@@ -1,0 +1,216 @@
+<?xml version = "1.0" encoding = "ISO-8859-1"?>
+
+<!DOCTYPE controllers SYSTEM "dtds/controllers.dtd">
+
+<controllers>
+
+	<!-- Environment variable: <env-var name="OneRelease_DEFAULT_YEAR" value="2015"/> -->
+
+	<!-- Session object: <object name="OneRelease_activeYear" class="java.lang.Integer" 
+		value="2015" scope="global"/> -->
+
+	
+	
+	<controller name="Project">
+	<extends controller="Typical"/>
+	</controller>
+	
+	
+<!-- 	<controller name="Functionality"> -->
+<!-- 	<action name="search" mode="detail" -->
+<!--         by-default="if-possible" hidden="true"      keystroke="F8" -->
+<!--         class="org.onerelease.actions.functionality.SearchFunctionnality"/> -->
+<!-- 	</controller> -->
+	
+	
+	
+	
+		
+	<controller name="Collaborator">
+	<extends controller="Typical" />	
+	<action class="org.onerelease.actions.collaborator.Save"
+	 name="save" mode="detail" by-default="if-possible" image="save.gif" icon="content-save"
+			keystroke="Control S" ></action>
+	<action class="org.onerelease.actions.collaborator.SaveInCollection"
+	 name="saveInCollection" label="Save" mode="NONE"></action>
+	</controller>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<controller name="FunctionalityAnalysis">
+	<extends controller="Typical" />	
+	<action class="org.onerelease.actions.FunctionalityAnalysis.createFuncionalityAnalysis"
+	 name="newFunctionalityAnalysis" image="create_new.gif"
+		label="new"		icon="library-plus"></action>
+	</controller>
+	
+	<controller name="PeerReviewLine">
+	<extends controller="Typical"/>
+	<action class="org.onerelease.actions.peerReviewLine.NewPeerReviewLine"
+	 name="newPeerReviewLine" hidden="true" 
+	 before-each-request="true"
+	 after-each-request="true" 
+	 on-each-request="true" 
+	 >
+	</action>
+	<action class="org.onerelease.actions.peerReviewLine.EditPeerReviewLine"
+	 name="editPeerReviewLine" hidden="true">
+	</action>
+	</controller>
+	
+
+	
+	<controller name="Sections">
+	<action name="change" 
+			class="org.onerelease.actions.CustomChangeSection"
+			keystroke="Control 1..9"/>
+	</controller>
+	
+	
+	
+	<controller name="Ticket">
+	<extends controller="Typical" />
+	<extends controller="AddToCollection"/>
+		<action name="save" mode="detail" by-default="if-possible"
+			class="org.onerelease.actions.ticket.CreateTicket" image="save.gif" icon="content-save"
+			keystroke="Control S" />
+		<action class="org.onerelease.actions.ticket.CreateEpic" name="saveEpic"
+			hidden="true" label="save"
+			/>
+		<action class="org.onerelease.actions.ticket.SaveUserStory" name="saveUserStory"
+			hidden="true" image="save.gif" icon="content-save"
+			keystroke="Control S"/>
+		<action class="org.onerelease.actions.ticket.CreateNewUserStoryFomProject" 
+		name="createUserStoryFromProject" hidden="true"/>
+		<action class="org.onerelease.actions.ticket.EditUserStory" name="editUserStory"
+		 image="edit.gif"	icon="pencil" hidden="true"/>
+	 	</controller> 
+	
+	<controller name="Sprint">
+	
+		<extends controller="Typical" />
+		
+		<action name="search"
+        mode="detail"
+        by-default="if-possible" hidden="true" keystroke="F8"
+        class="org.onerelease.actions.sprint.Search"/>		
+		<action class="org.onerelease.actions.sprint.StartSprint"
+			name="startSprint" mode="detail" available-on-new="false"
+			label="start Sprint" ></action>
+		<action class="org.onerelease.actions.sprint.CompleteSprint"
+			available-on-new="false" name="completeSprint" mode="detail"
+			label="complete Sprint" ></action>
+		<action class="org.onerelease.actions.sprint.EditSprint" 
+			name="edit" image="edit.gif"
+			icon="pencil" mode="NONE"></action>
+		<action class="org.onerelease.actions.sprint.SaveSprint"
+			name="save" mode="detail" by-default="if-possible"
+			image="save.gif" icon="content-save"
+			keystroke="Control S"
+			></action>
+	</controller>
+
+
+<!-- 	<controller name="SprintViewDtail"> -->
+<!-- 		<extends controller="List"/> -->
+<!-- 		<action name="viewDetail" -->
+<!-- 			class="org.onerelease.actions.sprint.ViewDetail" -->
+<!-- 			hidden="true" -->
+<!-- 			mode="list" -->
+<!-- 			image="edit.gif" -->
+<!-- 			icon="border-color" -->
+<!-- 			by-default="always"> -->
+<!-- 			<set property="nextAction" value="Mode.detail"/> -->
+<!-- 		</action> -->
+<!-- 	</controller> -->
+
+
+
+
+
+
+
+
+
+
+	<controller name="Move">
+		<action class="org.onerelease.actions.ticket.MoveUp" name="moveUp"
+			icon="arrow-up-bold"></action>
+		<action class="org.onerelease.actions.ticket.MoveDown" name="moveDown"
+			icon="arrow-down-bold"></action>
+	</controller>
+
+
+	<controller name="HideSquadActions">
+		<extends controller="Collection" />
+		<action class="org.onerelease.actions.suqad.SquadNewHideAction"
+			name="new" image="create_new.gif" icon="library-plus"></action>
+		<action class="org.onerelease.actions.suqad.SquadEditHideAction"
+			name="edit" image="edit.gif" icon="pencil"></action>
+	</controller>
+
+	<controller name="HideEpicActions">
+		<extends controller="Collection" />
+		<action class="org.onerelease.actions.ticket.EpicNewHideAction"
+			name="new"  image="create_new.gif" icon="library-plus"></action>
+		<action class="org.onerelease.actions.ticket.EpicEditHideAction"
+			name="edit" image="edit.gif" icon="pencil"></action>
+	</controller>
+
+	<controller name="CollectionCopyPaste">
+		<action name="cut" icon="content-cut" image="cut.gif"
+			in-each-row="true" hidden="true"
+			class="org.openxava.actions.CutElementsFromCollectionAction" />
+
+		<action name="paste" icon="content-paste" image="paste.gif"
+			hidden="true"
+			class="org.openxava.actions.PasteElementsIntoCollectionAction" />
+	</controller>
+
+	
+<!-- 	<controller name="Reference"> -->
+<!-- 		<action name="search" -->
+<!-- 			class="org.openxava.actions.ReferenceSearchAction" -->
+<!-- 			icon="magnify" -->
+<!-- 			image="search.gif"/> -->
+<!-- 		<action name="createNew"  -->
+<!-- 			class="org.openxava.actions.CreateNewFromReferenceAction" -->
+<!-- 			icon="library-plus" -->
+<!-- 			image="create_new.gif"/> -->
+<!-- 		<action name="modify"  -->
+<!-- 			class="org.onerelease.actions.CustomModifyFromReferenceAction" -->
+<!-- 			icon="border-color" -->
+<!-- 			image="edit.gif"/> -->
+<!-- 	</controller> -->
+
+
+
+
+
+
+
+
+	
+	<controller name="addTicketToSprint">
+		<action class="org.onerelease.actions.ticket.AssignAction"
+			name="assign" icon="account-convert" />
+		<action class="org.onerelease.actions.ticket.AddTicketToSprintAction"
+			name="AddTicketToSprintAction" />
+
+	</controller>
+	
+	
+	
+	
+	
+
+
+
+
+</controllers>

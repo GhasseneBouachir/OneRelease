@@ -1,0 +1,6 @@
+03-Sep-2021 12:36:04.509 INFOS [main] org.apache.catalina.core.ApplicationContext.log No Spring WebApplicationInitializer types detected on classpath
+03-Sep-2021 12:36:04.666 INFOS [main] org.apache.catalina.core.ApplicationContext.log Initializing Spring DispatcherServlet 'spring-mvc'
+03-Sep-2021 12:45:45.737 INFOS [main] org.apache.catalina.core.ApplicationContext.log No Spring WebApplicationInitializer types detected on classpath
+03-Sep-2021 12:45:45.982 INFOS [main] org.apache.catalina.core.ApplicationContext.log Initializing Spring DispatcherServlet 'spring-mvc'
+03-Sep-2021 15:09:56.418 INFOS [main] org.apache.catalina.core.ApplicationContext.log No Spring WebApplicationInitializer types detected on classpath
+03-Sep-2021 15:09:56.622 INFOS [main] org.apache.catalina.core.ApplicationContext.log Initializing Spring DispatcherServlet 'spring-mvc'
