@@ -162,7 +162,6 @@ public class Style {
 	
 	protected Collection<String> createAdditionalCssFiles() {
 		return Arrays.asList( 
-			"/xava/editors/calendar/skins/aqua/theme.css", 
 			"/xava/style/yahoo-treeview/treeview.css",
 			"/xava/style/custom.css", 
 			getJQueryCss()
@@ -769,6 +768,13 @@ public class Style {
 		return "editor";
 	}
 	
+	/**
+	 * @since 6.5.3
+	 */
+	public String getEditorSuffix() { 
+		return "ox-editor-suffix"; 
+	}
+	
 	/** @since 5.6.1 */
 	public String getWebURL() { 
 		return "ox-web-url";
@@ -826,6 +832,14 @@ public class Style {
 	public String getDateCalendar() {   
 		return "ox-date-calendar";
 	}
+	
+	/**
+	 * @since 6.4.1
+	 */
+	public String getReadOnlyHtmlText() { 
+		return "ox-read-only-html-text";
+	}
+
 	
 	/**
 	 * @since 5.6.1
@@ -1115,11 +1129,6 @@ public class Style {
 	
 	public String getBottomButtons() {
 		return "ox-bottom-buttons";
-	}
-
-	
-	public boolean isNeededToIncludeCalendar() {
-		return true;
 	}
 
 	/**

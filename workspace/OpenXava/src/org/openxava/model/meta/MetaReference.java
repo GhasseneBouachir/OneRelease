@@ -2,15 +2,13 @@ package org.openxava.model.meta;
 
 import java.util.*;
 
-
-
 import org.apache.commons.logging.*;
 import org.openxava.calculators.*;
 import org.openxava.component.*;
+import org.openxava.filters.meta.*;
 import org.openxava.util.*;
 import org.openxava.util.meta.*;
-import org.openxava.view.meta.MetaDescriptionsList;
-import org.openxava.view.meta.MetaView;
+import org.openxava.view.meta.*;
 
 /**
  * 
@@ -24,6 +22,7 @@ public class MetaReference extends MetaMember implements Cloneable {
 	private MetaModel metaModelReferenced;
 	private String referencedModelName;
 	private String referencedModelContainerReference;
+	private String referencedModelCorrespondingCollection; 
 	private String role;
 	private boolean required;
 	private boolean key;
@@ -60,16 +59,18 @@ public class MetaReference extends MetaMember implements Cloneable {
 	public MetaModel getMetaModelReferenced() throws XavaException {
 		if (metaModelReferenced == null) {
 			ElementName modelName = new ElementName(getReferencedModelName());			
-			if (modelName.isQualified()) { 
+			if (modelName.isQualified()) {
 				String componentName = modelName.getContainerName();
 				String aggregateName = modelName.getUnqualifiedName();
 				return MetaComponent.get(componentName).getMetaAggregate(aggregateName);
 			}
 			
 			// Not qualified
-			if (!getMetaModel().isAnnotatedEJB3() && getReferencedModelName().equals(getMetaModel().getName())) metaModelReferenced = getMetaModel(); 
+			if (!getMetaModel().isAnnotatedEJB3() && getReferencedModelName().equals(getMetaModel().getName())) {
+				metaModelReferenced = getMetaModel(); 
+			}
 			else {
-				if (explicitAggregate && !aggregate && getMetaModel().isAnnotatedEJB3()) { 
+				if (explicitAggregate && !aggregate && getMetaModel().isAnnotatedEJB3()) {
 					metaModelReferenced = MetaComponent.get(getReferencedModelName()).getMetaEntity();
 					if (!Is.empty(referencedModelContainerReference)) metaModelReferenced.setContainerReference(referencedModelContainerReference); 					
 				}
@@ -245,6 +246,15 @@ public class MetaReference extends MetaMember implements Cloneable {
 		return result.toString();
 	}
 	
+	/** @since 6.4 */
+	public String getFilterInDescriptionsList(MetaView metaView) throws XavaException { 
+		MetaDescriptionsList descriptionsList = metaView.getMetaDescriptionList(this);		
+		if (descriptionsList == null) return "";
+		MetaFilter filter = descriptionsList.getMetaFilter();
+		if (filter == null) return "";
+		return filter.getClassName();
+	}
+	
 	public String getKeyProperty(String propertyKey){
 		Collection keys = getMetaModelReferenced().getAllKeyPropertiesNames(); 
 		if (keys.size() == 1) return keys.iterator().next().toString();
@@ -274,5 +284,12 @@ public class MetaReference extends MetaMember implements Cloneable {
 		return referencedModelContainerReference;
 	}
 
+	public String getReferencedModelCorrespondingCollection() {
+		return referencedModelCorrespondingCollection;
+	}
+
+	public void setReferencedModelCorrespondingCollection(String referencedModelCorrespondingCollection) {
+		this.referencedModelCorrespondingCollection = referencedModelCorrespondingCollection;
+	}
 	
 }

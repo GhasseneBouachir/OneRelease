@@ -10,10 +10,12 @@
 <%@page import="org.openxava.util.XSystem"%>
 <%@page import="org.openxava.util.Strings"%>
 <%@page import="org.openxava.util.Is"%>
+<%@page import="org.openxava.util.XavaPreferences"%> 
 <%@page import="org.openxava.web.dwr.Module"%>
 <%@page import="org.openxava.web.servlets.Servlets"%>
 <%@page import="org.openxava.web.Ids"%>
-<%@page import="org.openxava.web.Requests"%> 
+<%@page import="org.openxava.web.Requests"%>
+<%@page import="org.openxava.web.style.Themes"%>  
 <%@page import="org.apache.commons.logging.LogFactory" %>
 <%@page import="org.apache.commons.logging.Log" %>
 <%@page import="org.openxava.web.Browsers"%> 
@@ -48,19 +50,15 @@
 <jsp:useBean id="context" class="org.openxava.controller.ModuleContext" scope="session"/>
 <jsp:useBean id="style" class="org.openxava.web.style.Style" scope="request"/>
 <%
-	if ("true".equals(request.getParameter("init"))) {
-		context.resetModule(request);
-	}
 	String windowId = context.getWindowId(request);
-	context.setCurrentWindowId(windowId);	
-	Locales.setCurrent(request);	
+	context.setCurrentWindowId(windowId);		
 	request.getSession().setAttribute("xava.user",
 			request.getRemoteUser());
 	String app = request.getParameter("application");
 	String module = context.getCurrentModule(request);
 	String contextPath = (String) request.getAttribute("xava.contextPath");
 	if (contextPath == null) contextPath = request.getContextPath();
-
+	
 	org.openxava.controller.ModuleManager managerHome = (org.openxava.controller.ModuleManager) context
 			.get(request, "manager",
 					"org.openxava.controller.ModuleManager");
@@ -89,8 +87,8 @@
 	boolean htmlHead = isPortlet?false:!Is.equalAsStringIgnoreCase(request.getParameter("htmlHead"), "false");
 	String version = org.openxava.controller.ModuleManager.getVersion();
 	String realPath = request.getSession().getServletContext()
-			.getRealPath("/");			
-	Requests.init(request, app, module); 
+			.getRealPath("/");
+	Requests.init(request, app, module);
 	manager.log(request, "MODULE:" + module);
 	manager.setModuleURL(request);
 %>
@@ -157,21 +155,15 @@
 	<% if (Browsers.isIE(request)) { %>
 	<script type='text/javascript' src="<%=request.getContextPath()%>/xava/js/babel-polyfill.js?ox=<%=version%>"></script>
 	<script type='text/javascript' src="<%=request.getContextPath()%>/xava/js/filepond-polyfill.js?ox=<%=version%>"></script>
+	<script type='text/javascript' src="<%=request.getContextPath()%>/xava/js/css-vars-ponyfill.js?ox=<%=version%>"></script>
+	<script type='text/javascript'>cssVars({ }); </script>
 	<% } %>
 	<script type='text/javascript'>
 		openxava.lastApplication='<%=app%>'; 		
-		openxava.lastModule='<%=module%>'; 	
-		openxava.language='<%=request.getLocale().getLanguage()%>';
-	</script>	
-	<%
-		if (style.isNeededToIncludeCalendar()) {
-	%>
-	<script type="text/javascript" src="<%=contextPath%>/xava/editors/calendar/calendar.js?ox=<%=version%>"></script>
-	<script type="text/javascript" src="<%=contextPath%>/xava/editors/calendar/lang/calendar-<%=Locales.getCurrent().getLanguage()%>.js?ox=<%=version%>"></script>	
-	<%
-			}
-		%>	
-	<script type='text/javascript' src='<%=contextPath%>/xava/js/calendar.js?ox=<%=version%>'></script>
+		openxava.lastModule='<%=module%>'; 
+		openxava.language='<%=Locales.getCurrent().getLanguage()%>'; 
+		openxava.contextPath = '<%=contextPath%>';
+	</script>
 	<%
 		if (new File(realPath + "/xava/js/custom-editors.js").exists()) {
 	%>
@@ -235,7 +227,7 @@ if (!coreViaAJAX && restoreLastMessage) {
 	Module.restoreLastMessages(request, app, module);
 }	
 
-if (manager.isResetFormPostNeeded()) {	
+if (manager.isResetFormPostNeeded()) {
 %>		
 	<form id="xava_reset_form">
 		<% if (!"true".equals(request.getParameter("friendlyURL"))) { // To support old URL style (with xava/moduls.jsp?application=...) %>
@@ -269,6 +261,9 @@ if (manager.isResetFormPostNeeded()) {
 	<%=style.getCoreEndDecoration()%>
 	
 <% } %>			
+	<% if (Themes.isChooserEnabled(request)) { %>
+	<jsp:include page="themeChooser.jsp"/>
+	<% } %>
 	<div id="xava_console" >
 	</div>
 	<div id="xava_loading">				
@@ -313,25 +308,33 @@ if (manager.isResetFormPostNeeded()) {
 	if (openxava != null && openxava.<%=initiated%> == null) {
 		openxava.browser.ie = <%=Browsers.isIE(request)%>;
 		openxava.browser.ff = <%=Browsers.isFF(request)%>;
+		openxava.browser.edge = <%=Browsers.isEdge(request)%>; 
 		openxava.showFiltersMessage = '<xava:message key="show_filters"/>';
 		openxava.hideFiltersMessage = '<xava:message key="hide_filters"/>';
+		openxava.confirmLoseChangesMessage = '<xava:message key="confirm_lose_changes"/>';
+		openxava.confirmRemoveFileMessage = '<xava:message key="confirm_remove_file"/>';   
 		openxava.selectedRowClass = '<%=style.getSelectedRow()%>';
 		openxava.currentRowClass = '<%=style.getCurrentRow()%>';
 		openxava.currentRowCellClass = '<%=style.getCurrentRowCell()%>';
 		openxava.selectedListFormatClass = '<%=style.getSelectedListFormat()%>'; 
 		openxava.customizeControlsClass = '<%=style.getCustomizeControls()%>';
 		openxava.errorEditorClass = '<%=style.getErrorEditor()%>';
+		openxava.editorClass = '<%=style.getEditor()%>'; 
 		openxava.listAdjustment = <%=style.getListAdjustment()%>;
 		openxava.collectionAdjustment = <%=style.getCollectionAdjustment()%>;
 		openxava.closeDialogOnEscape = <%=browser != null && browser.indexOf("Firefox") >= 0 ? "false":"true"%>;		  
 		openxava.calendarAlign = '<%=browser != null && browser.indexOf("MSIE 6") >= 0 ? "tr":"Br"%>';
 		openxava.subcontrollerSelectedClass = '<%=style.getSubcontrollerSelected()%>';
 		<% java.text.DecimalFormatSymbols symbols = java.text.DecimalFormatSymbols.getInstance(Locales.getCurrent()); %>
-		openxava.decimalSeparator = '<%=symbols.getDecimalSeparator()%>';
-		openxava.groupingSeparator = '<%=symbols.getGroupingSeparator()%>';
+		openxava.decimalSeparator = "<%=symbols.getDecimalSeparator()%>";
+		openxava.groupingSeparator = "<%=symbols.getGroupingSeparator()%>";		
 		openxava.setHtml = <%=style.getSetHtmlFunction()%>;			
+		<% if (XavaPreferences.getInstance().isEnterMovesToNextField()) { %>
+		openxava.initFocusKey = openxava.setEnterAsFocusKey;
+		<% } %>
 		<% if (browser != null && browser.contains("HtmlUnit")) { // Because of low performance of fadeIn with HtmlUnit %>
 		openxava.fadeIn = openxava.show;
+		openxava.browser.htmlUnit = true; 
 		<% } %>
 		<%String initThemeScript = style.getInitThemeScript();
 			if (initThemeScript != null) {%>
@@ -350,7 +353,11 @@ if (manager.isResetFormPostNeeded()) {
 <%=onLoadFunction%>();
 </script>
 <% }
-manager.commit();
-context.cleanCurrentWindowId(); 
-org.openxava.util.SessionData.clean(); 
+try {
+	manager.commit();
+}
+finally {
+	context.cleanCurrentWindowId(); 
+	org.openxava.util.SessionData.clean();
+} 
 %>

@@ -37,6 +37,7 @@ public class Result {
 	private String postJS;
 	private String [] editorsWithError; 
 	private String [] editorsWithoutError; 
+	private boolean dataChanged;  
 	
 	public Result() {
 	}
@@ -243,6 +244,16 @@ public class Result {
 
 	public void setEditorsWithoutError(String [] editorsWithoutError) {
 		this.editorsWithoutError = editorsWithoutError;
+	}
+
+	/** @since 6.3 */
+	public boolean isDataChanged() {
+		return dataChanged;
+	}
+
+	/** @since 6.3 */
+	public void setDataChanged(boolean changed) {
+		this.dataChanged = changed;
 	}
 	
 }

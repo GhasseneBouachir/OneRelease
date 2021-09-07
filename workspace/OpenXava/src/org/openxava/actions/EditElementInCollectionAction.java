@@ -1,12 +1,9 @@
 package org.openxava.actions;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.openxava.model.MapFacade;
-import org.openxava.util.XavaException;
+import org.openxava.model.*;
+import org.openxava.util.*;
 
 
 /**
@@ -36,9 +33,9 @@ public class EditElementInCollectionAction extends CollectionElementViewBaseActi
 		}
 				
 		if (keys != null) {
-			values = MapFacade.getValues(getCollectionElementView().getModelName(), keys, getCollectionElementView().getMembersNames());			
-			getCollectionElementView().setValues(values);						
-			getCollectionElementView().setCollectionEditingRow(getRow());			
+			values = MapFacade.getValues(getCollectionElementView().getModelName(), keys, getCollectionElementView().getMembersNames());
+			getCollectionElementView().setValues(values);					
+			getCollectionElementView().setCollectionEditingRow(getRow());
 		} else {
 			throw new XavaException("only_list_collection_for_aggregates");
 		}

@@ -40,13 +40,14 @@ public class ButtonTag extends ActionTagBase {
 				pageContext.getOut().print("'");
 			}
 			pageContext.getOut().print(" tabindex='1'"); 
-			pageContext.getOut().print(" title='"); 
-			pageContext.getOut().print(getTooltip(metaAction)); 
+			pageContext.getOut().print(" title='");  
+			pageContext.getOut().print(filterApostrophes(getTooltip(metaAction))); 
 			pageContext.getOut().print("'");
 			pageContext.getOut().print(" class='");
 			Style style = (Style) request.getAttribute("style");
 			pageContext.getOut().print(style.getButton());
-			pageContext.getOut().print("'\tonclick='openxava.executeAction(");			
+			if (metaAction.isLosesChangedData()) pageContext.getOut().print("'\tonclick='openxava.executeActionConfirmLosesChangedData(");
+			else pageContext.getOut().print("'\tonclick='openxava.executeAction(");
 			pageContext.getOut().print('"');				
 			pageContext.getOut().print(application);
 			pageContext.getOut().print('"');
@@ -56,7 +57,7 @@ public class ButtonTag extends ActionTagBase {
 			pageContext.getOut().print('"');
 			pageContext.getOut().print(", ");			
 			pageContext.getOut().print('"');				
-			pageContext.getOut().print(metaAction.getConfirmMessage(request));
+			pageContext.getOut().print(filterApostrophes(metaAction.getConfirmMessage(request))); 
 			pageContext.getOut().print('"');
 			pageContext.getOut().print(", ");
 			pageContext.getOut().print(metaAction.isTakesLong());
@@ -77,7 +78,7 @@ public class ButtonTag extends ActionTagBase {
 				}
 			}
 			pageContext.getOut().print(")' value='");
-			pageContext.getOut().print(metaAction.getLabel(request));
+			pageContext.getOut().print(filterApostrophes(metaAction.getLabel(request))); 
 			pageContext.getOut().println("'/>");
 		}
 		catch (Exception ex) {

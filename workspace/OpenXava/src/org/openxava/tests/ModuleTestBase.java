@@ -129,7 +129,7 @@ abstract public class ModuleTestBase extends TestCase {
 	}
 	
 	private void resetPreferences() throws Exception {
-		getUtilClient().getPage("http://" + getHost() + ":" + getPort() + "/" + application + "/xava/resetPreferences.jsp?zxy=HOljkso83");
+		getUtilClient().getPage("http://" + getHost() + ":" + getPort() + getContextPath() + "xava/resetPreferences.jsp?zxy=HOljkso83"); 
 	}
 	
 	private static WebClient getUtilClient() throws Exception { 
@@ -192,7 +192,13 @@ abstract public class ModuleTestBase extends TestCase {
 			// NaviOX, the built-in OpenXava login mechanism
 			String originalModule = module;
 			selectModuleInPage("SignIn");
-			setValue("user", user);
+			try { 
+				setValue("user", user); 
+			}
+			catch (ElementNotFoundException ex) {
+				reload(); // Under high load sometime the page ajax loading takes some time, and this is the only way we found to solve the issue
+				setValue("user", user);
+			}
 			setValue("password", password);
 			execute("SignIn.signIn");
 			assertNoErrors();
@@ -532,7 +538,7 @@ abstract public class ModuleTestBase extends TestCase {
 		}
 		else {
 			// NaviOX, the built-in login mechanism of OpenXava
-			page = ((HtmlAnchor)getHtmlPage().getByXPath("//a[contains(@href, '/" + application + "/naviox/signOut.jsp')]").get(0)).click();
+			page = ((HtmlAnchor)getHtmlPage().getByXPath("//a[contains(@href, '" + getContextPath() + "naviox/signOut.jsp')]").get(0)).click(); 
 		}
 	}
 	
@@ -631,7 +637,7 @@ abstract public class ModuleTestBase extends TestCase {
 		metaView = null;
 		metaTab = null;				
 		if (reloadPage) page = (HtmlPage) client.getPage(getModuleURL()); 
-		resetForm();		
+		resetForm();	
 		restorePage(); 
 	}
 	
@@ -645,7 +651,7 @@ abstract public class ModuleTestBase extends TestCase {
 			return "http://" + getHost() + ":" + getPort() + "/" + getJetspeed2URL() + "/portal/" + application + "/" + folder + module + ".psml";
 		}
 		else {
-			return "http://" + getHost() + ":" + getPort() + "/" + application + "/modules/" + module + "?modulesLimit=0";
+			return "http://" + getHost() + ":" + getPort() + getContextPath() + "modules/" + module + "?modulesLimit=0"; 
 		}
 	}
 	
@@ -1063,6 +1069,14 @@ abstract public class ModuleTestBase extends TestCase {
 	}
 	
 	/**
+	 * The content of the response for popup window.
+	 * @since 6.4.2
+	 */
+	protected InputStream getPopupContentAsStream() throws Exception {  
+		return getPopupPage(-1).getWebResponse().getContentAsStream();
+	}	
+	
+	/**
 	 * The content of the PDF in the popup window as text.
 	 * 
 	 * @since 4.6
@@ -1205,10 +1219,13 @@ abstract public class ModuleTestBase extends TestCase {
 				}
 				catch (com.gargoylesoftware.htmlunit.ElementNotFoundException ex2) {
 				}
+				
 				// A bit Ad Hoc, because we assume that filtering fields have always onchange events, 
 				// if that changes this will not be real, but we have no option
 				// since HtmlUnit 2.32 stopped to react to change events on inputs
-				setFormValueAlwaysThrowChangedEvent(id + "." + i, values[i]); 
+				// setFormValueAlwaysThrowChangedEvent(id + "." + i, values[i]); // Until 6.4.2, in 6.5 filtering fields no longer throw change events
+
+				setFormValue(id + "." + i, values[i]);  
 			}
 			catch (com.gargoylesoftware.htmlunit.ElementNotFoundException ex) {
 				break;
@@ -1297,6 +1314,11 @@ abstract public class ModuleTestBase extends TestCase {
 	
 	protected void assertLabel(String name, String expectedLabel) throws Exception {		
 		assertEquals(XavaResources.getString("unexpected_label", name), expectedLabel, getLabel(name));		
+	}
+	
+	/** @since 6.4 */
+	protected void assertLabel(int sectionIndex, String expectedLabel) throws Exception{ 
+		assertLabel("xava_view_section" + sectionIndex + "_sectionName", expectedLabel);
 	}
 	
 	protected void assertNoLabel(String name) throws Exception{
@@ -1810,8 +1832,10 @@ abstract public class ModuleTestBase extends TestCase {
 		HtmlTable table = getTable(tableId, message);
 		int rowInTable = table.getRowCount() - getTotalsRowCount(table) + row;
 		column+=getColumnIncrement(table, column);
-		assertEquals(XavaResources.getString("total_not_match", new Integer(column)), total,   
-				table.getCellAt(rowInTable, column).asText().trim());		
+		HtmlTableCell cell = table.getCellAt(rowInTable, column);
+		List<HtmlElement> inputs = cell.getElementsByAttribute("input", "type", "text");
+		String value = inputs.isEmpty()?cell.asText().trim():inputs.get(0).getAttribute("value");
+		assertEquals(XavaResources.getString("total_not_match", new Integer(column)), total, value);
 	}		
 	
 	private int getColumnIncrement(HtmlTable table, int originalColumn) {
@@ -2371,16 +2395,22 @@ abstract public class ModuleTestBase extends TestCase {
 		HtmlElement textField = (HtmlElement) page.getHtmlElementById(decorateId(name)).getPreviousElementSibling();
 		String actualValues = textField.getAttribute("data-values");
 		StringTokenizer st = new StringTokenizer(actualValues, "\"");
-		st.nextToken();
+		nextTokens(st, 3); 
 		List<KeyAndDescription> validValues = new ArrayList<KeyAndDescription>();
 		while (st.hasMoreTokens()) {			
 			String description = st.nextToken();
-			st.nextToken();
+			nextTokens(st, 3); 
 			String key = st.nextToken();
-			st.nextToken();
+			nextTokens(st, 3); 
 			validValues.add(new KeyAndDescription(key, description));
 		}
 		return validValues;
+	}
+	
+	private void nextTokens(StringTokenizer st, int count) { 
+		for (int i=0; i<count; i++) {
+			if (st.hasMoreTokens()) st.nextToken();
+		}
 	}
 	
 	protected void assertValidValuesCount(String name, int count) throws Exception {
@@ -2577,6 +2607,14 @@ abstract public class ModuleTestBase extends TestCase {
 		return host;		
 	}	
 	
+	/**
+	 * 
+	 * @since 6.3
+	 */
+	protected String getContextPath() { 
+		return getXavaJunitProperties().getProperty("contextPath", "/" + application + "/");
+	}
+
 		
 	private static String getDefaultLocale() {
 		if (!isDefaultLocaleSet) {
@@ -2647,6 +2685,7 @@ abstract public class ModuleTestBase extends TestCase {
 	static public String getXavaJUnitProperty(String id) {
 		return getXavaJunitProperties().getProperty(id);
 	}
+	
 	
 	/**
 	 * From file xava-junit.properties 
@@ -3017,8 +3056,19 @@ abstract public class ModuleTestBase extends TestCase {
 	}
 	
 	private HtmlSelect getSelectListConfigurations() { 
-		return getSelectInListTitle(0);
-	} 
+		try { 
+			return getSelectInListTitle(0);	
+		}
+		catch (ElementNotFoundException ex) {
+			return getPhoneListConfigurationsSelect();
+		}
+	}
+	
+	private HtmlSelect getPhoneListConfigurationsSelect() { 
+		HtmlElement selectParent = getHtmlPage().getHtmlElementById("phone_list_configurations"); 
+		return (HtmlSelect) selectParent.getElementsByTagName("select").get(0); 
+	}
+
 	
 	private HtmlSelect getSelectGroupBy() { 
 		return getSelectInListTitle(1);
@@ -3192,10 +3242,12 @@ abstract public class ModuleTestBase extends TestCase {
 	 * @since 6.2
 	 */	
 	protected void removeFile(String property) throws Exception { 
-		removeFile(property, null); 
+		String value = getValue(property);
+		String fileId = value.length() == 32?value:null;
+		removeFile(property, fileId); 
 	}
 	
-	private void removeFile(String property, String fileId) throws Exception { 
+	private void removeFile(String property, String fileId) throws Exception {
 		String fileIdParam = fileId == null?"":" + '&fileId=" + fileId + "'";
 		getHtmlPage().executeJavaScript(
 			"var input = document.getElementById('" + decorateId(property) + "');" +	

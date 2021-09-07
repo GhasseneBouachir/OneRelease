@@ -4,7 +4,6 @@ import java.rmi.*;
 import java.util.*;
 
 import javax.ejb.*;
-import javax.rmi.*;
 
 import org.apache.commons.logging.*;
 import org.openxava.component.*;
@@ -54,13 +53,16 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 	
 	public void search(String condition, Object key) throws FinderException, RemoteException {
 		try {				
+			if (condition != null && condition.contains(" group by ")) {
+				setConditionProperties(condition);
+			}
 			StringBuffer select = new StringBuffer(getSelectBase());
 			if (!Is.emptyString(condition)) {				
 				if (!condition.toUpperCase().trim().startsWith("ORDER BY")) {
 					if (select.toString().toUpperCase().indexOf("WHERE") < 0) select.append(" WHERE "); 
 					else select.append(" AND "); 								
 				}
-				select.append(condition); 
+				select.append(condition);
 			}																
 			tabProvider.search(select.toString(), key);
 		}
@@ -70,6 +72,11 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 		}		
 	}
 	
+	private void setConditionProperties(String condition) {
+		tabProvider.setConditionProperties(Strings.extractVariables(condition));
+		selectBase = null;
+	}
+
 	private String getSelectBase() {
 		if (selectBase == null) {
 			String select = tabProvider.getSelectBase();

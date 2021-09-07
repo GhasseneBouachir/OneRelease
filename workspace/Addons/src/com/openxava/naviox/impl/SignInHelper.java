@@ -3,6 +3,7 @@ package com.openxava.naviox.impl;
 import java.io.*;
 import java.util.*;
 
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.apache.commons.logging.*;
@@ -29,13 +30,15 @@ public class SignInHelper {
 		return forwardURI;
 	}	
 	
-	public static void signIn(HttpSession session, String userName) {
+	public static void signIn(HttpServletRequest request, String userName) {
+		HttpSession session = request.getSession();
 		session.setAttribute("naviox.user", userName);
 		Modules modules = (Modules) session.getAttribute("modules");
+		Users.setCurrent(userName); // In order startInLastVisitedModule=false works
 		modules.reset();		
 	}
 	
-	public static boolean isAuthorized(String user, String password) {
+	public static boolean isAuthorized(ServletRequest request, String user, String password) {
 		String storedPassword = getUsers().getProperty(user, null);
 		return password.equals(storedPassword);
 	}	
@@ -43,8 +46,8 @@ public class SignInHelper {
 	/**
 	 * @since 5.4 
 	 */
-	public static boolean isAuthorized(String userName, String password, Messages errors) {  
-		boolean authorized = isAuthorized(userName, password);
+	public static boolean isAuthorized(ServletRequest request, String userName, String password, Messages errors) {  
+		boolean authorized = isAuthorized(request, userName, password);
 		if (!authorized) errors.add("unauthorized_user");
 		return authorized;
 	}	

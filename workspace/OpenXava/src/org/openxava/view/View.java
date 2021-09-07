@@ -186,10 +186,12 @@ public class View implements java.io.Serializable {
 	private Map oldCollectionTotals;    
 	private Map membersNameForElementCollection;
 	private Map<MetaProperty, Map> validValuesByProperty;
+	private Set<String> noBlankValidValuesProperties; 
 	private Collection<String> sumProperties;  
 	private Map<String, List<String>> totalProperties; 
 	private StringBuffer defaultSumProperties;
-	private int collectionSize = -1; 
+	private int collectionSize = -1;
+	private boolean dataChanged;  
 	
 	public static void setRefiner(Object newRefiner) {
 		refiner = newRefiner;
@@ -210,11 +212,11 @@ public class View implements java.io.Serializable {
 		return metaMembers;		
 	}
 	
-	private Collection<MetaMember> getMetaMembersIncludingCollectionTotals() throws XavaException { 
+	private Collection<MetaMember> getMetaMembersIncludingCollectionTotals() throws XavaException {
 		if (metaMembersIncludingCollectionTotals == null) {
 			metaMembersIncludingCollectionTotals = createMetaMembers(false, true);
 		}		
-		return metaMembersIncludingCollectionTotals;		
+		return metaMembersIncludingCollectionTotals;
 	}
 	
 	private Collection getMetaMembersIncludingHiddenKey() throws XavaException { 
@@ -244,7 +246,7 @@ public class View implements java.io.Serializable {
 			removeNotInListProperties(metaMembers);
 		}
 		else if (isRepresentsCollection()) {     
-			metaMembers = extractAggregateRecursiveReference(metaMembers);					
+			metaMembers = extractAggregateRecursiveReference(metaMembers);
 		}				
 		extractRecursiveReference(metaMembers); 
 		if (!hiddenIncluded && hiddenMembers != null) {
@@ -309,29 +311,31 @@ public class View implements java.io.Serializable {
 		}
 	} 
 
-	private void extractRecursiveReference(Collection metaMembers) {		
+	private void extractRecursiveReference(Collection metaMembers) {
+		
 		for (Iterator it=metaMembers.iterator(); it.hasNext(); ) {
 			Object member = it.next();
 			MetaReference ref = null;
 			if (member instanceof MetaReference) ref = (MetaReference) member; 
 			else continue;
-			String model = ref.getMetaModel().getName();
+			if (displayAsDescriptionsList(ref)) continue;
+			String model = ref.getMetaModelReferenced().getName();
 			String view = getMetaView().getMetaView(ref).getName();			
 			if (isViewInParents(model, view)) {
 				it.remove();
 			}
-		}				
+		}		
+		
 	}
 
-	private boolean isViewInParents(String modelName, String viewName) { 
+	private boolean isViewInParents(String modelName, String viewName) {
 		View parent = getParent();		
 		if (parent == null)	return false;
-		if (isSection() || isGroup()) return parent.isViewInParents(modelName, viewName);;  
+		if (isSection() || isGroup()) return parent.isViewInParents(modelName, viewName);  
 		String parentView = parent.getViewName();
 		if (parentView ==null) parentView = "";		 
 		if (Is.equal(parent.getModelName(), modelName) && 
 			Is.equal(parentView, viewName)) return true;
-			
 		return parent.isViewInParents(modelName, viewName);
 	}
 
@@ -610,8 +614,13 @@ public class View implements java.io.Serializable {
 			}
 		}											
 	}
-	
+
 	public void setValues(Map values) throws XavaException {
+		setValuesChangingModel(values);
+		getRoot().dataChanged = !isFirstLevel() && !isRepresentsTransientReference();
+	}
+	
+	public void setValuesChangingModel(Map values) throws XavaException {
 		boolean modelChanged = false;
 		if (values != null) {
 			String modelName = (String) values.get(MapFacade.MODEL_NAME);
@@ -623,7 +632,7 @@ public class View implements java.io.Serializable {
 				modelChanged = true;				
 			}
 		}	
-		setValues(values, true);
+		setValues(values, !isRepresentsCollection()); 
 		if (modelChanged) refresh();
 	}
 	
@@ -643,9 +652,8 @@ public class View implements java.io.Serializable {
 	}
 	
 	private void setValues(Map map, boolean closeCollections) throws XavaException { 
-		if (values == null) values = new HashMap();
-		else values.clear();
-		if (closeCollections) resetCollections(true); 
+		clearValues(); 
+		if (closeCollections) resetCollections(true);
 		resetCollectionTotals();
 		addValues(map, true);
 	}
@@ -773,8 +781,23 @@ public class View implements java.io.Serializable {
 			Iterator itSubviews = getSubviews().values().iterator();
 			while (itSubviews.hasNext()) {
 				View subview = (View) itSubviews.next();
+				if (!subview.isRepresentsCollection() || isRepresentsElementCollection()) { 
+					subview.clearValues();
+				}
+			}
+		}
+		if (hasGroups()) {
+			Iterator itSubviews = getGroupsViews().values().iterator();
+			while (itSubviews.hasNext()) {
+				View subview = (View) itSubviews.next();
 				subview.clearValues();
 			}
+		}						
+		if (hasSections()) {
+			int count = getSections().size();
+			for (int i = 0; i < count; i++) {
+				getSectionView(i).clearValues();
+			}	
 		}
 	}
 	
@@ -849,6 +872,7 @@ public class View implements java.io.Serializable {
 				if (elementIndex < 0 || elementIndex >= collectionValues.size()) return null;
 				Map element = (Map) collectionValues.get(elementIndex);
 				String collectionMember = Strings.noFirstTokenWithoutFirstDelim(member, ".");
+				collectionMember = collectionMember.replaceAll("^this\\.", ""); 
 				return Maps.getValueFromQualifiedName(element, collectionMember);
 			}
 			else {
@@ -880,6 +904,18 @@ public class View implements java.io.Serializable {
 	 */	
 	public Object getValue(String name) throws XavaException {
 		return getValue(name, true);
+	}
+	
+	/** @since 6.2.2 */
+	public boolean isMemberFromElementCollection(String memberName) {
+		if (!memberName.contains(".")) return false;
+		String subviewName = memberName.split("\\.")[0];
+		try {
+			return getSubview(subviewName).isRepresentsElementCollection();
+		}
+		catch (ElementNotFoundException ex) {
+			return false;
+		}
 	}
 
 	/**
@@ -1276,9 +1312,34 @@ public class View implements java.io.Serializable {
 			String viewName = getViewName() == null?"":"'" + getViewName() + "'";
 			throw new XavaException("member_not_found_in_view", "'" + name + "'", viewName, "'" + getModelName() + "'");
 		}
+		try {
+			if (!isTransient(name)) {
+				getRoot().dataChanged = true;
+			}
+		}
+		catch (ElementNotFoundException ex) {
+			// It could be a view property of a XML component
+		}
 		moveViewValuesToCollectionValues();
-	}	
+	}
 	
+	private boolean isRepresentsTransientReference() { 
+		return isRepresentsEntityReference() && getParent().getMetaReference(getMemberName()).isTransient();
+	}
+	
+	private boolean isTransient(String memberName) { 
+		MetaMember member = getMetaModel().getMetaMember(memberName);
+		if (member.isTransient()) return true;
+		if (memberName.contains(".")) {
+			String refName = Strings.firstToken(memberName, ".");
+			if (getMetaModel().containsMetaReference(refName)) {
+				MetaReference ref = getMetaModel().getMetaReference(refName);
+				if (ref.isTransient()) return true;			
+			}
+		}
+		return isRepresentsTransientReference();
+	}
+
 	/**
 	 * Try to set the value to the indicated member. <p>
 	 * 
@@ -1293,7 +1354,7 @@ public class View implements java.io.Serializable {
 					
 	private boolean trySetValue(String name, Object value, boolean setValuesForSubviews) throws XavaException {
 		name = Ids.undecorate(name); 
-		int idx = name.indexOf('.');		
+		int idx = name.indexOf('.');
 		if (idx < 0) {
 			if (getMembersNamesInGroup().contains(name)) {
 				trySetValueInGroups(name, value);		
@@ -1309,17 +1370,19 @@ public class View implements java.io.Serializable {
 			if (hasSubview(name)) {	
 				View subview = getSubview(name);
 				if (!subview.isRepresentsCollection()) {
-					if (setValuesForSubviews) subview.setValues((Map)value);
+					if (setValuesForSubviews) subview.setValuesChangingModel((Map)value); 
 					else subview.addValues((Map)value);
 				}
 				else {
-					subview.collectionValues = (List) value; 
+					subview.collectionValues = (List) value;
+					subview.refreshCollection(); 
 				}		
 			}
-			else { 					
+			else { 		
 				if (values == null) values = new HashMap();					
 				value = Strings.removeXSS(value);
 				values.put(name, value);
+				resetElementCollectionTotalsForProperty(name); 
 			}	
 		} 
 		else if (displayAsDescriptionsList()) {
@@ -1347,6 +1410,43 @@ public class View implements java.io.Serializable {
 			}
 		}
 		return true;
+	}
+	
+	private void resetElementCollectionTotalsForProperty(String name) { 
+		if (hasSubviews()) { 
+			Iterator it = getSubviews().values().iterator();
+
+			while (it.hasNext()) {
+				View subview = (View) it.next();
+				if (subview.isRepresentsElementCollection()) {
+					if (subview.collectionTotals != null && subview.collectionTotals.containsKey(name)) {
+						if (isEditable(name)) subview.collectionTotals = null;
+					}
+				}
+														
+			}
+		}
+				
+		if (hasGroups()) {
+			Iterator it = getGroupsViews().values().iterator();
+			while (it.hasNext()) {
+				View subview = (View) it.next();
+				subview.resetElementCollectionTotalsForProperty(name);
+			}
+		}
+				
+		if (hasSections()) {
+			int count = getSections().size();
+			for (int i = 0; i < count; i++) {
+				View subview = getSectionView(i); 
+				subview.resetElementCollectionTotalsForProperty(name);
+			}	
+		}					 	
+	}
+
+	/** @since 6.3 */
+	public boolean isDataChanged() {  
+		return dataChanged;
 	}
 	
 	private void growCollection(Collection collection, int newSize) { 
@@ -1678,7 +1778,7 @@ public class View implements java.io.Serializable {
 	// Before 4m6 it was private
 	public MetaCollection getMetaCollection() throws XavaException { 
 		assertRepresentsCollection("getMetaCollection()");
-		return getParent().getMetaModel().getMetaCollection(getMemberName());
+		return getParentIfSectionOrGroup().getParent().getMetaModel().getMetaCollection(getMemberName()); 
 	}
 
 
@@ -1984,7 +2084,7 @@ public class View implements java.io.Serializable {
 	/**
 	 * @since 5.9
 	 */
-	public void removeCollectionSumProperty(String property) { 
+	public void removeCollectionSumProperty(String property) {
 		assertRepresentsCollection("removeCollectionSumProperty()");
 		getSumProperties().remove(property);
 		collectionTotals = null;
@@ -2356,10 +2456,12 @@ public class View implements java.io.Serializable {
 	 * Clear all data and set the default values.
 	 */
 	public void reset() throws XavaException {
-		createSubviews(); 
-		clear();
-		resetCollections(true); 
+		createSubviews();
+		clear();		
+		resetCollections(true); 	
 		calculateDefaultValues(true);
+		getRoot().dataChanged = false;
+		 
 	}
 	
 	/**
@@ -2392,7 +2494,7 @@ public class View implements java.io.Serializable {
 		setIdFocusProperty(null);
 		setFocusCurrentId(null); 
 		setCollectionDetailVisible(false);
-		resetRecalculatedProperties(); 
+		resetRecalculatedProperties();
 		if (values == null) return;
 		Iterator it = values.entrySet().iterator();
 		while (it.hasNext()) {
@@ -2420,17 +2522,17 @@ public class View implements java.io.Serializable {
 			for (int i = 0; i < count; i++) {
 				getSectionView(i).clear();
 			}	
-		}				
+		}		
 	}
 	
 	/**
 	 * Set the default values in the empty fields.  
 	 */
 	private void calculateDefaultValues(boolean firstLevel) throws XavaException {
-		// Properties
 		if (firstLevel) { 
 			getRoot().registeringExecutedActions = true;
-		}		
+		}
+		// Properties
 		try {					
 			Collection properties = new ArrayList(getMetaModel().getMetaPropertiesWithDefaultValueCalculator());			
 			properties.addAll(getMetaModel().getMetaPropertiesViewWithDefaultCalculator());			
@@ -2441,7 +2543,7 @@ public class View implements java.io.Serializable {
 				while (it.hasNext()) {
 					MetaProperty p = (MetaProperty) it.next();
 					if (p.hasCalculatorDefaultValueOnCreate()) continue;  
-					if (membersNames.containsKey(p.getName())) {
+					if (membersNames.containsKey(p.getName()) || isTotalPropertyInAnyCollection(p.getName())) { 
 						try {
 							if (!p.getMetaCalculatorDefaultValue().containsMetaSetsWithoutValue()) { // This way to avoid calculate the dependent ones
 								ICalculator calculator = p.createDefaultValueCalculator();
@@ -2573,6 +2675,22 @@ public class View implements java.io.Serializable {
 		}
 	}
 
+	private boolean isTotalPropertyInAnyCollection(String name) { 
+		for (View subview: getSubviews().values()) {
+			if (subview.isRepresentsCollection()) {
+				for (List<String> properties: subview.getTotalProperties().values()) {
+					for (String property: properties) {
+						if (!property.startsWith("__SUM__")) {
+							String pureProperty = subview.getMetaCollection().removeTotalPropertyPrefix(property);
+							if (pureProperty.equals(name)) return true;
+						}
+					}
+				}
+			}
+		}
+		return false;		
+	}
+
 	private void resetExecutedActions() {		
 		if (getRoot().executedActions != null) getRoot().executedActions.clear();		
 	}
@@ -2591,6 +2709,11 @@ public class View implements java.io.Serializable {
 
 	public boolean isKeyEditable() {
 		if (insideAViewDisplayedAsDescriptionsListAndReferenceView()) return false;
+		if (isRepresentsEntityReference() && !isRepresentsCollection()) {
+			View parent = getParentIfSectionOrGroup().getParent();
+			MetaReference ref = parent.getMetaReference(getMemberName());
+			return parent.isEditable(ref);
+		}
 		return !isReadOnly() && keyEditable;
 	}
 	
@@ -2636,8 +2759,8 @@ public class View implements java.io.Serializable {
 	/**
 	 * If at this moment is editable.
 	 */
-	public boolean isEditable(MetaProperty metaProperty) { 
-		if (isEditableImpl(metaProperty)) return true;
+	public boolean isEditable(MetaProperty metaProperty) {
+		if (isEditableImpl(metaProperty)) return true;		
 		if (isLastSearchKey(metaProperty)) return isKeyEditable();
 		return false;
 	}
@@ -2645,11 +2768,11 @@ public class View implements java.io.Serializable {
 	/**
 	 * If at this moment is editable.
 	 */
-	private boolean isEditableImpl(MetaProperty metaProperty) {		
+	private boolean isEditableImpl(MetaProperty metaProperty) { 	
 		try {
 			MetaPropertyView metaPropertyView = getMetaView().getMetaPropertyViewFor(metaProperty.getName());
 			if (metaPropertyView != null) {
-				if (isKeyEditable() && metaPropertyView.isReadOnly() && !metaPropertyView.isReadOnlyOnCreate()) return true;
+				if (isKeyEditable() && metaPropertyView.isReadOnly() && !metaPropertyView.isReadOnlyOnCreate())	return true;
 			}
 			if (metaProperty.isReadOnly()) return false;			
 			if (metaProperty.isKey() || 
@@ -2658,6 +2781,7 @@ public class View implements java.io.Serializable {
 				return isKeyEditable();
 			}
 			if (!isEditable()) return false;			
+			
 			return isMarkedAsEditable(metaProperty.getName());
 		}
 		catch (Exception ex) {
@@ -2665,6 +2789,7 @@ public class View implements java.io.Serializable {
 			return false;
 		}		
 	}
+
 	
 	/**
 	 * If at this moment is editable.
@@ -2672,16 +2797,12 @@ public class View implements java.io.Serializable {
 	public boolean isEditable(MetaReference metaReference) {
 		try {
 			MetaReferenceView metaReferenceView = getMetaView().getMetaReferenceView(metaReference);
-			if (metaReferenceView != null && isKeyEditable() && metaReferenceView.isReadOnly() && !metaReferenceView.isReadOnlyOnCreate()) {
-				setEditable(metaReference.getName(), true); 
+			if (metaReferenceView != null && isKeyEditable() &&  metaReferenceView.isReadOnly() && !metaReferenceView.isReadOnlyOnCreate()) {
+				setEditable(metaReference.getName(), true);
 				return true;
 			}
-			if (metaReferenceView != null && metaReferenceView.isReadOnly()) return false;
-			if (metaReference.isKey() || 
-				(metaReference.isSearchKey() && isRepresentsEntityReference())) 
-			{
-				return isKeyEditable(); 				
-			}
+			if (metaReferenceView != null && metaReferenceView.isReadOnly()) return false;			
+			if (metaReference.isKey() || (metaReference.isSearchKey() && isRepresentsEntityReference())) return isKeyEditable(); 				
 			if (!isEditable()) return false;				
 			return isMarkedAsEditable(metaReference.getName());
 		}
@@ -2767,16 +2888,25 @@ public class View implements java.io.Serializable {
 			}	
 		}						
 	}
-
-	public boolean isEditable() {		 
-		return !isReadOnly() && editable;
+	
+	public boolean isEditable() {
+		if (isReadOnly()) return false;
+		
+		if (isRepresentsAggregate()) {
+			Set parentNotEditableMembersNames = getParentIfSectionOrGroup().getParent().notEditableMembersNames; 
+			if (parentNotEditableMembersNames != null) {
+				if (parentNotEditableMembersNames.contains(getMemberName())) return false;
+			}
+		}
+		return editable;
 	}
-
+	
 	public void setEditable(boolean b) throws XavaException {
 		editable = b;
 			
 		for (Iterator it = getSubviews().values().iterator(); it.hasNext();) {				
 			View subview = (View) it.next();
+			
 			if (subview.isRepresentsCollection()) {
 				subview.setCollectionEditable(isMarkedAsEditable(subview.getMemberName())?b:false); 
 				if (!subview.collectionMembersEditables || !isMarkedAsEditable(subview.getMemberName())) {
@@ -2790,24 +2920,26 @@ public class View implements java.io.Serializable {
 			}
 			else if (subview.isRepresentsEntityReference()) {
 				subview.setEditable(false);
-				subview.setKeyEditable(isMarkedAsEditable(subview.getMemberName())?b:false);  
+				subview.setKeyEditable(isMarkedAsEditable(subview.getMemberName())?b:false);						
 			}
 			else {
 				subview.setEditable(b);
-			}						
+			}
+						
 		}			
-			
+		
 		for (Iterator it = getGroupsViews().values().iterator(); it.hasNext();) {				
 			View subview = (View) it.next();
 			subview.setEditable(b); 
 		}		
+		
 		
 		if (hasSections()) {
 			int count = getSections().size();
 			for (int i = 0; i < count; i++) {
 				getSectionView(i).setEditable(b);
 			}	
-		}				
+		}
 	}
 
 	public String getModelName() {		
@@ -2817,7 +2949,7 @@ public class View implements java.io.Serializable {
 	public void setModelName(String newModel) {
 		if (Is.equal(modelName, newModel)) return;		
 		modelName = newModel;
-		getRoot().reloadNeeded = true; // If the model of the view of a reference changes, the main view must be reloaded.
+		getFirstLevelView().reloadNeeded = true; // If the model of the view of a reference changes, the main view must be reloaded.
 		resetMembers();		
 		if (model != null && !model.getClass().getSimpleName().equals(modelName)) model = null; 
 	}
@@ -2849,7 +2981,7 @@ public class View implements java.io.Serializable {
 		sections = null; 
 		hiddenMembers = null; 
 		groupsViews = null;
-		polished = false; 
+		polished = false;
 	}
 	
 	public void assignValuesToWebView() {
@@ -2857,7 +2989,7 @@ public class View implements java.io.Serializable {
 	}
 		
 	private void assignValuesToWebView(String qualifier, boolean firstLevel) {
-		try {		
+		try {
 			this.firstLevel = firstLevel; 
 			formattedProperties = null; 
 			focusForward = "true".equalsIgnoreCase(getRequest().getParameter("xava_focus_forward"));
@@ -2880,6 +3012,7 @@ public class View implements java.io.Serializable {
 			refreshDescriptionsLists = false;
 			oldNotEditableMembersNames = notEditableMembersNames==null?null:new HashSet(notEditableMembersNames);
 			
+			throwElementCollectionTotalsChanged(); 
 						
 			if (hasSections()) { 								
 				View section = getSectionView(getActiveSection());
@@ -2906,6 +3039,26 @@ public class View implements java.io.Serializable {
 	}
 	
 	
+	private void throwElementCollectionTotalsChanged() { 
+		for (View subview: getSubviews().values()) {				
+			if (subview.isRepresentsElementCollection()) {
+				if (subview.collectionSize < 0 && !subview.getTotalProperties().isEmpty()) {
+					for (Collection<String> totalProperties: subview.getTotalProperties().values()) {
+						for (String totalProperty: totalProperties) {
+							String property = subview.removeTotalPropertyPrefix(totalProperty);
+							propertyChanged(property);
+						}
+					}
+				}
+			}						
+		}			
+			
+		for (Iterator it = getGroupsViews().values().iterator(); it.hasNext();) {				
+			View subview = (View) it.next();
+			subview.throwElementCollectionTotalsChanged(); 
+		}
+	}
+
 	private void assignValuesToMembers(String qualifier, Collection members) {
 		for (Object m: members) { 		
 			if (isMetaProperty(m)) {
@@ -3049,6 +3202,7 @@ public class View implements java.io.Serializable {
 		setCollectionEditionRowFromChangedProperty();
 		oldCollectionTotals = collectionTotals; 
 		moveCollectionValuesToViewValues();
+		collectionSize = collectionValues.size(); 
 		if (collectionValues.size() != oldCount) {
 			collectionTotals = null;
 			collectionSize = -1; 
@@ -3162,7 +3316,8 @@ public class View implements java.io.Serializable {
 			}
 			if (getMetaView().hasOnChangeAction(p.getName())) return true;			
 			if (isLastSearchKey(p)) return true; 			
-			if (!isSubview()) return false;							
+			if (!isSubview()) return false;		
+			if (isRepresentsElementCollection() && getTotalProperties().containsKey(p.getName())) return true; 
 			return isRepresentsEntityReference() && !isRepresentsCollection() && getLastPropertyKeyName().equals(p.getName()); 
 		}
 		catch (Exception ex) {
@@ -3272,9 +3427,8 @@ public class View implements java.io.Serializable {
 		return !Is.emptyString(getNameOfLastPropertyMarkedAsSearchKey());
 	}
 	
-
 	private void propertyChanged(String propertyId) {
-		try {							
+		try {		
 			String name = Ids.undecorate(propertyId);
 			if (isRepresentsElementCollection()) {
 				if (StringUtils.isNumeric(Strings.firstToken(name, "."))) {
@@ -3316,6 +3470,16 @@ public class View implements java.io.Serializable {
 					getParent().propertyChanged(changedProperty, qualifiedName); 
 				}
 			}
+
+			if (isRepresentsElementCollection()) {
+				Collection<String> totalProperties = getTotalProperties().get(name);
+				if (totalProperties != null) {
+					for (String totalProperty: totalProperties) {
+						String property = Strings.noFirstTokenWithoutFirstDelim(totalProperty, ".");
+						getParent().propertyChanged(property);
+					}
+				}
+			}
 		}
 		catch (ElementNotFoundException ex) {
 			// So that sections that do not have all the properties do not throw exceptions
@@ -3323,9 +3487,9 @@ public class View implements java.io.Serializable {
 		catch (Exception ex) {
 			log.warn(XavaResources.getString("property_changed_warning", propertyId),ex);
 			getErrors().add("change_property_error");
-		}				 		 		
+		}			
 	}
-	
+		
 	private void propertyChanged(MetaProperty changedProperty, String changedPropertyQualifiedName) { 
 		try {			
 			tryPropertyChanged(changedProperty, changedPropertyQualifiedName);
@@ -3564,7 +3728,7 @@ public class View implements java.io.Serializable {
 	}
 	
 	private void calculateValue(MetaProperty metaProperty, MetaCalculator metaCalculator, ICalculator calculator, Messages errors, Messages messages) {		
-		try {					
+		try {	
 			PropertiesManager mp = new PropertiesManager(calculator);
 			Iterator it = metaCalculator.getMetaSets().iterator();			
 			while (it.hasNext()) {
@@ -3597,7 +3761,7 @@ public class View implements java.io.Serializable {
 					return;
 				}
 			}
-			Object old = getValue(metaProperty.getName());
+			Object old = getValue(metaProperty.getName()); 
 			if (!setValueNotifyingInTotals(metaProperty.getName(), newValue, old)) {
 				if (!Is.equal(old, newValue)) {				
 					setValueNotifying(metaProperty.getName(), newValue);
@@ -3773,7 +3937,7 @@ public class View implements java.io.Serializable {
 		try {			
 			// In this view								
 			for (Iterator it = getMetaPropertiesQualified().iterator(); it.hasNext();) {
-				Object element = (Object) it.next();				
+				Object element = it.next();				
 				if (isMetaProperty(element)) {
 					MetaProperty pro = (MetaProperty) element;					
 					if (WebEditors.depends(pro, p, getViewName())) {
@@ -3929,6 +4093,7 @@ public class View implements java.io.Serializable {
 				if (getMetaModel().containsMetaCollection(reference)) { 
 					// From element collection
 					String collectionMember = Strings.noFirstTokenWithoutFirstDelim(member, ".");
+					collectionMember = collectionMember.replaceAll("^this\\.", ""); 
 					return getMetaModel().getMetaCollection(reference).getMetaReference().getMetaModelReferenced().getMetaProperty(collectionMember);
 				}
 				if (getMetaModel().containsMetaReference(reference)) { 
@@ -4069,8 +4234,8 @@ public class View implements java.io.Serializable {
 		if (Is.equal(viewName, newView)) return;
 		resetMembers();		
 		viewName = newView;
-		getRoot().reloadNeeded = true; // We reload the root view when a subview
-								// is changed. Obviously this can be optimized
+		getFirstLevelView().reloadNeeded = true; // We reload the root view when a subview
+										// is changed. Obviously this can be optimized		
 		reloadNeeded = true;
 	}
 	
@@ -4106,6 +4271,7 @@ public class View implements java.io.Serializable {
 	}
 
 	public boolean isRepresentsCollection() {		
+		if (isGroup()) return getParent().isRepresentsCollection(); 
 		return representsCollection;
 	}
 	
@@ -4310,7 +4476,13 @@ public class View implements java.io.Serializable {
 		else {
 			return ref.getParameterValuesPropertiesInDescriptionsList(getMetaView());
 		} 
+	}
+	
+	/** @since 6.4 */
+	public String getFilterInDescriptionsList(MetaReference ref) throws XavaException { 
+		return ref.getFilterInDescriptionsList(getMetaView());
 	}	
+
 	
 	
 
@@ -4512,7 +4684,7 @@ public class View implements java.io.Serializable {
 			metaPropertiesQualified = null;
 			reloadNeeded = true;			
 			updateHiddenSections(); 
-			getRoot().reloadNeeded = true; 
+			getFirstLevelView().reloadNeeded = true; 
 			refreshCollection();
 		}
 		
@@ -4553,6 +4725,11 @@ public class View implements java.io.Serializable {
 		View parent = getParent();
 		if (parent == null) return this;
 		return parent.getRoot();
+	}
+	
+	private View getFirstLevelView() { 
+		if (isFirstLevel()) return this;
+		return getParent().getFirstLevelView();
 	}
 	
 	/**
@@ -5257,31 +5434,62 @@ public class View implements java.io.Serializable {
 			}			
 		}
 		return p.getLabel(getRequest());
-	}
-	
+	}	
+
 	/**
 	 * 
-	 * @param propertyName  Since v4.2 can qualified
+	 * @param property  Since v4.2 can qualified. Since v6.4 can be a group or section name
 	 * @param id  Id of the label from i18n files
 	 */
-	public void setLabelId(String propertyName, String id) {		
-		if (propertyName == null) return; 
-		int idx = propertyName.indexOf('.');
+	public void setLabelId(String property, String id) {
+		if (property == null) return; 
+		int idx = property.indexOf('.');
 		if (idx >= 0) {
-			String subviewName = propertyName.substring(0, idx);
-			String member = propertyName.substring(idx+1);								 				
+			String subviewName = property.substring(0, idx);
+			String member = property.substring(idx+1);								 				
 			getSubview(subviewName).setLabelId(member, id);
 			return;
 		}
 		if (getLabels() == null) setLabels(new HashMap());
-		String old = (String) getLabels().put(propertyName, id);		
+		String old = (String) getLabels().put(property, id);		
 		if (!Is.equal(old, id)) {
 			if (getRoot().changedLabels == null) getRoot().changedLabels = new HashMap();
-			getRoot().changedLabels.put(getPropertyPrefix() + propertyName,
-				getLabelFor(getMetaModel().getMetaMember(propertyName)));
+			int sectionIndex = getIndexOfSection(property);
+			if (sectionIndex >= 0) {
+				String sectionId = getViewObject() + "_section" + sectionIndex + "_sectionName";
+				String label = Labels.get(id);
+				getSectionView(sectionIndex).setTitle(label);
+				getRoot().changedLabels.put(sectionId, label);
+			}
+			else if (getGroupsViews().containsKey(property)) {
+				String label = Labels.get(id);
+				getGroupView(property).setTitle(label);
+				getRoot().changedLabels.put(property, label);
+			}
+			else {
+				getRoot().changedLabels.put(getPropertyPrefix() + property,
+					getLabelFor(getMetaModel().getMetaMember(property)));
+			}
 		}
 	}
-		
+	
+	/**
+	 * @return -1 if name is not a section
+	 * @since 6.4
+	 */
+	private int getIndexOfSection(String name) {
+		try {
+			View view = getSection(name);	
+			for (int i = 0; i < getSections().size(); i++) {
+				MetaView mv = (MetaView)getSections().get(i);
+				if (mv.equals(view.getMetaView())) return i;
+			}
+			return -1;
+		}
+		catch(ElementNotFoundException e) {
+			return -1;	// section does not exist
+		}
+	}
 	
 	private Map getLabels() {
 		View root = getRoot();
@@ -5480,7 +5688,7 @@ public class View implements java.io.Serializable {
 	 * 
 	 * @return In each entry the key is the qualified id and value the container view 
 	 */
-	public Map getChangedPropertiesActionsAndReferencesWithNotCompositeEditor() {  		
+	public Map getChangedPropertiesActionsAndReferencesWithNotCompositeEditor() {
 		if (changedPropertiesActionsAndReferencesWithNotCompositeEditor == null) {
 			changedPropertiesActionsAndReferencesWithNotCompositeEditor = new HashMap();
 			fillChangedPropertiesActionsAndReferencesWithNotCompositeEditor(changedPropertiesActionsAndReferencesWithNotCompositeEditor);
@@ -5489,6 +5697,7 @@ public class View implements java.io.Serializable {
 	}
 	
 	private void propertiesAndReferencesWithReadOnlywithOnCreateFalse(Map result) {
+		if (!hasKeyEditableChanged()) return; 
 		for (MetaMember m : getMetaMembers()) {
 			if (m instanceof MetaProperty) {
 				MetaPropertyView metaPropertyView = getMetaView().getMetaPropertyViewFor(m.getName());
@@ -5497,16 +5706,27 @@ public class View implements java.io.Serializable {
 				}
 			}
 			else if (m instanceof MetaReference) {
-				MetaReference t = getMetaReference(m.getName());
-				MetaReferenceView metaReferenceView = getMetaView().getMetaReferenceView(t);
-				if (metaReferenceView != null && isKeyEditable() && metaReferenceView.isReadOnly() && !metaReferenceView.isReadOnlyOnCreate()) {
-					result.put(m.getName(), this);
+				MetaReference ref = getMetaReference(m.getName());
+				MetaReferenceView metaReferenceView = getMetaView().getMetaReferenceView(ref);
+				if (metaReferenceView != null  &&  metaReferenceView.isReadOnly() && !metaReferenceView.isReadOnlyOnCreate()) {
+					if (displayReferenceWithNotCompositeEditor(ref) ) {
+						result.put(m.getName(), this);
+					}
+					else {
+						View subview = getSubview(ref.getName());
+						subview.oldKeyEditable = !subview.keyEditable; // So subview.hasKeyEditableChanged() is true and the actions are refreshed 
+						for (String key: ref.getMetaModelReferenced().getAllKeyPropertiesNames()) {
+							result.put(ref.getName() + "." + key, subview);
+						}
+					}
 				}
 			}
 		}
 	}
 	
 	private void fillChangedPropertiesActionsAndReferencesWithNotCompositeEditor(Map result) {
+		if (modelName == null) return; // To avoid NullPointerException filtering a list in the dialog to choose an element for a reference
+		
 		propertiesAndReferencesWithReadOnlywithOnCreateFalse(result);
 		
 		if (displayAsDescriptionsList() && 
@@ -5522,7 +5742,7 @@ public class View implements java.io.Serializable {
 		{
 			result.put(getPropertyPrefix(), getParent().getViewForChangedProperty());
 			return;
-		}		 				
+		}
 		
 		if (displayReferenceWithNotCompositeEditor() && 
 			getParent().hasEditableMemberChanged(getMemberName()))
@@ -5568,7 +5788,7 @@ public class View implements java.io.Serializable {
 			if (!equals(en.getValue(), values.get(en.getKey())) ||
 				editorMustBeReloaded((String) en.getKey()) ||
 				hasKeyEditableChanged())  
-			{					
+			{	
 				addChangedPropertyOrReferenceWithSingleEditor(result, (String) en.getKey());
 			}
 		}	
@@ -5687,6 +5907,9 @@ public class View implements java.io.Serializable {
 				!getMembersNamesInGroup().contains(name)) 
 			{				
 				result.put(getPropertyPrefix() + name, getViewForChangedProperty());
+				if (displayAsDescriptionsListAndReferenceView()) {
+					result.put(propertyPrefix.substring(0, propertyPrefix.length() - 1), getViewForChangedProperty());
+				}
 			}
 			if (hasKeyEditableChanged() && displayAsDescriptionsListAndReferenceView()) {
 				String propertyPrefix = getPropertyPrefix(); 
@@ -5874,18 +6097,20 @@ public class View implements java.io.Serializable {
 	 * @return In each entry the key is the qualified id and value the container view
 	 * @since 5.1 
 	 */	
-	public Map getChangedCollectionsTotals() { 		
-		Map result = new HashMap();
+	public Map<String, View> getChangedCollectionsTotals() {  		
+		Map<String, View> result = new HashMap<>(); 
 		fillChangedCollectionsTotals(result);
 		return result;
 	}
 	
-	private void fillChangedCollectionsTotals(Map result) {  
+	private void fillChangedCollectionsTotals(Map<String, View> result) {   
 		if (hasSubviews()) {
 			Iterator itSubviews = getSubviews().values().iterator();
 			while (itSubviews.hasNext()) {
 				View subview = (View) itSubviews.next();
-				if (subview.isRepresentsElementCollection() || (subview.isRepresentsCollection() && subview.isCollectionFromModel())) { 
+				if ((subview.isRepresentsElementCollection() && !subview.mustRefreshCollection) || 
+					(subview.isRepresentsCollection() && subview.isCollectionFromModel() && !subview.isRepresentsElementCollection())) 
+				{
 					int rowCount = subview.getCollectionTotalsCount();
 					int columnCount = subview.getMetaPropertiesList().size();					
 					for (int row=0; row<rowCount; row++) {
@@ -6465,7 +6690,7 @@ public class View implements java.io.Serializable {
 	 * @since 5.6
 	 */
 	public void reloadMetaModel() { 
-		getRoot().reloadNeeded = true; 
+		getFirstLevelView().reloadNeeded = true; 
 		resetMembers();
 	}
 
@@ -6570,8 +6795,7 @@ public class View implements java.io.Serializable {
 	 * @param property  The name of the property. It has to be in the model, but not in the view in this moment.
 	 * @param value  The valid value stored in the property that we want to remove, the type has to match with the property type.
 	 * @since 5.8
-	 */
-	
+	 */	
 	public void removeValidValue(String property, Object value) {
 		if (isSection() || isGroup()) {
 			getParent().removeValidValue(property, value);
@@ -6581,6 +6805,77 @@ public class View implements java.io.Serializable {
 		if (validValues == null) return;
 		validValues.remove(value);		
 	}
+	
+	/**
+	 * Remove all the valid values previously added with addValidValue(). <br>
+	 * 
+	 * The property is still displayed as a combo with a sigle blank option.
+	 * 
+	 * @param property  The name of the property. It has to be in the model, but not in the view in this moment.
+	 * @since 6.3
+	 */
+	public void clearValidValues(String property) { 
+		if (isSection() || isGroup()) {
+			getParent().clearValidValues(property);
+			return;
+		}
+		Map validValues = getValidValues(property);
+		if (validValues == null) return;
+		validValues.clear();
+		if (noBlankValidValuesProperties != null) noBlankValidValuesProperties.remove(property);
+	}
+	
+	/**
+	 * Remove all the valid values previously added with addValidValue() and disable the combo. <br>
+	 * 
+	 * After calling the method the property is displayed as regular text field, no longer as a combo.
+	 * 
+	 * @param property  The name of the property. It has to be in the model, but not in the view in this moment.
+	 * @since 6.3
+	 */	
+	public void disableValidValues(String property) { 
+		if (isSection() || isGroup()) {
+			getParent().disableValidValues(property);
+			return;
+		}
+		if (validValuesByProperty == null) return;
+		MetaProperty metaProperty = getMetaProperty(property);
+		validValuesByProperty.remove(metaProperty);
+		if (noBlankValidValuesProperties != null) noBlankValidValuesProperties.remove(property);
+	}
+
+	/**
+	 * Removed the blank option of a valid value created with addValidValue().
+	 * 
+	 * By default using addValidValues() creates a combo that includes a blank option. This method removes that blank option.
+	 * 
+	 * @param property  The name of the property. It has to be in the model, but not in the view in this moment.
+	 * @since 6.3
+	 */		
+	public void removeBlankValidValue(String property) { 
+		if (isSection() || isGroup()) {
+			getParent().removeBlankValidValue(property);
+			return;
+		}
+		if (noBlankValidValuesProperties == null) noBlankValidValuesProperties = new HashSet<>();
+		noBlankValidValuesProperties.add(property);
+	}
+	
+	/**
+	 * If the property with valid values added via addValidValue() has a blank option. <p>
+	 * 
+	 * @param property  The name of the property. It has to be in the model, but not in the view in this moment.
+	 * @since 6.3
+	 */
+	public boolean hasBlankValidValue(String property) { 
+		if (isSection() || isGroup()) {
+			return getParent().hasBlankValidValue(property);
+		}
+		if (noBlankValidValuesProperties == null) return true;
+		return !noBlankValidValuesProperties.contains(property);
+	}
+ 
+
 
 	/**
 	 * If the property has valid values associated. <p>
@@ -6645,5 +6940,4 @@ public class View implements java.io.Serializable {
 		return descriptionsList.getCondition();
 	}
 
-	
 }

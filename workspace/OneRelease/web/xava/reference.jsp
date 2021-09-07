@@ -45,8 +45,8 @@ if (Is.empty(labelStyle)) labelStyle = XavaPreferences.getInstance().getDefaultL
 String label = ref.getLabel(request);
 %>
 
-<% if (view.isFlowLayout()) { %> 
-<div class='<%=frame?"ox-flow-layout":""%>'>
+<% if (view.isFlowLayout()) { %>
+	<div class='<%=frame?"ox-flow-layout":""%>'>
 <% } %>
 
 <% if (!onlyEditor) { %>
@@ -139,10 +139,10 @@ if (descriptionsList || descriptionsListAndReferenceView) {
 	boolean orderByKey = view.isOrderByKeyInDescriptionsList(ref);
 	String order = view.getOrderInDescriptionsList(ref); 
 	org.openxava.tab.meta.MetaTab metaTab = ref.getMetaModelReferenced().getMetaComponent().getMetaTab();
-	String filter = "";
-	if (metaTab.hasFilter()) {
+	String filter = view.getFilterInDescriptionsList(ref); 
+	if (Is.emptyString(filter) && metaTab.hasFilter()) {
 		filter = metaTab.getMetaFilter().getClassName(); 
-	}
+	}	
 	if (metaTab.hasBaseCondition()) {
 		if (org.openxava.util.Is.emptyString(condition)) {
 			condition = metaTab.getBaseCondition();

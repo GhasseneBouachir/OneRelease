@@ -25,6 +25,7 @@ public class NaviOXPreferences {
 	private static NaviOXPreferences instance;
 	private boolean testingAutologin = false;
 	private boolean testingNotShowOrganizationOnSignIn = false;
+	private boolean testingNotShowListOfOrganizationsOnSignIn = false; 
 	private Properties properties;
 
 	private NaviOXPreferences() {
@@ -51,6 +52,14 @@ public class NaviOXPreferences {
 	
 	public static void stopTestingNotShowOrganizationOnSignIn() {
 		getInstance().testingNotShowOrganizationOnSignIn = false;
+	}
+	
+	public static void startTestingNotShowListOfOrganizationsOnSignIn() { 
+		getInstance().testingNotShowListOfOrganizationsOnSignIn = true;
+	}
+	
+	public static void stopTestingNotShowListOfOrganizationsOnSignIn() { 
+		getInstance().testingNotShowListOfOrganizationsOnSignIn = false;
 	}
 	
 	private Properties getProperties() {
@@ -119,12 +128,28 @@ public class NaviOXPreferences {
 		if (testingNotShowOrganizationOnSignIn) return false; // Only for testing purposes
 		return "true".equalsIgnoreCase(getProperties().getProperty("showOrganizationOnSignIn", "true").trim());
 	}
+
+	/**
+	 * @since 6.3
+	 */
+	public boolean isShowListOfOrganizationsOnSignIn() { 
+		if (testingNotShowListOfOrganizationsOnSignIn) return false; // Only for testing purposes
+		return "true".equalsIgnoreCase(getProperties().getProperty("showListOfOrganizationsOnSignIn", "true").trim());
+	}
+
 		
 	/**
 	 * @since 5.3
 	 */
 	public boolean isStartInLastVisitedModule() { 
 		return "true".equalsIgnoreCase(getProperties().getProperty("startInLastVisitedModule", "true").trim());
+	}
+
+	/**
+	 * @since 6.3.2
+	 */	
+	public String getInitialModule() { 
+		return getProperties().getProperty("initialModule", "FirstSteps").trim();
 	}
 		
 	/**

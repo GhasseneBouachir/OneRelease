@@ -5,6 +5,7 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.openxava.application.meta.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
 
@@ -19,7 +20,21 @@ import com.openxava.naviox.util.*;
 public class NaviOXFilter implements Filter {
 	
 	public void init(FilterConfig cfg) throws ServletException {
-		Modules.init(cfg.getServletContext().getContextPath().substring(1)); 
+		String contextPath = cfg.getServletContext().getContextPath();
+		String applicationName = null;
+		if (Is.emptyString(contextPath)) {
+			if (MetaApplications.getMetaApplications().size() > 1) {
+				throw new XavaException("root_context_only_one_app"); 
+			}
+			applicationName = MetaApplications.getMainMetaApplication().getName(); 
+		}
+		else {
+			applicationName = contextPath.substring(1);
+			MetaApplications.setMainApplicationName(applicationName);
+		}
+		
+		Modules.init(applicationName); 
+		ThemeProvider.init(); 
 	}
 
 
@@ -37,8 +52,8 @@ public class NaviOXFilter implements Filter {
 			if (Is.empty(session.getAttribute("xava.user"))) {
 				String autologinUser = NaviOXPreferences.getInstance().getAutologinUser();
 				if (!Is.emptyString(autologinUser)) {
-					if (SignInHelper.isAuthorized(autologinUser, NaviOXPreferences.getInstance().getAutologinPassword())) {
-						SignInHelper.signIn(session, autologinUser);
+					if (SignInHelper.isAuthorized(request, autologinUser, NaviOXPreferences.getInstance().getAutologinPassword())) { 
+						SignInHelper.signIn((HttpServletRequest) request, autologinUser); 
 					}					
 				}
 			}
@@ -47,14 +62,13 @@ public class NaviOXFilter implements Filter {
 			
 			HttpServletRequest secureRequest = new SecureRequest(request);
 			
-			Users.setCurrent(secureRequest);
-			SessionData.setCurrent(secureRequest); 
+			Users.setCurrent(secureRequest); 
 		
 			if (modules.isModuleAuthorized(secureRequest)) {
 				chain.doFilter(secureRequest, response);
 			}
 			else {
-				char base = secureRequest.getRequestURI().split("/")[2].charAt(0)=='p'?'p':'m'; 
+				char base = secureRequest.getRequestURI().split("/")[Is.emptyString(request.getServletContext().getContextPath())?1:2].charAt(0)=='p'?'p':'m';
 				String originalURI = secureRequest.getRequestURI();
 				String organization = Organizations.getCurrent(request);
 				if (organization != null) originalURI = originalURI.replace("/modules/", "/o/" + organization + "/m/");

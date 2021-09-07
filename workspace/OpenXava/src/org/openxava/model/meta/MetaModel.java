@@ -5,9 +5,6 @@ import java.beans.*;
 import java.rmi.*;
 import java.util.*;
 
-
-
-
 import org.apache.commons.logging.*;
 import org.openxava.component.*;
 import org.openxava.mapping.*;
@@ -50,7 +47,7 @@ abstract public class MetaModel extends MetaElement {
 	private transient Map propertyDescriptors;
 	private Map mapMetaProperties;
 	private Map mapMetaReferences;
-	private Map mapMetaColections;
+	private Map mapMetaCollections;
 	private Map mapMetaViews;
 	private Map mapMetaMethods;
 	private Collection<String> membersNames = new ArrayList<String>(); 
@@ -71,7 +68,9 @@ abstract public class MetaModel extends MetaElement {
 	private Collection persistentPropertiesNames;
 	private Collection interfaces;
 	private Collection recursiveQualifiedPropertiesNames;
-	private Collection recursiveQualifiedPropertiesNamesUntilSecondLevel; 
+	private Collection recursiveQualifiedPropertiesNamesUntilSecondLevel;
+	private Collection<String> recursiveQualifiedPropertiesNamesIncludingCollections;
+	private Collection<String> recursiveQualifiedPropertiesNamesUntilSecondLevelIncludingCollections;
 	private Collection metaReferencesWithDefaultValueCalculator;
 	private String qualifiedName;
 	private boolean hasDefaultCalculatorOnCreate = false;
@@ -304,7 +303,7 @@ abstract public class MetaModel extends MetaElement {
 	 * @param newMetaCollection  not null
 	 */	
 	public void addMetaCollection(MetaCollection newMetaCollection) {
-		getMapMetaColections().put(newMetaCollection.getName(), newMetaCollection);
+		getMapMetaCollections().put(newMetaCollection.getName(), newMetaCollection);
 		membersNames.add(newMetaCollection.getName());
 		newMetaCollection.setMetaModel(this);
 	}
@@ -322,7 +321,7 @@ abstract public class MetaModel extends MetaElement {
 	}
 	
 	public boolean containsMetaCollection(String collection) {
-		return getMapMetaColections().containsKey(collection);
+		return getMapMetaCollections().containsKey(collection);
 	}
 	
 	/**
@@ -398,7 +397,13 @@ abstract public class MetaModel extends MetaElement {
 			if (idx >= 0) {				
 				String referenceName = name.substring(0, idx);								
 				String propertyName = name.substring(idx + 1);				
-				return getMetaReference(referenceName).getMetaModelReferenced().getMetaProperty(propertyName);
+				try {
+					return getMetaReference(referenceName).getMetaModelReferenced().getMetaProperty(propertyName);
+				}
+				catch (ElementNotFoundException ex) {
+					String collectionName = referenceName;
+					return getMetaCollection(collectionName).getMetaReference().getMetaModelReferenced().getMetaProperty(propertyName);
+				}
 			}
 			throw new ElementNotFoundException("property_not_found", name, getName());
 		}
@@ -474,7 +479,7 @@ abstract public class MetaModel extends MetaElement {
 	 * @param name May be qualified, that is mycollection.mynestedcollection
 	 */
 	public MetaCollection getMetaCollection(String name) throws ElementNotFoundException, XavaException {
-		MetaCollection r = (MetaCollection) getMapMetaColections().get(name);
+		MetaCollection r = (MetaCollection) getMapMetaCollections().get(name);
 		if (r == null) {			
 			int idx = name.indexOf('.');
 			if (idx >= 0) {
@@ -502,11 +507,11 @@ abstract public class MetaModel extends MetaElement {
 		return getMapMetaViews().values();
 	}
 		
-	private Map getMapMetaColections() {
-		if (mapMetaColections == null) {
-			mapMetaColections = new HashMap();
+	private Map getMapMetaCollections() {
+		if (mapMetaCollections == null) {
+			mapMetaCollections = new HashMap();
 		}
-		return mapMetaColections;
+		return mapMetaCollections;
 	}
 	
 	
@@ -573,7 +578,7 @@ abstract public class MetaModel extends MetaElement {
 	 */
 	public Collection getColectionsNames() {
 		// We wrap it inside array for make it serializable		
-		return Collections.unmodifiableCollection(new ArrayList(getMapMetaColections().keySet()));
+		return Collections.unmodifiableCollection(new ArrayList(getMapMetaCollections().keySet()));
 	}
 
 	public Collection getEntityReferencesNames() throws XavaException {
@@ -605,7 +610,7 @@ abstract public class MetaModel extends MetaElement {
 	 * @return Collection of <tt>MetaCollection</tt>, not null and read only
 	 */
 	public Collection getMetaCollectionsAgregate() throws XavaException {
-		Iterator it = getMapMetaColections().values().iterator();
+		Iterator it = getMapMetaCollections().values().iterator();
 		ArrayList result = new ArrayList();
 		while (it.hasNext()) {
 			MetaCollection c = (MetaCollection) it.next();
@@ -703,7 +708,7 @@ abstract public class MetaModel extends MetaElement {
 	 * 
 	 * @return Collection of <tt>String</tt>, not null and read only 
 	 */
-	public Collection<String> getAllKeyPropertiesNames() throws XavaException {  
+	public Collection<String> getAllKeyPropertiesNames() throws XavaException {   
 		if (allKeyPropertiesNames==null) {
 			ArrayList result = new ArrayList();
 			Iterator itRef = getMetaMembersKey().iterator();
@@ -1137,7 +1142,7 @@ abstract public class MetaModel extends MetaElement {
 	 * @return Collection of <tt>MetaCollection</tt>, not null and read only
 	 */
 	public Collection<MetaCollection> getMetaCollections() { 
-		return Collections.unmodifiableCollection(getMapMetaColections().values());
+		return Collections.unmodifiableCollection(getMapMetaCollections().values());
 	}
 	
 	/**
@@ -1179,8 +1184,8 @@ abstract public class MetaModel extends MetaElement {
 		
 		int idx = propertyName.indexOf('.');
 		if (idx >= 0) {				
-			String refName = propertyName.substring(0, idx);								
-			String property = propertyName.substring(idx + 1);			
+			String refName = propertyName.substring(0, idx);		
+			String property = propertyName.substring(idx + 1);		
 			return getMetaReference(refName).getMetaModelReferenced().isCalculated(property);
 		}
 		
@@ -1217,21 +1222,33 @@ abstract public class MetaModel extends MetaElement {
 	 * @return Not null
 	 */
 	public Map extractKeyValues(Map values) throws XavaException {
-		return extractKeyValues(keyTester, values); 
+		return extractKeyValues(keyTester, values, false);
 	}
 	
-	public Map extractSearchKeyValues(Map values) throws XavaException { 
-		return extractKeyValues(searchKeyTester, values);
+	public Map extractSearchKeyValues(Map values) throws XavaException {
+		return extractKeyValues(searchKeyTester, values, false); 
 	}
 	
-	private Map extractKeyValues(IKeyTester keyTester, Map values) throws XavaException { 
+	/** @since 6.2.2 */
+	public Map extractKeyValuesFlattenEmbeddedIds(Map values) throws XavaException { 
+		return extractKeyValues(keyTester, values, true); 
+	}
+	
+	private Map extractKeyValues(IKeyTester keyTester, Map values, boolean flattenEmbeddedIds) throws XavaException { 
 		Iterator it = values.keySet().iterator();
 		Map result = new HashMap();
 		while (it.hasNext()) {
 			String name = (String) it.next();
 			if (isKey(keyTester, name)) {
 				if (isReference(name) && getMetaReference(name).isAggregate()) { // @EmbeddedId case  
-					return (Map) values.get(name);
+					if (flattenEmbeddedIds) {
+						return (Map) values.get(name);
+					}
+					else {
+						Map embeddedId = new HashMap();
+						embeddedId.put(name, values.get(name));
+						return embeddedId;
+					}
 				}
 				else {
 					result.put(name, values.get(name));
@@ -1417,8 +1434,8 @@ abstract public class MetaModel extends MetaElement {
 					MetaReference ref = getMetaReference((String)en.getKey());
 					MetaModel referencedModel = ref.getMetaModelReferenced();
 					Object referencedObject = pm.executeGet((String)en.getKey());
+					Map refValues = (Map) en.getValue(); 
 					if (referencedObject == null) {
-						Map refValues = (Map) en.getValue();
 						if (!ref.isAggregate()) { 							 
 							Map key = referencedModel.extractKeyValues(refValues);
 							if (Maps.isEmpty(key)) {
@@ -1428,7 +1445,19 @@ abstract public class MetaModel extends MetaElement {
 						pm.executeSet((String)en.getKey(), referencedModel.toPOJO(refValues));
 					}
 					else {
-						referencedModel.fillPOJO(referencedObject, (Map) en.getValue());
+						if (ref.isAggregate()) {
+							referencedModel.fillPOJO(referencedObject, refValues);
+						}
+						else {
+							Map newKey = referencedModel.extractKeyValues(refValues);
+							Map oldKey = referencedModel.toKeyMap(referencedObject); 
+							if (newKey.equals(oldKey)) {
+								referencedModel.fillPOJO(referencedObject, refValues);
+							}
+							else {
+								pm.executeSet((String)en.getKey(), referencedModel.toPOJO(refValues));
+							}
+						}
 					}
 				}
 				else if (containsMetaCollection((String)en.getKey())) {
@@ -1459,7 +1488,7 @@ abstract public class MetaModel extends MetaElement {
 					MetaProperty property = getMetaProperty((String)en.getKey());
 					if (property.isReadOnly()) continue; 
 					Object value = en.getValue();
-					try {						
+					try {				
 						pm.executeSet((String)en.getKey(), en.getValue());
 					}
 					catch (IllegalArgumentException ex) {
@@ -1628,6 +1657,7 @@ abstract public class MetaModel extends MetaElement {
 			
 	public void setContainerModelName(String modelName) {
 		this.containerModelName = modelName;
+		this.metaModelContainer = null; 
 	}
 	public String getContainerModelName() { 
 		return containerModelName;
@@ -1688,13 +1718,13 @@ abstract public class MetaModel extends MetaElement {
 
 
 	/**
-	 * Does not include <i>Transient</i> properties
+	 * Does not include <i>Transient</i> properties and properties from collections
 	 */
 	public Collection getRecursiveQualifiedPropertiesNames() throws XavaException {
 		if (recursiveQualifiedPropertiesNames == null) {
 			Collection parents = new HashSet();
 			parents.add(getName());			
-			recursiveQualifiedPropertiesNames = createQualifiedPropertiesNames(parents, "", 4); // The limit cannot be very big because it freezes the add column dialog with plain OpenXava 
+			recursiveQualifiedPropertiesNames = createQualifiedPropertiesNames(parents, "", false, 4); // The limit cannot be very big because it freezes the add column dialog with plain OpenXava 
 																								// and produces OutOfMemoryError with XavaPro on starting module, 
 																								// with entities with many nested references
 		}
@@ -1702,7 +1732,7 @@ abstract public class MetaModel extends MetaElement {
 	}
 	
 	/**
-	 * Does not include <i>Transient</i> properties
+	 * Does not include <i>Transient</i> properties and properties from collections
 	 * 
 	 * @since 4.9
 	 */
@@ -1710,13 +1740,41 @@ abstract public class MetaModel extends MetaElement {
 		if (recursiveQualifiedPropertiesNamesUntilSecondLevel == null) {
 			Collection parents = new HashSet();
 			parents.add(getName());			
-			recursiveQualifiedPropertiesNamesUntilSecondLevel = createQualifiedPropertiesNames(parents, "", 2);
+			recursiveQualifiedPropertiesNamesUntilSecondLevel = createQualifiedPropertiesNames(parents, "", false, 2);
 		}
 		return recursiveQualifiedPropertiesNamesUntilSecondLevel;
 	}
-
 	
-	private Collection createQualifiedPropertiesNames(Collection parents, String prefix, int level) throws XavaException {
+	/**
+	 * Does not include <i>Transient</i> properties
+	 * @since 6.5 
+	 */
+	public Collection<String> getRecursiveQualifiedPropertiesNamesIncludingCollections() throws XavaException { 
+		if (recursiveQualifiedPropertiesNamesIncludingCollections == null) {
+			Collection parents = new HashSet();
+			parents.add(getName());			
+			recursiveQualifiedPropertiesNamesIncludingCollections = createQualifiedPropertiesNames(parents, "", true, 4); // The limit cannot be very big because it freezes the add column dialog with plain OpenXava 
+																								// and produces OutOfMemoryError with XavaPro on starting module, 
+																								// with entities with many nested references
+		}
+		return recursiveQualifiedPropertiesNamesIncludingCollections;
+	}
+	
+	/**
+	 * Does not include <i>Transient</i> properties 
+	 * 
+	 * @since 6.5
+	 */
+	public Collection<String> getRecursiveQualifiedPropertiesNamesUntilSecondLevelIncludingCollections() throws XavaException {  
+		if (recursiveQualifiedPropertiesNamesUntilSecondLevelIncludingCollections == null) {
+			Collection parents = new HashSet();
+			parents.add(getName());			
+			recursiveQualifiedPropertiesNamesUntilSecondLevelIncludingCollections = createQualifiedPropertiesNames(parents, "", true, 2);
+		}
+		return recursiveQualifiedPropertiesNamesUntilSecondLevelIncludingCollections;
+	}
+
+	private Collection<String> createQualifiedPropertiesNames(Collection parents, String prefix, boolean includeCollections, int level) throws XavaException { 
 		if (level == 0) return Collections.EMPTY_LIST; 
 		List result = new ArrayList();		
 		for (Iterator it = getMembersNames().iterator(); it.hasNext();) {
@@ -1729,15 +1787,44 @@ abstract public class MetaModel extends MetaElement {
 			}
 			else if (getMapMetaReferences().containsKey(name)) {
 				MetaReference ref = (MetaReference) getMapMetaReferences().get(name);
+				if (ref.isTransient()) continue; 
 				if (!parents.contains(ref.getReferencedModelName())) {
 					Collection newParents = new HashSet();
 					newParents.addAll(parents);
 					newParents.add(ref.getReferencedModelName());	
-					result.addAll(ref.getMetaModelReferenced().createQualifiedPropertiesNames(newParents, prefix + ref.getName() + ".", level - 1));
+					result.addAll(ref.getMetaModelReferenced().createQualifiedPropertiesNames(newParents, prefix + ref.getName() + ".", includeCollections, level - 1));
+				}
+			}
+			else if (includeCollections && getMapMetaCollections().containsKey(name)) {
+				MetaCollection collection = (MetaCollection) getMapMetaCollections().get(name);
+				if (collection.hasCalculator()) continue;
+				MetaReference ref = collection.getMetaReference();
+				if (!parents.contains(ref.getReferencedModelName())) {
+					Collection newParents = new HashSet();
+					newParents.addAll(parents);
+					newParents.add(ref.getReferencedModelName());	
+					newParents.addAll(ref.getMetaModel().getParentsWithCollection((String) name)); 
+					result.addAll(ref.getMetaModelReferenced().createQualifiedPropertiesNames(newParents, prefix + collection.getName() + ".", includeCollections, level - 1));
 				}
 			}
 		} 
 		return result;		
+	}
+	
+	private Collection<String> getParentsWithCollection(String collectionName) { 
+		Collection<String> result = new ArrayList<String>();
+		Class superClass = getPOJOClass().getSuperclass();
+		while (!superClass.equals(Object.class)) {
+			try {
+				boolean exists = new PropertiesManager(superClass).exists(collectionName);
+				if (exists) result.add(superClass.getSimpleName());
+			} 
+			catch (PropertiesManagerException ex) {				
+				log.warn(XavaResources.getString("parent_not_excluded_rendundant_columns", superClass.getSimpleName()), ex);
+			}
+			superClass = superClass.getSuperclass();			
+		}
+		return result;
 	}
 
 	/**

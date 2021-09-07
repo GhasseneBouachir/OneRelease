@@ -56,17 +56,18 @@ public class ImageTag extends ActionTagBase {
 				pageContext.getOut().print("'");	
 			}			
 			pageContext.getOut().print(" title='");
-			pageContext.getOut().print(getTooltip(metaAction)); 
+			pageContext.getOut().print(filterApostrophes(getTooltip(metaAction))); 
 			pageContext.getOut().print("'");
-			pageContext.getOut().print(" href=\"javascript:openxava.executeAction(");
+			if (metaAction.isLosesChangedData()) pageContext.getOut().print(" href=\"javascript:openxava.executeActionConfirmLosesChangedData(");
+			else pageContext.getOut().print(" href=\"javascript:openxava.executeAction(");
 			pageContext.getOut().print("'");				
 			pageContext.getOut().print(application);
 			pageContext.getOut().print("', '");
 			pageContext.getOut().print(module);
 			pageContext.getOut().print("', ");									
 			pageContext.getOut().print("'");
-			if (!Is.empty(getArgv())) pageContext.getOut().print(metaAction.getConfirmMessage(request, getArgv()));	
-			else pageContext.getOut().print(metaAction.getConfirmMessage(request));
+			if (!Is.empty(getArgv())) pageContext.getOut().print(filterApostrophes(metaAction.getConfirmMessage(request, getArgv())));	
+			else pageContext.getOut().print(filterApostrophes(metaAction.getConfirmMessage(request)));			
 			pageContext.getOut().print("'");
 			pageContext.getOut().print(", ");			
 			pageContext.getOut().print(metaAction.isTakesLong());

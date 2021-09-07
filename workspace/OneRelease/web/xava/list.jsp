@@ -28,22 +28,25 @@ if (collection == null || collection.equals("")) {
 <% if (style.isShowModuleDescription()) { %>
 <%=manager.getModuleDescription()%>
 <% } %>
-<select onchange="openxava.executeAction('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '', false, 'List.filter','configurationId=' + this.value)">
-	<% String confName = tab.getConfigurationName();%>
-	<option value=""><%=confName%></option>
-	<% 
-	int count = 1; 
-	for (Tab.Configuration conf: tab.getConfigurations()) {
-		if (!confName.equals(conf.getName())) {
-			if (++count > Tab.MAX_CONFIGURATIONS_COUNT) break; 
-	%>
-	<option value="<%=conf.getId()%>"><%=conf.getName()%></option>
-	<% 
-		}
-	} 
-	%>
-</select>
+
+<jsp:include page="listConfigurations.jsp"/>
+
+<%
+if (!tab.isAllConfiguration()) { 
+	if (tab.isSaveConfigurationAllowed()) { %>
+<span id="xava_save_list_configuration">
+<xava:link action="List.saveConfiguration"/>
+</span>
+<% 
+   	}	 
+   	else {
+%>
 <xava:link action="List.changeConfiguration"/>
+<%
+   	}
+}
+%>
+
 <% 
 if (tab.isTitleVisible()) { 
 %> 
@@ -64,7 +67,7 @@ if (tab.isTitleVisible()) {
 <select onchange="openxava.executeAction('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '', false, 'List.groupBy','property=' + this.value)">
 	<option value=""><%=grouping?XavaResources.getString("no_grouping"):XavaResources.getString("no_grouping")%></option>
 	<% 
-	for (MetaProperty property: tab.getMetaPropertiesBeforeGrouping()) {
+	for (MetaProperty property: tab.getMetaPropertiesGroupBy()) {
 		String selected = "";
 		if (groupBy.equals(property.getQualifiedName())) {
 			selected = "selected";

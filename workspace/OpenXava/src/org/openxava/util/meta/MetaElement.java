@@ -52,7 +52,8 @@ abstract public class MetaElement implements java.io.Serializable {
 	protected String getLabel(Locale locale, String id) {
 		if (id == null) return "";
 		if (Is.emptyString(label)) label = Strings.javaIdentifierToNaturalLabel(getName());
-		return Labels.get(id, locale, label).trim();
+		String result = Labels.get(id, locale, label).trim();
+		return filterApostrophes(result);
 	}
 	
 		
@@ -103,7 +104,11 @@ abstract public class MetaElement implements java.io.Serializable {
 				(this.description == null?"":this.description) : 
 				(this.placeholder == null?"":this.placeholder);
 		}				
-		return Strings.change(result, "'", "&#145;");
+		return filterApostrophes(result); 
+	}
+	
+	private String filterApostrophes(String source) {
+		return source.replace("''", "'");
 	}
 	
 	public String getDescription(ServletRequest request) {

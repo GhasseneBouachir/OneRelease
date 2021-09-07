@@ -22,12 +22,13 @@ class DWRBase {
 	/**
 	 * @since 5.4
 	 */
-	protected void initRequest(HttpServletRequest request, HttpServletResponse response, String application, String module) { 
+	protected void initRequest(HttpServletRequest request, HttpServletResponse response, String application, String module) {
 		Servlets.setCharacterEncoding(request, response);
+		ModuleContext context = getContext(request); // Must be here, before checkSecurity()
+		if (context != null) context.setCurrentWindowId(request);
 		checkSecurity(request, application, module);
-		request.setAttribute("style", Style.getInstance(request)); 
-		Locales.setCurrent(request); 
-		Requests.init(request, application, module); 
+		request.setAttribute("style", Style.getInstance(request));  
+		Requests.partialInit(request, application, module); 
 	}
 	
 	protected void cleanRequest() { 

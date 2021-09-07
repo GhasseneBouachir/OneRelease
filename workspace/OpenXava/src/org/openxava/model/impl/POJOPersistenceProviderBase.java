@@ -199,7 +199,9 @@ abstract public class POJOPersistenceProviderBase implements IPersistenceProvide
 	}
 
 	public Object getKey(MetaModel metaModel, Map keyValues) throws XavaException {
-		return getObject(metaModel.getPOJOKeyClass(), metaModel.extractKeyValues(keyValues), "key_for_pojo_error");
+		keyValues = Maps.plainToTree(keyValues);
+		keyValues = metaModel.extractKeyValuesFlattenEmbeddedIds(keyValues);
+		return getObject(metaModel.getPOJOKeyClass(), keyValues, "key_for_pojo_error"); 
 	}
 	
 	public Object getContainer(MetaModel metaModel, Map containerKeyValues) throws XavaException {
@@ -244,8 +246,6 @@ abstract public class POJOPersistenceProviderBase implements IPersistenceProvide
 	}
 
 	public Object createAggregate(MetaModel metaModel, Map values, MetaModel metaModelContainer, Object containerModel, int number) throws CreateException, ValidationException, RemoteException, XavaException {
-		String container = metaModel.getContainerReference(); 
-		values.put(container, containerModel);
 		// The next two lines use Hibernate. At the momment for Hibernate and EJB3 
 		// In order to support a EJB3 no hibernate implementations we will need to change them
 		org.openxava.hibernate.impl.DefaultValueIdentifierGenerator.setCurrentContainerKey(containerModel);

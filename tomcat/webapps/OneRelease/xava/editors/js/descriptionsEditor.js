@@ -6,6 +6,7 @@ openxava.addEditorInitFunction(function() {
 		$(this).autocomplete({
 			source: eval($(this).data("values")), 
 			minLength: 0,
+			disabled: true, // For IE11 not open combos on init with accents
 			select: function( event, ui ) {
 				$(event.target).val(ui.item.label);
 				$(event.target).next().val(ui.item.value);
@@ -42,12 +43,29 @@ openxava.addEditorInitFunction(function() {
 					else $(event.target).val($(event.target).next().next().val()); 
 				}				
 			},
+			source: function( request, response ) {
+				var input = $(this)[0]["element"];
+				var values = $(input).data("values");
+				var matcher = new RegExp($.ui.autocomplete.escapeRegex(descriptionsEditor.removeAccents(request.term)), "i");
+				response( $.grep( values, function( value ) {
+					return matcher.test(descriptionsEditor.removeAccents(value.label));
+				}) );
+			},
 			appendTo: "body"
 		}); 	
 		
 		$(this).attr("autocomplete", "nope");
+
+		var editor = $(this);
+		$(this).parent().click(function() {
+			editor.autocomplete("enable");
+		});
+		$(this).focus(function() {
+			editor.autocomplete("enable");
+		});		
+
 	});
-	
+
 	
 });
 
@@ -67,4 +85,13 @@ descriptionsEditor.executeOnChange = function(element) {
 	var onchange = element.attr("onchange");
 	if (typeof onchange == 'undefined') return;
 	eval(onchange);
+}
+
+descriptionsEditor.removeAccents = function(str) { 
+	return str.toLowerCase()
+		.replace(/[באגה]/,"a")
+		.replace(/[יטךכ]/,"e")
+		.replace(/[םלמן]/,"i")
+		.replace(/[ףעפצ]/,"o")
+		.replace(/[תשûü]/,"u");	
 }

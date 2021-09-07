@@ -2,6 +2,7 @@ package org.openxava.util;
 
 import java.beans.*;
 import java.lang.reflect.*;
+import java.math.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -77,7 +78,7 @@ public class PropertiesManager implements java.io.Serializable {
 				throw new PropertiesManagerException(
 					XavaResources.getString("write_only_property", propertyName, getTheClass()));
 			}			
-			return met.invoke(object, null);
+			return met.invoke(object, (Object []) null); 
 		}
 		catch (PropertiesManagerException ex) {
 			throw ex;
@@ -185,7 +186,7 @@ public class PropertiesManager implements java.io.Serializable {
 			}
 			else {
 				// Not logging exception because this exception usually is treated by the caller code
-				 log.error(XavaResources.getString("set_property_error", propertyName),ex);
+				// log.error(XavaResources.getString("set_property_error", propertyName),ex);
 				throw ex;
 			} 			
 		}
@@ -538,6 +539,9 @@ public class PropertiesManager implements java.io.Serializable {
 		else if (type.equals(float.class)) {
 			return new Float(value.floatValue());
 		}
+		else if (type.equals(BigDecimal.class) ) {
+			return new BigDecimal(value.toString());
+		}
 		else if (type.equals(Float.class)) {
 			return new Float(value.floatValue());
 		}
@@ -558,6 +562,9 @@ public class PropertiesManager implements java.io.Serializable {
 		}
 		else if (type.equals(Byte.class)) {
 			return new Byte(value.byteValue());
+		}
+		else if (type.equals(BigInteger.class) ) {
+			return new BigInteger(value.toString());
 		}
 		return null;
 	}

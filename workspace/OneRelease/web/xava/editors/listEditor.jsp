@@ -101,6 +101,7 @@ if (grouping) action = null;
 	<a  id="<xava:id name='<%="customize_" + id%>'/>" href="javascript:openxava.customizeList('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '<%=id%>')" title="<xava:message key='customize_list'/>" class="<%=style.getActionImage()%>">
 		<i class="mdi mdi-settings"></i>
 	</a>
+	<% } %>
 	<% if (filter) { %> 
 	<a id="<xava:id name='<%="show_filter_" + id%>'/>" style='display: <%=tab.isFilterVisible()?"none":""%>' href="javascript:openxava.setFilterVisible('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '<%=id%>', '<%=tabObject%>', true)" title="<xava:message key='show_filters'/>">
 		<i id="<xava:id name='<%="filter_image_" + id%>'/>" class="mdi mdi-filter"></i>
@@ -110,14 +111,13 @@ if (grouping) action = null;
 	</a>	
 	<% } // if (filter) %>	
 	<%
-		if (tab.isCustomizeAllowed()) { 
+	if (tab.isCustomizeAllowed()) { 
 	%>
 	<span class="<xava:id name='<%="customize_" + id%>'/>" style="display: none;">
 	<xava:image action="List.addColumns" argv="<%=collectionArgv%>"/>
 	</span>	
 	<%
-		}
-	} 
+	}
 	%>
 </nobr> 
 </th>
@@ -163,7 +163,7 @@ while (it.hasNext()) {
 <%
 	String label = property.getQualifiedLabel(request);
 	if (resizeColumns) label = label.replaceAll(" ", "&nbsp;");
-	if (property.isCalculated() || sortable) { 
+	if (!tab.isOrderCapable(property) || sortable) { 
 %>
 <%=label%>&nbsp;
 <%
@@ -288,7 +288,19 @@ while (it.hasNext()) {
 		+ "&index=" + iConditionValues
 		+ "&idConditionValue=" + idConditionValue
 		+ "&idConditionValueTo=" + idConditionValueTo;
-	String classConditionValue = isDate?"class='" + style.getDateCalendar() + "'":""; 
+	String classConditionValue = "";
+	String dateDisabled = ""; 
+	String styleCalendar = "";
+	if (isDate) { 
+		if (Is.anyEqual(comparator, "year_comparator", "year_month_comparator", "month_comparator")) {
+			classConditionValue="class='" + style.getDateCalendar() + "'";
+			dateDisabled = "xava_date_disabled";
+			styleCalendar = "display: none;"; 
+		}
+		else classConditionValue="class='xava_date " + style.getDateCalendar() + "'";  
+	}
+	String attrConditionValue = isDate?"data-date-format='" + org.openxava.util.Dates.dateFormatForJSCalendar(isTimestamp) + "'":"";
+	if (isTimestamp) attrConditionValue += " data-enable-time='true'"; 
 	if (isEmptyComparator) {
 %>
 <br/>
@@ -297,15 +309,27 @@ while (it.hasNext()) {
 <span class="xava_comparator" <%=styleXavaComparator%>> 
 <jsp:include page="<%=urlComparatorsCombo%>" />
 <br/> 
-</span> 
-<nobr <%=classConditionValue%>>
-<input id="<%=idConditionValue%>" name="<%=idConditionValue%>" class=<%=style.getEditor()%> type="text" maxlength="<%=maxLength%>" size="<%=length%>" value="<%=value%>" placeholder="<%=labelFrom%>" style="<%=styleConditionValue%>; width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;"/><% if (isDate) { %><a href="javascript:showCalendar('<%=idConditionValue%>', '<%=org.openxava.util.Dates.dateFormatForJSCalendar(org.openxava.util.Locales.getCurrent(), isTimestamp)%>'<%=isTimestamp?", '12'":""%>)" style="position: relative; right: 25px; <%=styleConditionValue%>" tabindex="999"><i class="mdi mdi-<%=isTimestamp?"calendar-clock":"calendar"%>"></i></a>
-<% } %>
+</span>
+<%-- WARNING: IF YOU CHANGE THE NEXT CODE PASS THE MANUAL TEST ON DateCalendarTest.txt --%> 
+<nobr <%=classConditionValue%> <%=attrConditionValue%>>
+<input id="<%=idConditionValue%>" name="<%=idConditionValue%>" class="<%=style.getEditor()%> <%=dateDisabled%>" type="text"
+	maxlength="<%=maxLength%>" size="<%=length%>" value="<%=value%>" placeholder="<%=labelFrom%>"
+	<%=isDate?"data-input":""%> 
+	style="<%=styleConditionValue%>; width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;"/>
+	<% if (isDate) { %>
+		<a href="javascript:void(0)" data-toggle style="position: relative; right: 25px; <%=styleConditionValue%> <%=styleCalendar%>" tabindex="999"><i class="mdi mdi-<%=isTimestamp?"calendar-clock":"calendar"%>"></i></a>
+	<% } %>
 </nobr>
-<br/> 
-<nobr <%=classConditionValue%>>
-<input id="<%=idConditionValueTo%>" name="<%=idConditionValueTo%>" class=<%=style.getEditor()%> type="text" maxlength="<%=maxLength%>" size="<%=length%>" value="<%=valueTo%>" placeholder="<%=labelTo%>" style="<%=styleConditionValueTo%>; width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;"/><% if (isDate) { %><a style="position: relative; right: 25px; <%=styleConditionValueTo%>" href="javascript:showCalendar('<%=idConditionValueTo%>', '<%=org.openxava.util.Dates.dateFormatForJSCalendar(org.openxava.util.Locales.getCurrent(), isTimestamp)%>'<%=isTimestamp?", '12'":""%>)" tabindex="999"><i class="mdi mdi-<%=isTimestamp?"calendar-clock":"calendar"%>"></i></a>
-<% } %>
+<br/>
+<%-- WARNING: IF YOU CHANGE THE NEXT CODE PASS THE MANUAL TEST ON DateCalendarTest.txt --%> 
+<nobr <%=classConditionValue%> <%=attrConditionValue%>>
+<input id="<%=idConditionValueTo%>" name="<%=idConditionValueTo%>" class=<%=style.getEditor()%> type="text" 
+	maxlength="<%=maxLength%>" size="<%=length%>" value="<%=valueTo%>" placeholder="<%=labelTo%>"
+	<%=isDate?"data-input":""%> 
+	style="<%=styleConditionValueTo%>; width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;"/>
+	<% if (isDate) { %>
+		<a href="javascript:void(0)" data-toggle style="position: relative; right: 25px; <%=styleConditionValueTo%>" tabindex="999"><i class="mdi mdi-<%=isTimestamp?"calendar-clock":"calendar"%>"></i></a>
+	<% } %>
 </nobr>
 	<%			
 		}
@@ -392,20 +416,26 @@ for (int f=tab.getInitialIndex(); f<model.getRowCount() && f < finalIndex; f++) 
 <%
 	for (int c=0; c<model.getColumnCount(); c++) {
 		MetaProperty p = tab.getMetaProperty(c);
-		String align =p.isNumber() && !p.hasValidValues()?"vertical-align: middle;text-align: right; ":"vertical-align: middle; ";
+		String align =p.isNumber() && !p.hasValidValues() && !tab.isFromCollection(p)?"vertical-align: middle;text-align: right; ":"vertical-align: middle; "; 
 		String cellStyle = align + style.getListCellStyle();
 		int columnWidth = tab.getColumnWidth(c);		 		
 		String width = columnWidth<0 || !resizeColumns?"":"width: " + columnWidth + "px"; 
 		String fvalue = null;
-		fvalue = WebEditors.format(request, p, model.getValueAt(f, c), errors, view.getViewName(), true);
-		Object title = WebEditors.formatTitle(request, p, model.getValueAt(f, c), errors, view.getViewName(), true); 
+		Object title = null;
+		if (tab.isFromCollection(p)) {
+			title = fvalue = Strings.toString(model.getValueAt(f, c));
+		}
+		else {
+			fvalue = WebEditors.format(request, p, model.getValueAt(f, c), errors, view.getViewName(), true);
+			title = WebEditors.formatTitle(request, p, model.getValueAt(f, c), errors, view.getViewName(), true);
+		} 
 %>
 	<td class="<%=cssCellClass%>" style="<%=cellStyle%>; padding-right: 0px">
 		<% if (style.isRowLinkable()) { %> 	
 		<xava:link action='<%=action%>' argv='<%="row=" + f + actionArgv%>' cssClass='<%=cssStyle%>' cssStyle="text-decoration: none; outline: none">
 			<div title="<%=title%>" class="<xava:id name='tipable'/> <xava:id name='<%=id%>'/>_col<%=c%>" style="overflow: hidden; <%=width%>">
 				<%if (resizeColumns) {%><nobr><%}%>
-				<%=fvalue%>&nbsp;
+				<%=fvalue%><%if (resizeColumns) {%>&nbsp;<%}%>
 				<%if (resizeColumns) {%></nobr><%}%>
 			</div>
 		</xava:link>
@@ -661,10 +691,10 @@ else {
 <% } // of if (style.isChangingPageRowCountAllowed()) %>
 </td>
 <td style='text-align: right; vertical-align: middle' class='<%=style.getListInfoDetail()%>'>
-<% if (XavaPreferences.getInstance().isShowCountInList() && !style.isShowRowCountOnTop() && !grouping) { %> 
+<% if (XavaPreferences.getInstance().isShowCountInList() && !style.isShowRowCountOnTop() && !grouping && totalSize < Integer.MAX_VALUE) { %> 
 <xava:message key="list_count" intParam="<%=totalSize%>"/>
 <% } %>
-<% if (collection == null && style.isHideRowsAllowed() && !grouping) { %> 
+<% if (collection == null && style.isHideRowsAllowed() && !grouping && totalSize < Integer.MAX_VALUE) { %> 
 (<xava:link action="List.hideRows" argv="<%=collectionArgv%>"/>)
 <% } %>
 </td>

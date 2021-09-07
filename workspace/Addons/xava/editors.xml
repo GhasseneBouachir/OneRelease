@@ -37,6 +37,11 @@
 		<for-model-property model="Organization" property="url" />
 	</editor>
 	
+	<editor url="textEditor.jsp">
+		<list-formatter class="com.openxava.naviox.formatters.ThemeListFormatter"/>
+		<for-model-property model="Organization" property="theme" />
+	</editor>
+	
 	<editor url="../../naviox/editors/privacyPolicyEditor.jsp" frame="true">
 		<for-model-property model="SignUp" property="privacyPolicy" />
 	</editor>

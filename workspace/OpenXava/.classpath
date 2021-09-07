@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="xava"/>
-	<classpathentry kind="src" path="properties"/>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="i18n"/>
 	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/commons-fileupload.jar"/>
 	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/itext.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/portlet-api-1.0.jar"/>
@@ -44,7 +40,7 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/ejb.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/jta.jar"/>
-	<classpathentry kind="lib" path="web/WEB-INF/lib/mime-util.jar"/>
+	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/mime-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/commons-lang3.jar"/>
 	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/jpa.jar"/>
 	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/hibernate-core.jar"/>
@@ -88,5 +84,18 @@
 	<classpathentry kind="lib" path="lib/websocket-common.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat-embed-websocket.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
+	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/openxava.jar" sourcepath="src"/>
+	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/jakarta.ws.rs-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/jakarta.json.bind-api.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/hk2-api.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/hk2-locator.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/hk2-utils.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/jersey-client.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/jersey-common.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/jersey-hk2.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/jersey-media-json-binding.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/yasson.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/jakarta.json.jar"/>
+	<classpathentry exported="true" kind="lib" path="web/WEB-INF/lib/lombok.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

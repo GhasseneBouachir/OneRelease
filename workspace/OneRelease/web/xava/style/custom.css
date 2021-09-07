@@ -1,6 +1,6 @@
 /*
 Put here your own style
-*/
+ */
 body
 {
 	width: 100%;
@@ -9,10 +9,13 @@ body
 
 /* Main menu */
 
+
+
+
 #menu
 {
 
-  position: absolute;
+  position: static;
   top: 0%;
 
 	width: 100%;
@@ -59,7 +62,7 @@ body
 	color: #fafafa;
 }
 
-*html #menu li a:hover /* IE6 */
+*html #menu li a:hover IE6
 {
 	color: #fafafa;
 }
@@ -134,12 +137,12 @@ body
 	text-transform: none;
 }
 
-*html #menu ul a /* IE6 */
+*html #menu ul a IE6
 {    
 	height: 10px;
 }
 
-*:first-child+html #menu ul a /* IE7 */
+*:first-child+html #menu ul a IE7
 {    
 	height: 10px;
 }
@@ -225,8 +228,8 @@ body
 	height: 0;
 }
 
-* html #menu             { zoom: 1; } /* IE6 */
-*:first-child+html #menu { zoom: 1; } /* IE7 */
+* html #menu             { zoom: 1; } IE6
+*:first-child+html #menu { zoom: 1; } IE7
 
 
 
@@ -255,4 +258,10 @@ body
 			bottom:0;
 			width:100%;
 			height:100%
+		}
+
+		#menu
+{
+
+  position: static;
 		}

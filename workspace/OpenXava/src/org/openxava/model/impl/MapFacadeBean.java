@@ -7,13 +7,11 @@ import java.util.*;
 import javax.ejb.*;
 
 import org.apache.commons.collections.*;
-import org.apache.commons.lang3.*;
 import org.apache.commons.logging.*;
 import org.openxava.calculators.*;
 import org.openxava.component.*;
 import org.openxava.model.*;
 import org.openxava.model.meta.*;
-import org.openxava.model.meta.MetaModel.*;
 import org.openxava.util.*;
 import org.openxava.util.meta.*;
 import org.openxava.validators.*;
@@ -43,15 +41,17 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		values = Maps.recursiveClone(values);
 		MetaModel metaModel = getMetaModel(modelName); 
 		try {
-			beginTransaction(metaModel); 			
+			beginTransaction(metaModel); 		
 			Object result = create(metaModel, values, null, null, null, 0, true); 
 			commitTransaction(metaModel);			
 			return result;
 		} 
 		catch (CreateException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) {
@@ -123,9 +123,10 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		}
 		catch (FinderException ex) {
 			log.error(ex.getMessage(), ex);
+			freeTransaction(); 
 			throw ex;
 		}
-		catch (RuntimeException ex) { 
+		catch (RuntimeException ex) {
 			log.error(ex.getMessage(), ex);
 			rollback(metaModel); 
 			throw ex;
@@ -171,6 +172,7 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		}
 		catch (FinderException ex) {
 			log.error(ex.getMessage(), ex);
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -198,9 +200,11 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			commitTransaction(metaModel); 
 		}
 		catch (RemoveException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -234,13 +238,15 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		MetaModel metaModel = getMetaModel(modelName); 
 		try {
 			beginTransaction(metaModel); 
-			setValues(metaModel, keyValues, values, true, tracking);
+			setValues(metaModel, keyValues, values, true, tracking, true); 
 			commitTransaction(metaModel); 
 		}
 		catch (FinderException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -273,9 +279,11 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			return result;
 		}	
 		catch (CreateException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -301,9 +309,11 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			return result;
 		}	
 		catch (CreateException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -335,17 +345,20 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		Users.setCurrentUserInfo(userInfo);
 		containerKeyValues = Maps.recursiveClone(containerKeyValues);
 		values = Maps.recursiveClone(values);
-		MetaModel metaModel = getMetaModel(modelName); 
+		MetaModel metaModel = getMetaModel(modelName);
+		MetaModel metaModelContainer = getMetaModelContainer(metaModel, modelName);  
 		try {		
-			beginTransaction(metaModel);			
-			Object result = createAggregate(metaModel, containerKeyValues, collectionName, counter, values);
+			beginTransaction(metaModel);	
+			Object result = createAggregate(metaModel, metaModelContainer, containerKeyValues, collectionName, counter, values); 
 			commitTransaction(metaModel);			
 			return result;
 		}	
 		catch (CreateException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -357,6 +370,15 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			rollback(metaModel); 
 			throw new RemoteException(ex.getMessage());
 		}
+	}
+
+	private MetaModel getMetaModelContainer(MetaModel metaModel, String modelName) {
+		String containerModelName = metaModel.getContainerModelName();
+		if (!Is.emptyString(containerModelName)) return metaModel.getMetaModelContainer();
+		if (modelName.contains(".")) {
+			containerModelName = modelName.split("\\.")[0];
+		}
+		return MetaComponent.get(containerModelName).getMetaEntity();
 	}
 	
 	public Object createAggregate(UserInfo userInfo, String modelName, Map containerKeyValues, String collectionName, Map values)  
@@ -380,14 +402,17 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		MetaModel metaModel = getMetaModel(modelName); 
 		try {		
 			beginTransaction(metaModel);
-			Object result = createAggregate(metaModel, container, counter, values);
+			MetaModel metaModelContainer = getMetaModelContainer(metaModel, modelName);  
+			Object result = createAggregate(metaModel, metaModelContainer, container, counter, values); 
 			commitTransaction(metaModel);			
 			return result;
 		}	
 		catch (CreateException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) { 
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -410,14 +435,17 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		MetaModel metaModel = getMetaModel(modelName); 
 		try {			
 			beginTransaction(metaModel);
-			Map result = createAggregateReturningKey(metaModel, containerKeyValues, collectionName, counter, values);
+			MetaModel metaModelContainer = getMetaModelContainer(metaModel, modelName);  
+			Map result = createAggregateReturningKey(metaModel, metaModelContainer, containerKeyValues, collectionName, counter, values); 
 			commitTransaction(metaModel);			
 			return result;
 		}	
 		catch (CreateException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {		
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -517,12 +545,15 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			commitTransaction(metaModel);			
 		} 
 		catch (FinderException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RemoveException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -575,7 +606,7 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			// If the child contains the reference to its parent we simply update this reference
 			Map nullParentKey = new HashMap();
 			nullParentKey.put(refToParent, null); 
-			setValues(childMetaModel, collectionElementKeyValues, nullParentKey, deletingElement, true);  
+			setValues(childMetaModel, collectionElementKeyValues, nullParentKey, deletingElement, true, false);   
 		}
 		if (metaCollection.hasPostRemoveCalculators()) {
 			executePostremoveCollectionElement(parentMetaModel, keyValues, metaCollection);			
@@ -595,9 +626,11 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			commitTransactionForAddCollectionElement(metaModel);		
 		} 
 		catch (FinderException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (ValidationException ex) {
+			freeTransaction(); 
 			throw ex;
 		}
 		catch (RuntimeException ex) { 
@@ -631,8 +664,8 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		if (childMetaModel.containsMetaReference(refToParent)) {
 			// If the child contains the reference to its parent we simply update this reference
 			Map parentKey = new HashMap();
-			parentKey.put(refToParent, keyValues);		
-			setValues(childMetaModel, collectionElementKeyValues, parentKey, false, true);  
+			parentKey.put(refToParent, keyValues);	
+			setValues(childMetaModel, collectionElementKeyValues, parentKey, true, true, false); 
 		}
 	}
 	
@@ -655,9 +688,11 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 				commitTransactionForAddCollectionElement(sourceMetaModel);		
 			} 
 			catch (FinderException ex) {
+				freeTransaction(); 
 				throw ex;
 			}
 			catch (ValidationException ex) {
+				freeTransaction(); 
 				throw ex;
 			}
 			catch (RuntimeException ex) { 
@@ -707,14 +742,13 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		}
 	}
 	
-	private Map createAggregateReturningKey(MetaModel metaModel, Map containerKeyValues, String collectionName, int counter, Map values) 
+	private Map createAggregateReturningKey(MetaModel metaModel, MetaModel metaModelContainer, Map containerKeyValues, String collectionName, int counter, Map values)
 		throws CreateException,ValidationException, XavaException, RemoteException 
 	{		
-		MetaModel metaModelContainer = metaModel.getMetaModelContainer();
 		addKeyToValues(metaModelContainer, collectionName, containerKeyValues, values); 
 		try {								
 			Object container = metaModelContainer.toPOJO(containerKeyValues); 
-			Object aggregate = createAggregate(metaModel, container, collectionName, counter, values, false);
+			Object aggregate = createAggregate(metaModel, metaModelContainer, container, collectionName, counter, values, false);
 			return getValues(metaModel, aggregate, getKeyNames(metaModel));			
 		}
 		catch (ClassCastException ex) {
@@ -722,7 +756,7 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		}
 	}
 
-	private void addKeyToValues(MetaModel metaModelContainer,	String collectionName, Map containerKeyValues, Map values) { 
+	private void addKeyToValues(MetaModel metaModelContainer, String collectionName, Map containerKeyValues, Map values) { 
 		if (collectionName == null) return;
 		MetaCollection metaCollection = metaModelContainer.getMetaCollection(collectionName);
 		Map parentKey = new HashMap();
@@ -730,25 +764,28 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		values.putAll(parentKey);
 	}
 	
-	private Object createAggregate(MetaModel metaModel, Object container, int counter, Map values) 
+	private Object createAggregate(MetaModel metaModel, MetaModel metaModelContainer, Object container, int counter, Map values)
 		throws CreateException,ValidationException, XavaException, RemoteException
 	{		
-		return createAggregate(metaModel, container, null, counter, values, true);
+		return createAggregate(metaModel, metaModelContainer, container, null, counter, values, true);
 	}
 	
-	private Object createAggregate(MetaModel metaModel, Map containerKeyValues, String collectionName, int counter, Map values) 
+	private Object createAggregate(MetaModel metaModel, MetaModel metaModelContainer, Map containerKeyValues, String collectionName, int counter, Map values) 
 		throws CreateException,ValidationException, XavaException, RemoteException 
 	{		
-		MetaModel metaModelContainer = metaModel.getMetaModelContainer();
 		addKeyToValues(metaModelContainer, collectionName, containerKeyValues, values);
 
-		try {					
-			Object containerKey = getPersistenceProvider(metaModel).getContainer(metaModel, containerKeyValues); 
-			return createAggregate(metaModel, containerKey, collectionName, counter, values, true);
+		try {	
+			Object containerKey = getPersistenceProvider(metaModel).find(metaModelContainer, containerKeyValues);
+			return createAggregate(metaModel, metaModelContainer, containerKey, collectionName, counter, values, true); 
 		}
 		catch (ClassCastException ex) {
 			throw new XavaException("aggregate_must_be_persistent_for_create", metaModel.getMetaModelContainer().getName());					
-		}		
+		}
+		catch (FinderException ex) {
+			log.warn(ex.getMessage(), ex);
+			throw new XavaException("container_for_pojo_error");
+		}
 	}	
 	
 	private Map createReturningKey(MetaModel metaModel, Map values, boolean validateCollection) 
@@ -773,14 +810,16 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		MetaModel metaModel, 	
 		Map keyValues,
 		Map membersNames)
-		throws FinderException, XavaException, RemoteException {		
+		throws FinderException, XavaException, RemoteException {
 		try {			
-			Map result =
-				getValues(					 
-					metaModel,
-					findEntity(metaModel, keyValues), 
-					membersNames); 	
-			return result;
+			Object entity = findEntity(metaModel, keyValues);
+			try {
+				return getValues(metaModel, entity,	membersNames);
+			}
+			catch (PropertiesContainerException ex) {
+				getPersistenceProvider(metaModel).refreshIfManaged(entity);
+				return getValues(metaModel, entity,	membersNames);
+			}
 		} catch (XavaException ex) {
 			log.error(ex.getMessage(), ex);
 			throw new XavaException("get_values_error", metaModel.getName()); 
@@ -820,11 +859,10 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		return names;
 	}
 	
-	private Object createAggregate(MetaModel metaModel, Object container, String collectionName, int counter, Map values, boolean validateCollections) 
+	private Object createAggregate(MetaModel metaModel, MetaModel metaModelContainer, Object container, String collectionName, int counter, Map values, boolean validateCollections) 
 		throws CreateException,ValidationException, XavaException, RemoteException 
 	{
 		// counter is ignored, we keep it for backward compatibility in method signatures
-		MetaModel metaModelContainer = metaModel.getMetaModelContainer();
 		if (metaModel.isAnnotatedEJB3()) {
 			return create(metaModel, values, metaModelContainer, container, collectionName, -1, validateCollections);
 		}
@@ -880,29 +918,33 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 				throw new ValidationException(validationErrors);			
 			}		
 			updateReferencedEntities(metaModel, values);			
-			Map convertedValues = convertSubmapsInObject(metaModel, values); 
+			Map convertedValues = convertSubmapsInObject(metaModel, values);
+			if (!validateCollections) {
+				setCollectionsWithMinimumToNull(metaModel, convertedValues);
+			}			
 			Object newObject = null;			
-			if (container == null) { 
+			if (container == null) {
 				newObject = getPersistenceProvider(metaModel).create(metaModel, convertedValues); 
 			} 
-			else {								
+			else {
 				if (metaModelContainer == null) {
 					metaModelContainer = metaModel.getMetaModelContainer();
 				}
-				if (number < 0) { 
-					newObject = getPersistenceProvider(metaModel).create(metaModel, convertedValues); 
-					addToCollection(container, collectionName, newObject); 
+				if (number < 0) {
+					newObject = getPersistenceProvider(metaModel).create(metaModel, convertedValues);
 				}
 				else {
-					newObject = getPersistenceProvider(metaModel).createAggregate( 
+					newObject = getPersistenceProvider(metaModel).createAggregate(
 						metaModel,
 						convertedValues,
 						metaModelContainer,
 						container,
 						number);
-				} 
+				}
+				addToCollection(container, collectionName, newObject);		
 			}
 			Map key = getValues(metaModel, newObject, getKeyNames(metaModel), false);
+			if (container == null) updateSortableCollections(metaModel, key, values); 
 			AccessTracker.created(metaModel.getName(), key); 
 			// Collections are not managed			
 			return newObject;
@@ -948,23 +990,50 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 
 	private void updateReferencedEntities(MetaModel metaModel, Map values) throws XavaException, RemoteException, CreateException, ValidationException {		
 		for (Iterator it = metaModel.getMetaReferencesToEntity().iterator(); it.hasNext(); ) {
-			MetaReference ref = (MetaReference) it.next();			
+			MetaReference ref = (MetaReference) it.next();		
 			Map referenceValues = (Map) values.get(ref.getName());
 			if (referenceValues != null) {
 				int hiddenKeyNotPresent = getHiddenKeyNotPressent(ref, referenceValues);
 				if (referenceValues.size() + hiddenKeyNotPresent > ref.getMetaModelReferenced().getMetaMembersKey().size()) {
 					try {	
 						findEntity(ref.getMetaModelReferenced(), referenceValues);
-						setValues(ref.getMetaModelReferenced(), new HashMap(referenceValues), new HashMap(referenceValues));						
+						setValues(ref.getMetaModelReferenced(), new HashMap(referenceValues), new HashMap(referenceValues));
 					}
 					catch (FinderException ex) {					
 						referenceValues = createReturningValues(ref.getMetaModelReferenced(), new HashMap(referenceValues)); 
 						values.put(ref.getName(), referenceValues);						
 					}
-				}					
+				}
 			}			
 		}
 	}
+	
+	private void updateSortableCollections(MetaModel metaModel, Map key, Map values) throws XavaException, RemoteException, CreateException, ValidationException { 
+		for (Iterator it = metaModel.getMetaReferencesToEntity().iterator(); it.hasNext(); ) {
+			MetaReference ref = (MetaReference) it.next();		
+			Map referenceValues = (Map) values.get(ref.getName());
+			if (referenceValues != null) {
+				if (!Is.emptyString(ref.getReferencedModelCorrespondingCollection())) {
+					if (ref.getMetaModelReferenced().containsMetaCollection(ref.getReferencedModelCorrespondingCollection())) {
+						MetaCollection col = ref.getMetaModelReferenced().getMetaCollection(ref.getReferencedModelCorrespondingCollection());
+						if (col.isSortable()) {
+							try {
+								Map referenceKey = extractKeyValues(ref.getMetaModelReferenced(), referenceValues);
+								if (!Is.empty(referenceKey)) { 
+									addCollectionElement(ref.getMetaModelReferenced(), referenceKey, ref.getReferencedModelCorrespondingCollection(), key);
+								}
+							} 
+							catch (PropertiesManagerException | InvocationTargetException | FinderException ex) {
+								log.error(ex.getMessage(), ex);
+								throw new XavaException("add_element_to_collection_error"); 
+							}
+						}
+					}
+				}
+			}			
+		}	
+	}
+
 
 	private int getHiddenKeyNotPressent(MetaReference ref, Map referenceValues) throws XavaException {
 		int hiddenKeyNotPresent = 0;
@@ -1026,7 +1095,12 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			String component = modelName.substring(0, idx);
 			idx = modelName.lastIndexOf('.'); // just in case we have: MyEntity.MyAggregate.MyAnotherAggregate --> It get MyAnotherAggregate within MyEntity Component
 			String aggregate = modelName.substring(idx + 1);
-			return MetaComponent.get(component).getMetaAggregate(aggregate);
+			try {  
+				return MetaComponent.get(component).getMetaAggregate(aggregate);
+			}
+			catch (ElementNotFoundException ex) {
+				return MetaComponent.get(aggregate).getMetaEntity();
+			}
 		}
 	}
 	
@@ -1083,7 +1157,7 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 						throw new XavaException("member_not_found", memberName, metaModel.getName());
 					}
 				}
-			}			
+			}
 			result.putAll(r.executeGets(names.toString()));
 			if (includeModelName) result.put(MapFacade.MODEL_NAME, persistenceProvider.getModelName(modelObject)); 
 			return result;
@@ -1093,7 +1167,7 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 			throw new RemoteException(XavaResources.getString("get_values_error", metaModel.getName()));
 		}
 	}
-	
+		
 	public Map getKeyValues(UserInfo userInfo, String modelName, Object entity) throws RemoteException, XavaException {
 		Users.setCurrentUserInfo(userInfo);
 		MetaModel metaModel = getMetaModel(modelName);
@@ -1205,6 +1279,8 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		} catch (FinderException ex) {
 			log.error(ex.getMessage(), ex);
 			throw new XavaException("get_reference_error", memberName, metaModel.getName());
+		} catch (PropertiesContainerException ex) {
+			throw ex;
 		} catch (XavaException ex) {
 			log.error(ex.getMessage(), ex);
 			throw new XavaException("get_reference_error", memberName, metaModel.getName());
@@ -1395,6 +1471,13 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 		}
 	}
 	
+	private void setCollectionsWithMinimumToNull(MetaModel metaModel, Map values) throws XavaException { 
+		for (MetaCollection col: metaModel.getMetaCollections()) {
+			if (!col.isElementCollection() && col.getMinimum() > 0) {
+				values.put(col.getName(), null);
+			}
+		}
+	}
 		
 	private void removeCalculatedFields(MetaModel metaModel, Map values)
 		throws XavaException {
@@ -1475,13 +1558,13 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 	private void setValues(MetaModel metaModel, Map keyValues, Map values) 
 		throws FinderException, ValidationException, XavaException 
 	{
-		setValues(metaModel, keyValues, values, true, true); 
+		setValues(metaModel, keyValues, values, true, true, false); 
 	}
 
-	private void setValues(MetaModel metaModel, Map keyValues, Map values, boolean validate, boolean tracking) 
+	private void setValues(MetaModel metaModel, Map keyValues, Map values, boolean validate, boolean tracking, boolean updateSortableCollections)  
 		throws FinderException, ValidationException, XavaException 
 	{ 		
-		try {						
+		try {								
 			Object entity = findEntity(metaModel, keyValues);
 			updateReferencedEntities(metaModel, values);			
 			removeKeyFields(metaModel, values);			
@@ -1502,6 +1585,7 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 				Map objects = convertSubmapsInObject(metaModel, values);
 				r.executeSets(objects);
 			}
+			if (updateSortableCollections) updateSortableCollections(metaModel, keyValues, values); 
 			// Collections are not managed			
 		} 
 		catch (FinderException ex) { 
@@ -1692,24 +1776,14 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 				while (itSets.hasNext()) {
 					MetaSet set = (MetaSet) itSets.next();					
 					Object value = values.get(set.getPropertyNameFrom());
-					if (value == null && !values.containsKey(set.getPropertyNameFrom())) {						
-						if (keyValues != null) {							
-							Map memberName = new HashMap();
-							memberName.put(set.getPropertyNameFrom(), null);
-							Map memberValue = getValues(metaModel, keyValues, memberName);
-							value = memberValue.get(set.getPropertyNameFrom());							
-						}
-						else {
-							Map valuesForPOJO = new HashMap(values); 
-							removeViewProperties(metaModel, valuesForPOJO);
-							Object model = metaModel.toPOJO(valuesForPOJO);
+					if (metaModel.containsMetaReference(set.getPropertyNameFrom())) {
+						MetaReference ref = metaModel.getMetaReference(set.getPropertyNameFrom());
+						if (!creating && keyValues != null && value == null && !values.containsKey(set.getPropertyNameFrom())) {
+							Object model = findEntity(metaModel, keyValues);
 							PropertiesManager modelPM = new PropertiesManager(model);
 							value = modelPM.executeGet(set.getPropertyNameFrom());							
 						}
-					}						
-					if (metaModel.containsMetaReference(set.getPropertyNameFrom())) {
-						MetaReference ref = metaModel.getMetaReference(set.getPropertyNameFrom());
-						if (ref.isAggregate()) {							
+						else if (ref.isAggregate()) {							
 							value = mapToReferencedObject(metaModel, set.getPropertyNameFrom(), (Map) value);
 						}
 						else {							
@@ -1730,6 +1804,22 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 							}																															
 						}		
 					}
+					else if (value == null && !values.containsKey(set.getPropertyNameFrom())) {		
+						if (keyValues != null) {							
+							Map memberName = new HashMap();
+							memberName.put(set.getPropertyNameFrom(), null);
+							Map memberValue = getValues(metaModel, keyValues, memberName);
+							value = memberValue.get(set.getPropertyNameFrom());							
+						}
+						else {
+							Map valuesForPOJO = new HashMap(values); 
+							removeViewProperties(metaModel, valuesForPOJO);
+							Object model = metaModel.toPOJO(valuesForPOJO);
+							PropertiesManager modelPM = new PropertiesManager(model);
+							value = modelPM.executeGet(set.getPropertyNameFrom());
+						}
+					}		
+
 					mp.executeSet(set.getPropertyName(), value);									
 				}							
 				v.validate(errors);
@@ -1786,6 +1876,11 @@ public class MapFacadeBean implements IMapFacadeImpl, SessionBean {
 	private void rollback(MetaModel metaModel) throws RemoteException {
 		if (getSessionContext() != null) getSessionContext().setRollbackOnly();
 		getPersistenceProvider(metaModel).rollback();
+		HibernateValidatorInhibitor.setInhibited(false); 
+	}
+	
+	private void freeTransaction() throws RemoteException { 
+		HibernateValidatorInhibitor.setInhibited(false); 
 	}
 			
 	private void executePostremoveCollectionElement(MetaModel metaModel, Map keyValues, MetaCollection metaCollection) throws FinderException, ValidationException, XavaException, RemoteException {

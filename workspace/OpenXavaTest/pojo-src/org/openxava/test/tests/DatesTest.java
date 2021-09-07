@@ -73,7 +73,7 @@ public class DatesTest extends TestCase {
 	}
 	
 	public void testDateTimeFormatForJSCalendar() throws Exception { 
-		assertEquals("%m/%e/%y %l:%M %p", Dates.dateTimeFormatForJSCalendar(Locale.US)); // The Java 8 format for all Java versions		
+		assertEquals("%m/%e/%y %l:%M %p", Dates.dateTimeFormatForJSCalendar()); // The Java 8 format for all Java versions		
 	}
 
 }

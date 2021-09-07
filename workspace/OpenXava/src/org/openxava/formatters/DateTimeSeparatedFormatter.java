@@ -16,6 +16,7 @@ import org.openxava.util.*;
 public class DateTimeSeparatedFormatter extends DateTimeBaseFormatter implements IMultipleValuesFormatter {
 	
 	private static DateFormat extendedDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	private static DateFormat dotDateFormat = new SimpleDateFormat("dd.MM.yyyy"); // Only for some locales like "hr"
 	
 	public String [] format(HttpServletRequest request, Object date) throws Exception {	
         String[] result = new String[2];
@@ -54,12 +55,13 @@ public class DateTimeSeparatedFormatter extends DateTimeBaseFormatter implements
 	
 	private DateFormat getDateFormat() {
 		if (isExtendedFormat())	return extendedDateFormat;		
-		return DateFormat.getDateInstance(DateFormat.SHORT, Locales.getCurrent());		
+		if (isDotFormat()) return dotDateFormat; 
+		return new SimpleDateFormat(Dates.getLocalizedDatePattern(Locales.getCurrent())); 
 	}
 	
 	private DateFormat[] getDateTimeFormats() {
-		if (isExtendedFormat()) return getExtendedDateTimeFormats();		
-		return new DateFormat [] { Dates.getDateTimeFormat() }; 
+		if (isExtendedFormat() || isDotFormat()) return getExtendedDateTimeFormats(); 
+		return new DateFormat [] { Dates.getDateTimeFormatForParsing(Locales.getCurrent()) }; 
 	}
 		
 }

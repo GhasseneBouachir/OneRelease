@@ -35,9 +35,21 @@ public class Browsers {
 	/**
 	 * @since 6.2
 	 */
-	public static boolean isFF(HttpServletRequest request) { 
+	public static boolean isFF(HttpServletRequest request) {
+		return isBrowser(request, "Firefox"); 
+	}
+
+	/**
+	 * @since 6.3.2
+	 */	
+	public static boolean isEdge(HttpServletRequest request) { 
+		return isBrowser(request, "Edge");
+	}
+	
+	private static boolean isBrowser(HttpServletRequest request, String string) {   
 		String browser = request.getHeader("user-agent");
-		return browser == null?false:browser.contains("Firefox");
-	}	
+		return browser == null?false:browser.contains(string);
+	}
+
 	
 }

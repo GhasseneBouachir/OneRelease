@@ -4,6 +4,7 @@ import java.rmi.*;
 import java.util.*;
 
 import javax.ejb.*;
+
 import org.apache.commons.logging.*;
 import org.openxava.component.*;
 import org.openxava.mapping.*;
@@ -30,11 +31,13 @@ abstract public class TabProviderBase implements ITabProvider, java.io.Serializa
 	private int current;  
 	private boolean eof = true;
 	private MetaTab metaTab;
-		
+	private Collection<String> conditionProperties; 
 		
 	abstract protected String translateProperty(String property);
 	abstract protected String translateCondition(String condition);
-	abstract protected Number executeNumberSelect(String select, String errorId);	
+	abstract protected Number executeNumberSelect(String select, String errorId);
+	/** @since 6.4 */
+	abstract protected String toSearchByCollectionMemberSelect(String select); 
 	
 	public void setMetaTab(MetaTab metaTab) {
 		this.metaTab = metaTab;
@@ -54,10 +57,11 @@ abstract public class TabProviderBase implements ITabProvider, java.io.Serializa
 		this.key = toArray(key);		
 		condition = condition == null ? "" : condition.trim();
 		select = translateCondition(condition);
-		selectSize = createSizeSelect(select);
 		select = toGroupBySelect(select);
+		select = toSearchByCollectionMemberSelect(select); 
+		selectSize = createSizeSelect(select); 
 	}
-						
+							
 	private String toGroupBySelect(String select) { 
 		if (!select.contains(" group by ")) return select;
 		String groupByProperty = Strings.lastToken(removeOrder(select)).replace("[month]", "").replace("[year]", "");
@@ -84,14 +88,24 @@ abstract public class TabProviderBase implements ITabProvider, java.io.Serializa
 				select = select.replace(original + " desc", alias + " desc");
 			} 
 		}
+		String orderBy = null;
+		if (select.contains(" order by " )) {
+			String [] selectTokens = select.split(" order by ", 2);
+			select = selectTokens[0];
+			orderBy = selectTokens[1]; 
+		}
 		if (select.endsWith("[month]")) { 
 			select = select.replace(groupByProperty + "[month]", "year(" + groupByProperty + "), month(" + groupByProperty + ")");
 			select = select.replaceFirst(groupByProperty, "concat(year(" + groupByProperty + "), '/',month(" + groupByProperty + "))");
+			if (orderBy != null) orderBy = orderBy.replaceFirst(groupByProperty, "concat(year(" + groupByProperty + "), '/',month(" + groupByProperty + "))"); 
 		}
 		else if (select.endsWith("[year]")) { 
 			select = select.replace(groupByProperty + "[year]", "year(" + groupByProperty + ")");
 			select = select.replaceFirst(groupByProperty, "year(" + groupByProperty + ")");
+			if (orderBy != null) orderBy = orderBy.replaceFirst(groupByProperty, "year(" + groupByProperty + ")"); 
 		} 
+		
+		if (orderBy != null) select = select + " order by " + orderBy; 
 
 		return select;
 	}
@@ -160,7 +174,7 @@ abstract public class TabProviderBase implements ITabProvider, java.io.Serializa
 	
 	private String createSizeSelect(String select) {
 		if (select == null) return null;
-		if (select.contains(" group by ")) return null; 
+		if (select.contains(" group by ")) return null;
 		String selectUpperCase = Strings.changeSeparatorsBySpaces(select.toUpperCase());
 		int iniFrom = selectUpperCase.indexOf(" FROM ");
 		int end = selectUpperCase.indexOf("ORDER BY ");
@@ -233,8 +247,21 @@ abstract public class TabProviderBase implements ITabProvider, java.io.Serializa
 				String property = (String) itProperties.next();				
 				fillEntityReferencesMappings(entityReferencesMappings, property, getMetaModel(), "", ""); 
 			}						
+			for (Iterator<String> itProperties = getConditionProperties().iterator(); itProperties.hasNext();) {
+				String property = itProperties.next();				
+				fillEntityReferencesMappings(entityReferencesMappings, property, getMetaModel(), "", ""); 
+			}
 		}		
 		return entityReferencesMappings;
+	}
+	
+	private Collection<String> getConditionProperties() { 
+		return conditionProperties == null?Collections.emptyList():conditionProperties;
+	}
+	
+	public void setConditionProperties(Collection<String> conditionProperties) {
+		this.conditionProperties = conditionProperties;
+		resetEntityReferencesMappings();
 	}
 	
 	private void fillEntityReferencesMappings(Collection<ReferenceMapping> result, String property, MetaModel metaModel, String parentReference, String aggregatePrefix) throws XavaException { 
@@ -245,6 +272,7 @@ abstract public class TabProviderBase implements ITabProvider, java.io.Serializa
 		int idx = property.indexOf('.');
 		if (idx >= 0) {
 			String referenceName = property.substring(0, idx);	
+			if (!metaModel.containsMetaReference(referenceName)) return; 
 			MetaReference ref = metaModel.getMetaReference(referenceName);
 			String memberName = property.substring(idx + 1);
 			boolean hasMoreLevels = memberName.indexOf('.') >= 0;
@@ -284,6 +312,7 @@ abstract public class TabProviderBase implements ITabProvider, java.io.Serializa
 		if (Is.emptyString(parentReference)) return referenceName; 
 		return parentReference + "_" + referenceName;
 	}	
+	
 	
 
 }

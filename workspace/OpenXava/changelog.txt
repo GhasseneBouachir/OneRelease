@@ -1,11 +1,348 @@
 Change Log for OpenXava project
 ===============================
 
+OpenXava 6.5.3 (2021-7-12)
+--------------------------
+- Getting Started guide includes video. 
+- Welcome page on starting OpenXava Studio simplified.
+- Documentation about @Calculation in Reference Guide (Model chapter) improved.
+- Database configuration documentation improved.
+- RequestReseter logic moved to a @WebListener.
+- Fix: @Calculation total property in @ElementCollection depending on summation not updated sometimes.
+- Fix: @ElementCollection summation not updated when the user changes values in the column of the summation. 
+- Fix: BigInteger properties are not treated as numeric values.
+- Fix: Dates ending with separator, like in Serbian, are incorrectly altered when modified. 
+- Fix: @ReadOnly(onCreate=false) did not work on references.
+- Fix: Unneeded AJAX loading of editors in some cases with @ReadOnly(onCreate=false), 
+- Fix: Read only enums not displayed completely when @Column(length=) with a low value is used.
+- Fix: Broken links in Model documentation of Reference Guide.
+- Fix: Changing in 'My reports' a comparison in a date from = to year = does not save the value of the year.     
+- Fix: Editing a date field comparing by year in 'My reports' does not show the year. 
+- Fix: Collection inside a section produces infinite loop if the collection element has recursive reference.
+- Fix: Date editor does not work well when locale format has the year at beginning, like in South Africa.
+- Fix: @ReadOnly ignored when using inside sections or groups with view inheritance.
+- Fix: Adding an element in a recursive collection that is also inside another collection fails.
+- Fix: @ReadOnly collections data not visible with Dark theme.
+- Fix: base.css is not refreshed by browser after updating OpenXava version.
+- Fix: File name for PDF generation and CSV export not encoded, so sometimes local characters are missed.
+- Fix: PDF reports do not work with Cp1250 encoding used by some Central and Eastern European languages.
+- Fix: Model name not translated in creation messages when key is included in the message.
+- Fix: @Calculation properties does not include thousand separators just after being calculated.
+- Fix: New action does not clear combo value on references with @DescriptionsList(showReferenceView=true).
+- Fix: @DescriptionsList(showReferenceView=true) does not refresh combo value navigating between records.
+- Fix: @AssertTrue throws error if has a message with a property with null value.
+
+OpenXava 6.5.2 (2021-5-31)
+--------------------------
+- Use of 4 digits for year in dates for all locales. 
+- 'How to' documentation improved. 
+- Oracle configuration documentation improved.
+- Concurrency and version property documentation improved.
+- Documentation to modify and build OpenXava code improved.
+- Fix: Adding date separators and completing century in year only work for first date in view.
+- Fix: Date calendar and rich text editor do not change the language when xava.portal.locale is changed.
+- Fix: When locale is changed via code (xava.portal.locale) the link for help documentation is not updated.
+- Fix: Modules in left menu in incorrect language when you change locale from code (xava.portal.locale).
+- Fix: SchemaTool does not work with AS/400 on creating the foreign keys.
+- Fix: Icon of the action to search references is difficult to see in Dark theme.
+- Fix: Redundant columns to add to list when using inheritance with entities with collections.
+- Fix: Action links for rows in list inside dialogs are difficult to see in Dark theme.
+- Fix: Calendar icon inside date fields is difficult to see in Dark theme.
+- Fix: Error message about SameSite attribute with cookies in FireFox console. 
+- Fix: Dead code in JavaScript editors.
+- Fix: Poor performance getting calculated collections in some circumstances.
+- Fix: Saving a collection element fails if the collection is inside a reference displayed with @AsEmbedded.
+- Fix: It's possible to remove attached files inadvertently in upload editors, now it asks for confirmation.
+- Fix: OpenXava.buildOpenXava Ant target doesn't work if ISO-8859-1 is not defined at Eclipse level.
+- Fix: Italian dates do not use 4 digits for years.
+- Fix: Editing a date of 20th century with popup calendar shows the date in the 21st century.
+- Fix: Adding separators to date or completing century in year doesn't work if there is a leading space.
+- Fix: Changing total property in @ElementCollection for existing entity not recalculated dependent values. 
+- Fix: NullPointerException in log filtering in a list in the dialog to choose an element for a reference.
+- Fix: Last new line ( ; ) in a @View used as base with view inheritance is ignored. 
+- Fix: Modifying a transient reference by code produces the "Changed data" message on exit. 
+- Fix: Transient references are available for adding by user on customizing list columns.
+
+OpenXava 6.5.1 (2021-4-13)
+--------------------------
+- Date separators added to date field automatically on focus lost.
+- Date separators added to date filter values automatically in list.
+- Queries in list with no explicit given name are discarded.
+- Portuguese translation for the standard labels.
+- New Emails.send() without fromEmail getting the value from smtpFromEmail of xava.properties.
+- New setConditionProperties() method in ITabProvider.
+- New extractVariables() methods in Strings utility class.
+- Activation framework upgraded to 1.2.1.
+- Fix: Filtering by year, month and year/month of a date does not work in list mode.
+- Fix: Filtering in @DescriptionsList does not ignore accents.
+- Fix: Date fields completes to century XXI even with later dates of century XX.
+- Fix: Date separators not added automatically to date field when missing.
+- Fix: Impossible to change name or remove some queries in list created before v6.5.
+- Fix: The buildAddons and buildOpenXava Ant targets do not work if bin folder does not exist.
+- Fix: Sending emails does not work with Java 11.
+- Fix: AccessTracker does not register the name of the file for FILE stereotype properties.
+- Fix: Messages from UploadServlet do not use the request language from time to time.
+- Fix: Users.getCurrent() does not work from time to time.
+- Fix: ElementNotFoundException: "Not found tab" accessing application while starting Tomcat.
+- Fix: Previous query in list is lost after coming back from grouping.
+- Fix: When grouping the current filter of the list is ignored.
+- Fix: Flow layout does not work inside @NoFrame references with flowLayout=true.
+- Fix: Bad alignment for @DescriptionsList with flowLayout=true. 
+- Fix: Executing JavaScript content is possible by a XSS attack in certain cases.
+- Fix: Losing focus in a date property with @OnChange shows the "Changed data" on exit.
+- Fix: "Session object manager not found in controllers.xml" error from time to time.
+
+OpenXava 6.5 (2021-2-24)
+------------------------
+- Left menu can be hidden or shown by the user.
+- Responsive left menu, it is shown or hidden depending on page size.
+- New 'Save query' action in list mode, because queries are no longer stored automatically.
+- Modern JavaScript popup calendar for dates and DATETIME. 
+- Wizard for creating a new OpenXava project in OpenXava Studio.
+- Lombok library added to OpenXava and OpenXava Studio supports Lombok by default.
+- 'All' query in list mode cannot be renamed or removed.
+- Date editor verified the date on losing focus.
+- A database manager can be launched from an OpenXava Studio menu option. 
+- New projects can be launched with Run As > Java Application on the project.
+- Eclipse Platform for OpenXava Studio upgraded to Eclipse 2020-12.
+- Java included in distribution changed to Eclipse JustJ.
+- DBManager launcher class no longer included in new projects, moved to OpenXava as an Ant target.
+- Getting started guide simplified and adapted to new OpenXava Studio wizards.
+- Documentation to use OpenXava with a 32bit machine improved.
+- Documentation to use your own Eclipse instead of OpenXava Studio improved.
+- Getting started guide and the complete course (until lesson 8) adapted to use Lombok.
+- The user can add properties from collections on customizing list columns.
+- Comparator combo in the list is shown when its corresponding value field gets the focus.
+- Focus in list mode is in combo with stored queries, instead of in the first filter field.
+- Some new common use labels to be used in applications.
+- Now IRequestReportParametersProvider extends IReportParametersProvider.
+- Fix: OpenXava Studio hangs running long test suites.
+- Fix: Plain Java project does not work in OpenXava Studio.
+- Fix: Generating Hibernate code for XML components fails with Java 8 in some cases.
+- Fix: Label duplicated in list column header when user changes the label adding a space at end.
+- Fix: In DateTimeSeparatedCalendar editor the focus does not enter in time field when moving with keyboard.
+- Fix: Hour part of the data hidden partially in DATETIME used in list filtering.
+- Fix: Some spelling errors in Spanish labels.	
+- Fix: The buildOpenXava and buildAddons Ant tasks do not work if openxava.jar or addons.jar are empty.
+- Fix: PDF report is not generated if there are errors obtaining the organization name. 
+- Fix: Request is not injected in IRequestReportParametersProvider. 
+- Fix: 'Organization' shown as organization in reports if xava.organization is missing in label files.
+- Fix: Module title outside corresponding span in some circumstances.
+- Fix: Selected menu option protrudes the left modules menu with Internet Explorer.
+
+OpenXava 6.4.2 (2020-11-9)
+--------------------------
+- Lessons 7 and 8 of course upgraded to latest OpenXava features.
+- New applicationPort property in xava.properties to indicate the port used by the application launcher.
+- New method getPopupContentAsStream() in ModuleTestBase to get the content of new web window.
+- Fix: "Controller YourController not found" error accessing the application when Tomcat is starting.
+- Fix: Label and column width changed by user not persisted if the column isn't in the original @Tab.
+- Fix: @NoFrame references are not well aligned with flowLayout=true.
+- Fix: Two groups in a row (separated by comma) are placed one below other with flowLayout=true.
+- Fix: WEBURL button overlapped with URL with long URLs.
+- Fix: WEBURL button renders incorrectly when flowLayout=true.
+- Fix: Property ICON in list without label is aligned to top when there are too many columns.
+- Fix: JasperReportBaseAction actions fail with databases with no READ_UNCOMMITTED support like Oracle.
+- Fix: Extra second added in java.sql.Time properties with some databases, such as PostgreSQL.
+- Fix: Required style not applied to text area editors.
+- Fix: JavaScript error with @Calculation properties: "Cannot read property 'toFixed' of undefined".
+- Fix: BigDecimals not recognized as numeric values by Excel because of thousands separators with CSVs. 
+- Fix: When the load action of an upload editor adds errors the messages are not shown to the user.
+- Fix: After adding two rows in an @ElementCollection with PHOTO the new blank row has an error.
+- Fix: Validation errors in controllers.xml/controladores.xml files in just created projects.
+- Fix: Clicking on menu of a module with IChangeModuleAction does not return to root module.
+- Fix: Duplicate load of totals via AJAX when refreshing an element collection.
+- Fix: View.setValue() for an element collection does not work.
+- Fix: View.setValue() for a reference sending the value as a map works but displays an error.
+- Fix: Application launcher (the _Run_YourApplication) fails if port 8080 is used by another process.
+- Fix: getView().setModel(anEntity) with an entity in a transient module put the permalink parameter.
+- Fix: Assign a model to the view of different type of the module and then reload the browser page fails. 
+- Fix: Group by month or year of a DATETIME property implemented with a java.util.Date fails.
+- Fix: Import data from Excel turn big numbers into 2147483647.
+- Fix: Real Excel generation (included in TypicalRealExcel) exports BigDecimal as String.
+- Fix: Assigning an Integer to a BigDecimal property with MapFacade fails instead of doing a conversion. 
+- Fix: Concurrent exception accessing labels from time to time under high load with many concurrent users.
+- Fix: View.setValue() to set null to a reference throws an exception.
+- Fix: Exception on save leaving first fields in blank when they are not required and with null values.
+
+OpenXava 6.4.1 (2020-9-22)
+--------------------------
+- Support for JAX-RS 2.1 (JSR 370) for calling RESTful web services.
+- Documentation to install the latest OpenXava version on a 32-bit computer.
+- Composite key explanation included in JPA documentation.
+- Lesson 6 of course upgraded to latest OpenXava features and includes an example of calling REST services.
+- Lesson 2 of course simplified removing some error prone parts.
+- Fix: Reference search icon bad displayed on hover inside element collections.
+- Fix: On removing rows from an element collection calculated properties dependent on totals not updated.
+- Fix: Property dependent on a total property of an element collection not recalculated when total changed.
+- Fix: Calculated properties are not refreshed on adding to collection.
+- Fix: Calculated properties available for "group by" in list, when they cannot be used for grouping.
+- Fix: Read only HTML_TEXT in a section put all content in a row overflowing the screen.
+- Fix: Generate PDF with an IIconEnum property in the list produces an error.
+- Fix: Date, LocalDate and DATETIME do not work with Croatian language.
+- Fix: When running from application launcher the default i18n does not work
+- Fix: The updateOX Ant target fails after a clean of OpenXava project.
+- Fix: Not applicable warnings on updateOX and deployWar Ant targets.
+- Fix: Error message of javax.validation.ValidationException from setter not shown on adding to a collection.
+- Fix: @EntityValidator does not work when entity is modified on adding to a collection.
+- Fix: On adding elements to a collection it closes the dialog even if no elements has been added.
+- Fix: Reference not injected in @EntityValidator on modify if it is not on the user interface.
+- Fix: Required validation on modifying does not work for IMAGES_GALLERY and FILES.
+- Fix: Removing a file from an upload editor does not work if it has an @OnChange action associated. 
+- Fix: Upload editor (PHOTO, IMAGES_GALLERY and FILES) doesn't allow to download file when read only.
+- Fix: Links of menu in JPA docs in Spanish broken. 
+- Fix: Assigning initial value to a reference used as mappedBy of an @OrderColumn list breaks the list.
+- Fix: Saving an entity with a reference with empty value used by a mappedBy of an @OrderColumn fails.
+- Fix: Creating a new element in an @OneToMany shows "You will lose all changes" message leaving record.
+- Fix: From time to time changing the theme by a user changes the login page theme for all users.
+
+OpenXava 6.4 (2020-7-28)
+------------------------
+- OpenXava Studio, a specific OpenXava IDE, included in the distribution.
+- Searching by collection content from list mode allowing qualified collection properties in @Tab.
+- Import data from list supports importing references, not just plain properties.
+- ENTER to move to next field with enterMovesToNextField=true in xava.properties.
+- New attribute filter in @DescriptionsList to use an IFilter like the ones used by @Tab.
+- New attribute filter in <descriptions-list> of XML components to use an IFilter.
+- Self-sufficient distributions for Windows, Linux and Mac (install Java and Eclipse is not needed).
+- An open source JRE (Zulu) included in the distribution.
+- Building workspace time for Eclipse optimized.
+- Getting started guide simplified and adapted to use OpenXava Studio.
+- Lesson 5 of course upgraded to latest features.
+- Creation confirmation messages include field values if they are generated on saving.
+- Total properties allowed in an @ElementCollection of a base class.
+- View.setLabelId() to allow changing the label of sections and groups.
+- New method assertLabel(int sectionIndex, String expectedLabel) in ModuleTestBase.
+- Detail mode of InvoiceDemo improved.
+- Header with breadcrumbs navigation in each documentation page.
+- Chapter navigation on top of table of contents for course and reference guide.
+- Links no longer open new windows or tab in documentation.
+- Documentation style adapted to fit better inside OpenXava Studio.
+- More descriptive HTML title in each documentation page. 
+- IThemeProvider to define your own logic to choose the current theme.
+- Automatic label for reference member in list improved.
+- Russian translation improved including labels for latest releases.
+- Fix: Combining inheritance, generic types and @ReferenceView fails.
+- Fix: @DefaultValueCalculator does not work for total properties of a collection if @View is specified.
+- Fix: assertTotalInCollection() in tests does not work for MONEY properties.
+- Fix: Horizontal scrollbar in list mode with large list configuration descriptions.
+- Fix: OpenXava.jar and openxava.jar files duplicated in Linux/Mac.
+
+OpenXava 6.3.2 (2020-5-12)
+--------------------------
+- New initialModule property in naviox.properties to start with your own module instead of First Steps.
+- New IProcedure functional interface that does not receive or return any value to be use in lambdas.
+- Instructions to install Java and Eclipse improved in Getting Started guide.
+- Application chapter of reference guide improved.
+- Some new common use labels to be used in applications.
+- Fix: Setting a reference used as mappedBy in an @OrderColumn breaks the collection.
+- Fix: Combo for list configurations too large for complex filters.
+- Fix: Calendar icon hides the date with Edge in Spanish.
+- Fix: Drag & drop does not work with Chrome in touch screens.
+- Fix: Excel import does not work when csvSeparator=, in xava.properties.
+- Fix: Importing Excel with ; in some field truncates data or move it to another column. 
+- Fix: ConcurrentModificationException from time to time for the first execution of the first module. 
+- Fix: 'Impossible to execute Select action' error when the first module executed enters in detail mode.  
+- Fix: Clicking on label in radio button editor does not change the option.
+- Fix: Tab.setConditionValue() does not work for references.
+- Fix: java.sql.Time and TIME stereotype do not allow nulls, always save 00:00 instead.
+- Fix: View.setEditable(member, false) does not work for embedded references.
+- Fix: startInLastVisitedModule=false in naviox.properties has no effect.
+- Fix: @ManyToMany collections with cascade REMOVE do not work.
+- Fix: BigDecimalValidator with 7 or more decimals fails.
+- Fix: When customizeList=false in xava.properties the icon to show/hide the filter in list is not shown.
+- Fix: After removing a row in an @ElementCollection, @DescriptionsLists after that row stop to work.
+- Fix: 'Loading...' message does not disappear from time to time.
+- Fix: Viewing image at full size on click does not work with upload file editor on Edge.
+
+OpenXava 6.3.1 (2020-4-1)
+-------------------------
+- Dialogs aligned on top, lowering a little for each new nested dialog to show the titles of all dialogs.
+- Lesson 4 of course upgraded to latest features.
+- Workspace in distribution upgraded to Eclipse 2020-03, though it still works with Neon (4.6).
+- Some new common use labels to be used in applications.
+- Fix: BeanValidation does not work when saving directly with JPA from time to time under high load.
+- Fix: After reordering an @OrderColumn collection editing/removing an element edits/removes a wrong one.
+- Fix: Hide members from an @OnChange action in an embedded inside a dialog has not effect.
+- Fix: Navigation by selected records starts by the first one after saving a record.
+- Fix: Inserting thousands separator automatically as you type does not work for Chrome, IE and Edge.
+- Fix: Some English source code in Spanish course.
+- Fix: Tooltips for actions with apostrophe are shown truncated. 
+- Fix: Row action with confirm=true and description with apostrophe does not work.
+- Fix: Delete button does not work in a row for French.
+- Fix: Title in dialog shows a number instead of apostrophe.
+- Fix: Labels of bottom buttons are truncated with they contain an apostrophe.
+- Fix: "FWK005 parse may not be called while parsing" on parsing XMLs from time to time. 
+- Fix: Two apostrophes one after the other in labels if they are in that way in labels files. 
+- Fix: When View.setValue() for a transient property it will ask confirmation before leave the record. 
+- Fix: Upload editor disabled when inside an already closed frame. 
+- Fix: Adding a new file to a FILES property that already has files using the Explore link fails. 
+- Fix: Generate PDF and Generate Excel fail when hibernate.cfg.xml is misconfigured. 
+- Fix: Scrollbar when the mouse over last element of a descriptions list with Firefox and Internet Explorer. 
+- Fix: Combining hide/show member in a dialog with changing sections displaces the dialog outside screen.
+- Fix: Actions inside dialog have a wrong visual style.
+- Fix: Search reference icon inside element collections is an opaque circle.   
+- Fix: Fail with locales that use ' as decimal separator, such as Switzerland.
+- Fix: Pagination in collections goes back to first page after editing/viewing an element with a dialog.
+- Fix: Creating a new element in a collection of entities fails with XML components.
+- Fix: Nested aggregate collections do not work with XML components. 
+ 
+OpenXava 6.3 (2020-2-26)
+------------------------
+- Terra theme softened.
+- Light theme unified with Terra, though it keeps its colors. 
+- New visual themes Dark, Black & White and Blue.  
+- Color refactoring to allow creating a new color scheme defining a few colors.
+- Moving all colors to variables in CSS. 
+- base.css to facilitate the creation of a new CSS style.
+- Theme chooser available for the user. 
+- IntelliJ IDEA support including documentation.
+- Asks for confirmation when leaving a record with changed data without saving first.
+- New loses-changed-data option for <action/> in controllers.xml.
+- Application can run in root context, that without application name in URL.
+- IIconEnum to associate an icon to each option of an enum.
+- Blank option can be removed from dynamic combos with View.removeBlankValidValue().
+- New methods in View for dynamic combos: clearValidValues(), disableValidValues() and hasBlankValidValue(). 
+- Material Design Icons upgraded to 4.9.95. Now with 4996 icons available.
+- Lessons from 1 to 3 of course upgraded to latest features.
+- Workspace in distribution upgraded to Eclipse 2019-12, though it still works with Neon (4.6).
+- Maven documentation updated.
+- Some new common use labels to be used in applications.
+- Fix: List formatters do not apply to enums in @OrderColumn lists, calculated and many to many collections.
+
+OpenXava 6.2.2 (2019-12-9)
+--------------------------
+- Migration documentation for adapting views to new FILES stereotype.
+- Some new common use labels to be used in applications.
+- Fix: JasperMultipleReportBaseAction with a type other than PDF has null as file name.
+- Fix: Format type in JasperMultipleReportBaseAction lost after first report.
+- Fix: updateOX ant task overwrites web/META-INF/context.xml sometimes when you update OpenXava version.
+- Fix: Dependent @DescriptionsList in an @ElementCollection fails when depends uses "this" as prefix.
+- Fix: Dependent @DescriptionsList in an @ElementCollection inside a dialog does not display the editor.
+- Fix: TypicalNotResetOnSave.save keystroke does not match CRUD.save keystroke.
+- Fix: Grouping by a year or month of a date in list and then order by that date fails.
+- Fix: Link in WEBURL fails when URL starts with "https://".
+- Fix: HTML_TEXT alone in a section with flowLayout=true has no margin on left.
+- Fix: When editing a DISCUSSION property the collections of other sections are narrowed.  
+- Fix: @Column(scale=) ignored when MONEY stereotype is used.
+- Fix: Throwing ValidationException from a validator doesn't show the original message saving with JPA.
+- Fix: XPersistence.setDefaultSchema() does to work for MySQL if dialect is not specified.
+- Fix: Adding an element to a collection of an entity with @EmbeddedId fails.
+- Fix: Deleting from list mode with @EmbeddedId fails.
+- Fix: Labels for excel generation in list mode are not qualified.
+- Fix: @DescriptionsList combos with tildes opened by default with Internet Explorer 11.
+- Fix: New element in an @OrderColumn list with @OneToMany without cascade fails.
+- Fix: Getting started guides still make references to configure Tomcat inside Eclipse. 
+- Fix: Calling getEntity() from an @OnChange action of a references throws an exception.
+- Fix: Error creating an entity with a collection with @Size(min=) and new ArrayList<>() in the declaration. 
+- Fix: ModuleTestBase.login() does not find the user field from time to time.
+- Fix: Module loses its state from time to time under high load on server.
+
 OpenXava 6.2.1 (2019-11-5)
 --------------------------
 - Some new common use labels to be used in applications.
 - Fix: Eclipse compilation errors on open OpenXava workspace because it is not refreshed on startup.
-- Fix: Print &quot; instead of " in PDF reports.
+- Fix: Print &quot;, &lt and &gt; instead of ", < and > in PDF reports.
 - Fix: Saving an element in a nested collection if root collection is not cascade remove fails.
 - Fix: New action of a collection inside a collection element of a not cascade remove collection fails.
 - Fix: View.setFocus() does not select the text of the focused editor.

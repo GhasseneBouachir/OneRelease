@@ -276,14 +276,15 @@ public class MetaTab implements java.io.Serializable, Cloneable {
 	 * Names of properties that must to exist but is not needed show they
 	 * to users.
 	 * <p>
-	 * Usually are properties used to calcualte others. <br>
+	 * Usually are properties used to calculate others. <br>
 	 * The keys are excluded. <br>
 	 * 
 	 * @return Not null, read only and of type <tt>String</tt>.
 	 */
 	public List getHiddenPropertiesNames() throws XavaException {
 		if (hiddenPropertiesNames == null) {
-			hiddenPropertiesNames = getMetaModel().isAnnotatedEJB3()?Collections.EMPTY_LIST:obtainPropertiesNamesUsedToCalculate(); 
+			hiddenPropertiesNames = getMetaModel().isAnnotatedEJB3()?Collections.EMPTY_LIST:obtainPropertiesNamesUsedToCalculate();
+			
 		}
 		return hiddenPropertiesNames;
 	}
@@ -763,7 +764,7 @@ public class MetaTab implements java.io.Serializable, Cloneable {
 	}
 
 	public List<String> getRemainingPropertiesNames() throws XavaException { 
-		List<String> result = new ArrayList<String>(getMetaModel().getRecursiveQualifiedPropertiesNames()); 
+		List<String> result = new ArrayList<String>(getMetaModel().getRecursiveQualifiedPropertiesNamesIncludingCollections()); 
 		result.removeAll(getPropertiesNames());
 		removeDroppedMembers(result);
 		return result;
@@ -773,7 +774,7 @@ public class MetaTab implements java.io.Serializable, Cloneable {
 	 * @since 5.2
 	 */
 	public List getRemainingPropertiesNamesUntilSecondLevel() throws XavaException {  
-		List result = new ArrayList(getMetaModel().getRecursiveQualifiedPropertiesNamesUntilSecondLevel());
+		List result = new ArrayList(getMetaModel().getRecursiveQualifiedPropertiesNamesUntilSecondLevelIncludingCollections()); 
 		result.removeAll(getPropertiesNames());
 		removeDroppedMembers(result); 
 		return result;

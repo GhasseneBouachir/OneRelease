@@ -28,7 +28,7 @@
 	<property name="server.properties.dir" value="${openxava.base.dir}/OpenXava/build/server-properties"/>
 	<property name="server.properties.tmp.dir" value="${user.home}/tmpServerProperties"/>
 	<property name="model.package" value="model"/>
-	<property name="javac.version" value="1.6"/>
+	<property name="javac.version" value="1.8"/>
 	<property name="portlet.encoding" value="UTF-8"/>
 	<property name="deploy.portlets.dir" value="${deploy.dir}/openxava${war.dir.suffix}/WEB-INF/deploy"/>
 	<property name="generate.jetspeed2.files" value="true"/>
@@ -334,7 +334,6 @@
 			<arg value="${package}"/>
 			<arg value="${model.package}"/>
 			<classpath>
-				<pathelement path="${openxava.base.dir}/OpenXava/bin"/>
 				<fileset dir="${openxava.base.dir}/OpenXava/web/WEB-INF/lib">
 					<include name="**/*.jar"/>
 				</fileset>
@@ -473,9 +472,6 @@
 			-->
 			<classpath>
 				<pathelement path="${openxava.base.dir}/OpenXava/bin"/>
-				<fileset dir="${openxava.base.dir}/OpenXava/web/WEB-INF/lib">
-					<include name="**/*.jar"/>
-				</fileset>
 				<fileset dir="${openxava.base.dir}/OpenXava/lib">
 					<include name="**/*.jar"/>
 				</fileset>
@@ -624,13 +620,13 @@
 	</target>
 
 	<target name="createWebXml">
-		<loadfile property="servlets.xml" srcfile="../${project}/web/WEB-INF/servlets.xml" failonerror="false"/>
+		<loadfile property="servlets.xml" srcfile="../${project}/web/WEB-INF/servlets.xml" failonerror="false" quiet="true"/>
 		<property name="servlets.xml" value=""/>
-		<loadfile property="filters.xml" srcfile="../${project}/web/WEB-INF/filters.xml" failonerror="false"/>
+		<loadfile property="filters.xml" srcfile="../${project}/web/WEB-INF/filters.xml" failonerror="false" quiet="true"/>
 		<property name="filters.xml" value=""/>
-		<loadfile property="listeners.xml" srcfile="../${project}/web/WEB-INF/listeners.xml" failonerror="false"/>
+		<loadfile property="listeners.xml" srcfile="../${project}/web/WEB-INF/listeners.xml" failonerror="false" quiet="true"/>
 		<property name="listeners.xml" value=""/>
-		<loadfile property="resources.xml" srcfile="../${project}/web/WEB-INF/resources.xml" failonerror="false"/>
+		<loadfile property="resources.xml" srcfile="../${project}/web/WEB-INF/resources.xml" failonerror="false" quiet="true"/>
 		<property name="resources.xml" value=""/>
 		<copy file="${openxava.base.dir}/OpenXava/web/WEB-INF/web.xml" 
   			todir="../${project}/web/WEB-INF" overwrite="true">
@@ -662,26 +658,21 @@
 		<antcall target="filter"/>
 		<antcall target="createEditorsJS"/>
 		<antcall target="createDefaultI18nFiles"/>
-		<jar jarfile="../${project}/web/WEB-INF/lib/openxava.jar" basedir="${openxava.base.dir}/OpenXava/bin"/>
 	</target>
 	
 	<target name="createDefaultI18nFiles">
-		<copy file="${openxava.base.dir}/OpenXava/bin/Messages_${default.language}.properties" 
-			tofile="${openxava.base.dir}/OpenXava/bin/Messages.properties"/>
-		<copy file="${openxava.base.dir}/OpenXava/bin/Labels_${default.language}.properties" 
-			tofile="${openxava.base.dir}/OpenXava/bin/Labels.properties"/>
 		<copy file="../${project}/${classes.dir}/${project}-messages_${default.language}.properties" 
 			tofile="../${project}/${classes.dir}/${project}-messages.properties"
-			failonerror="false"/>
+			failonerror="false" quiet="true"/> 
 		<copy file="../${project}/${classes.dir}/${project}-labels_${default.language}.properties" 
 			tofile="../${project}/${classes.dir}/${project}-labels.properties"
-			failonerror="false"/>
+			failonerror="false" quiet="true"/> 
 		<copy file="../${project}/${classes.dir}/Mensajes${project}_${default.language}.properties" 
 			tofile="../${project}/${classes.dir}/Mensajes${project}.properties"
-			failonerror="false"/>
+			failonerror="false" quiet="true"/> 
 		<copy file="../${project}/${classes.dir}/Etiquetas${project}_${default.language}.properties" 
 			tofile="../${project}/${classes.dir}/Etiquetas${project}.properties"
-			failonerror="false"/>		
+			failonerror="false" quiet="true"/> 		
 	</target>
 
 	<target name="createWar" depends="prepareWar">
@@ -822,7 +813,7 @@
 			<fileset dir="web/xava/editors/ckeditor"/>
 		</copy>
 		<copy todir="${dist.portlets.dir}/WEB-INF/jsp" >
-			<fileset dir="web" excludes="WEB-INF/**, xava/images/**, xava/style/**, xava/editors/js/**, xava/editors/calendar/**, xava/editors/ckeditor/**, xava/jasperReport.jsp public/**"/>
+			<fileset dir="web" excludes="WEB-INF/**, xava/images/**, xava/style/**, xava/editors/js/**, xava/editors/flatpickr/**, xava/editors/ckeditor/**, xava/jasperReport.jsp public/**"/>
 		</copy>
 		<copy todir="${dist.portlets.dir}/public" failonerror="false">
 			<fileset dir="web/public"/>
@@ -918,7 +909,6 @@
 		<antcall target="createWebXml"/>
 		<antcall target="createDefaultI18nFiles"/>
 		<antcall target="createAppLauncher"/> 
-		<jar jarfile="../${project}/web/WEB-INF/lib/openxava.jar" basedir="${openxava.base.dir}/OpenXava/bin"/>
 		<!-- Delete the old Hibernate jars (used until v4m5) -->
 		<delete file="../${project}/web/WEB-INF/lib/ejb3-persistence.jar"/>
 		<delete file="../${project}/web/WEB-INF/lib/hibernate-annotations.jar"/>
@@ -933,12 +923,16 @@
 		<delete file="../${project}/web/WEB-INF/lib/commons-jexl.jar"/>
 		<delete file="../${project}/web/WEB-INF/lib/hibernate-entitymanager.jar"/>
 		<delete file="../${project}/web/WEB-INF/lib/jboss-logging-annotations.jar"/>
+		<delete file="../${project}/web/WEB-INF/lib/addons-pro.jar"/>
 		
 		<!-- Delete unused CSS -->
 		<delete file="../${project}/web/xava/style/openxava.css"/>
 		<!-- Delete old FCKeditor files -->
 		<delete file="../${project}/web/xava/editors/fckEditor.jsp"/>
 		<delete dir="../${project}/web/xava/editors/FCKeditor"/>
+		<!-- Delete old Calendar files -->
+		<delete file="../${project}/web/xava/js/calendar.js"/>
+		<delete dir="../${project}/web/xava/editors/calendar"/>
 		<!-- Delete unused JS -->
 		<delete file="../${project}/web/xava/js/jquery.qtip.js"/>
 		<delete file="../${project}/web/xava/js/jquery.bgiframe.min.js"/>
@@ -974,6 +968,70 @@
 		
 	</target>
 	
+	<!--
+	Compile Java code of OpenXava project and create openxava.jar.
+	Call it after you modify OpenXava code, but you still need to call updateOX in your project.
+	-->
+	<target name="buildOpenXava">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${openxava.base.dir}/OpenXava/bin" includes="**/*"/>
+		</delete>		
+		<delete file="${openxava.base.dir}/OpenXava/web/WEB-INF/lib/openxava.jar"/>
+		<antcall target="javac">
+			<param name="compile.project" value="OpenXava"/>
+		</antcall>
+		<copy todir="${openxava.base.dir}/OpenXava/bin">
+			<fileset dir="${openxava.base.dir}/OpenXava/xava"/>
+			<fileset dir="${openxava.base.dir}/OpenXava/properties"/>
+			<fileset dir="${openxava.base.dir}/OpenXava/i18n"/>
+		</copy>
+		<copy file="${openxava.base.dir}/OpenXava/bin/Messages_${default.language}.properties" 
+			tofile="${openxava.base.dir}/OpenXava/bin/Messages.properties"/>
+		<copy file="${openxava.base.dir}/OpenXava/bin/Labels_${default.language}.properties" 
+			tofile="${openxava.base.dir}/OpenXava/bin/Labels.properties"/>
+		<jar jarfile="${openxava.base.dir}/OpenXava/web/WEB-INF/lib/openxava.jar" basedir="${openxava.base.dir}/OpenXava/bin"/>
+		<delete includeemptydirs="true">
+			<fileset dir="${openxava.base.dir}/OpenXava/bin" includes="**/*"/>
+		</delete>
+	</target>
+	
+	<target name="buildAddons">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${openxava.base.dir}/Addons/bin" includes="**/*"/>
+		</delete>		
+		<delete file="${openxava.base.dir}/Addons/web/WEB-INF/lib/addons.jar"/>
+		<antcall target="javac">
+			<param name="compile.project" value="Addons"/>
+		</antcall>
+		<copy todir="${openxava.base.dir}/Addons/bin" failonerror="false" quiet="true">
+			<fileset dir="${openxava.base.dir}/Addons/xava"/>
+			<fileset dir="${openxava.base.dir}/Addons/properties"/>
+		</copy>		
+		<jar jarfile="${openxava.base.dir}/Addons/web/WEB-INF/lib/addons.jar" basedir="${openxava.base.dir}/Addons/bin"/>
+		<delete includeemptydirs="true">
+			<fileset dir="${openxava.base.dir}/Addons/bin" includes="**/*"/>
+		</delete>
+	</target>
+	
+	<target name="javac">
+		<mkdir dir="${openxava.base.dir}/${compile.project}/bin"/>
+		<delete includeemptydirs="true">
+		  <fileset dir="${openxava.base.dir}/${compile.project}/bin" includes="**/*"/>
+		</delete>
+		<javac encoding="iso-8859-1" destdir="${openxava.base.dir}/${compile.project}/bin">
+			<src path="${openxava.base.dir}/${compile.project}/src"/>
+			<classpath>
+				<fileset dir="${openxava.base.dir}/OpenXava/web/WEB-INF/lib">
+					<include name="**/*.jar"/>
+				</fileset>
+				<fileset dir="${openxava.base.dir}/OpenXava/lib">
+					<include name="**/*.jar"/>
+				</fileset>
+				<pathelement path="${j2ee.lib};${xava.compiler.path}"/>
+			</classpath>
+		</javac>
+	</target>	
+	
 	<target name="defineJavaClass">
 		<script language="javascript">
 			var javaclass = project.getProperty("project").replace(/ /g,'').replace(/-/g,'');
@@ -992,6 +1050,9 @@
 			</filterset>
 		</copy>
 		<mkdir dir="../${project}/web/META-INF"/>
+		<touch>
+		    <fileset dir="../${project}/web/META-INF"/>
+		</touch>
 		<copy file="${openxava.base.dir}/OpenXava/project-templates/en/web/META-INF/context.xml" 
 			tofile="../${project}/web/META-INF/context.xml" overwrite="false">
 	    	<filterset>	    	
@@ -1028,16 +1089,14 @@
 				<present present="srconly" targetdir="../${project}/properties" />
 			</fileset>
 		</copy>
-		<copy todir="../${project}/src" overwrite="true" failonerror="false">
+		<copy todir="../${project}/src" overwrite="true" failonerror="false" quiet="true"> 
 			<fileset dir="${openxava.base.dir}/Addons/src-to-copy"/>
 		</copy>		
-		<delete file="../${project}/web/WEB-INF/lib/addons.jar" failonerror="false"/>
-		<jar jarfile="../${project}/web/WEB-INF/lib/addons.jar" basedir="${openxava.base.dir}/Addons/bin"/>		
 	</target>
 	
 	<target name="defineSchemaToolPath">
 		
-		<path id="schema.tool.path"> 
+		<path id="schema.tool.path">
 			<!-- Library from OpenXava in order to work the first time
 				before WEB-INF/lib of new project is populated -->
 			<fileset dir="${openxava.base.dir}/OpenXava/web/WEB-INF/lib">
@@ -1075,6 +1134,21 @@
 			<arg value="generate"/>
 			<arg value="${persistence.unit}"/>
 		</java>
-	</target>    
+	</target>
+	
+	<target name="defineDBManagerPath">
+		
+		<path id="dbmanager.path"> 
+			<fileset dir="${openxava.base.dir}/OpenXava/web/WEB-INF/lib">
+				<include name="**/*.jar"/>
+			</fileset>
+			<path path="${openxava.base.dir}/OpenXava/lib/hsqldb.jar"/>
+		</path>
+
+	</target>	
+
+	<target name="runDBManager" depends="defineDBManagerPath">
+		<java classname="org.openxava.tools.DBManager" classpathref="dbmanager.path" fork="true"/>
+	</target>
 
 </project>
