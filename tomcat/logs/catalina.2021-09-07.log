@@ -1,0 +1,270 @@
+07-Sep-2021 00:20:27.633 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.undeploy Repli (undeploy) de l'application web ayant pour chemin de contexte [/OneRelease]
+07-Sep-2021 00:20:27.669 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d2a5506]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@5c3e2374]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:20:27.672 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d2a5506]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@462fa534]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:20:27.673 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d2a5506]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@180ad956]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:20:27.674 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d2a5506]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@7173d34]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:20:27.674 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d2a5506]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@2a9f8b21]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:20:37.791 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+07-Sep-2021 00:20:43.794 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:20:44.029 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:20:44.392 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:20:44.393 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:20:44.686 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:20:46.256 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:20:46.558 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] has finished in [8 768] ms
+07-Sep-2021 00:27:07.114 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.reload Reloading context [/OneRelease]
+07-Sep-2021 00:27:07.114 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.core.StandardContext.reload Le rechargement du contexte [/OneRelease] a démarré
+07-Sep-2021 00:27:07.473 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@3f689977]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@79f0fb98]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:27:07.506 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@3f689977]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@6e13b06d]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:27:15.214 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:27:16.236 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:27:16.292 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:27:16.294 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:27:16.503 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:27:18.372 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:27:18.728 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.core.StandardContext.reload Le rechargement de ce contexte est terminé
+07-Sep-2021 00:31:39.618 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.undeploy Repli (undeploy) de l'application web ayant pour chemin de contexte [/OneRelease]
+07-Sep-2021 00:31:39.804 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@5b7bba7e]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@2c9aefc0]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:31:50.001 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+07-Sep-2021 00:31:56.886 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:31:57.212 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:31:57.266 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:31:57.269 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:31:57.424 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:31:58.635 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:31:58.909 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] has finished in [8 908] ms
+07-Sep-2021 00:37:49.876 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.undeploy Repli (undeploy) de l'application web ayant pour chemin de contexte [/OneRelease]
+07-Sep-2021 00:37:49.900 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+07-Sep-2021 00:37:49.941 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.core.ContainerBase.addChildInternal ContainerBase.addChild: start: 
+ org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/OneRelease]]
+	at org.apache.catalina.util.LifecycleBase.handleSubClassException(LifecycleBase.java:441)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:198)
+	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:743)
+	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:719)
+	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:695)
+	at org.apache.catalina.startup.HostConfig.deployDirectory(HostConfig.java:1141)
+	at org.apache.catalina.startup.HostConfig$DeployDirectory.run(HostConfig.java:1876)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:112)
+	at org.apache.catalina.startup.HostConfig.deployDirectories(HostConfig.java:1053)
+	at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:428)
+	at org.apache.catalina.startup.HostConfig.check(HostConfig.java:1629)
+	at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:304)
+	at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:123)
+	at org.apache.catalina.core.ContainerBase.backgroundProcess(ContainerBase.java:1179)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1401)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1405)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.run(ContainerBase.java:1373)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.lang.NoClassDefFoundError: javax/ws/rs/core/Application
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.catalina.startup.WebappServiceLoader.loadServices(WebappServiceLoader.java:188)
+	at org.apache.catalina.startup.WebappServiceLoader.load(WebappServiceLoader.java:159)
+	at org.apache.catalina.startup.ContextConfig.processServletContainerInitializers(ContextConfig.java:1655)
+	at org.apache.catalina.startup.ContextConfig.webConfig(ContextConfig.java:1132)
+	at org.apache.catalina.startup.ContextConfig.configureStart(ContextConfig.java:769)
+	at org.apache.catalina.startup.ContextConfig.lifecycleEvent(ContextConfig.java:299)
+	at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:123)
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5007)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+	... 19 more
+Caused by: java.lang.ClassNotFoundException: javax.ws.rs.core.Application
+	at org.apache.catalina.loader.WebappClassLoaderBase.loadClass(WebappClassLoaderBase.java:1328)
+	at org.apache.catalina.loader.WebappClassLoaderBase.loadClass(WebappClassLoaderBase.java:1157)
+	... 30 more
+
+07-Sep-2021 00:37:49.943 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Erreur lors du déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+ java.lang.IllegalStateException: ContainerBase.addChild: start: org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/OneRelease]]
+	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:747)
+	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:719)
+	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:695)
+	at org.apache.catalina.startup.HostConfig.deployDirectory(HostConfig.java:1141)
+	at org.apache.catalina.startup.HostConfig$DeployDirectory.run(HostConfig.java:1876)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:112)
+	at org.apache.catalina.startup.HostConfig.deployDirectories(HostConfig.java:1053)
+	at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:428)
+	at org.apache.catalina.startup.HostConfig.check(HostConfig.java:1629)
+	at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:304)
+	at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:123)
+	at org.apache.catalina.core.ContainerBase.backgroundProcess(ContainerBase.java:1179)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1401)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1405)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.run(ContainerBase.java:1373)
+	at java.lang.Thread.run(Thread.java:748)
+
+07-Sep-2021 00:37:49.946 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] has finished in [46] ms
+07-Sep-2021 00:37:59.957 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.undeploy Repli (undeploy) de l'application web ayant pour chemin de contexte [/OneRelease]
+07-Sep-2021 00:37:59.959 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.deploy.NamingResourcesImpl.cleanUp Failed to retrieve JNDI naming context for container [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/OneRelease]] so no cleanup was performed for that container
+ javax.naming.NameNotFoundException: Le Nom [comp/env] n'est pas lié à ce Contexte
+	at org.apache.naming.NamingContext.lookup(NamingContext.java:817)
+	at org.apache.naming.NamingContext.lookup(NamingContext.java:173)
+	at org.apache.catalina.deploy.NamingResourcesImpl.cleanUp(NamingResourcesImpl.java:1021)
+	at org.apache.catalina.deploy.NamingResourcesImpl.stopInternal(NamingResourcesImpl.java:1003)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:257)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:5345)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:257)
+	at org.apache.catalina.util.LifecycleBase.destroy(LifecycleBase.java:293)
+	at org.apache.catalina.core.ContainerBase.removeChild(ContainerBase.java:845)
+	at org.apache.catalina.startup.HostConfig.undeploy(HostConfig.java:1434)
+	at org.apache.catalina.startup.HostConfig.checkResources(HostConfig.java:1342)
+	at org.apache.catalina.startup.HostConfig.check(HostConfig.java:1620)
+	at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:304)
+	at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:123)
+	at org.apache.catalina.core.ContainerBase.backgroundProcess(ContainerBase.java:1179)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1401)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1405)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.run(ContainerBase.java:1373)
+	at java.lang.Thread.run(Thread.java:748)
+
+07-Sep-2021 00:37:59.979 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+07-Sep-2021 00:38:06.082 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:38:06.327 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:38:06.364 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:38:06.364 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:38:06.493 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:38:07.930 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:38:08.332 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] has finished in [8 353] ms
+07-Sep-2021 00:44:18.785 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.reload Reloading context [/OneRelease]
+07-Sep-2021 00:44:18.786 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.core.StandardContext.reload Le rechargement du contexte [/OneRelease] a démarré
+07-Sep-2021 00:44:19.024 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@59cc54e9]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@68b8b832]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:44:19.025 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@59cc54e9]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@365831a2]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:44:25.254 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:44:25.845 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:44:25.891 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:44:25.892 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:44:26.020 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:44:27.274 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:44:27.581 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.core.StandardContext.reload Le rechargement de ce contexte est terminé
+07-Sep-2021 00:48:48.454 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.undeploy Repli (undeploy) de l'application web ayant pour chemin de contexte [/OneRelease]
+07-Sep-2021 00:48:58.528 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+07-Sep-2021 00:49:03.828 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:49:04.061 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:49:04.099 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:49:04.099 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:49:04.228 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:49:05.319 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:49:05.615 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] has finished in [7 087] ms
+07-Sep-2021 00:50:45.767 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.reload Reloading context [/OneRelease]
+07-Sep-2021 00:50:45.776 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.core.StandardContext.reload Le rechargement du contexte [/OneRelease] a démarré
+07-Sep-2021 00:50:45.992 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@12690bd3]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@386bb7bf]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:50:45.992 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@12690bd3]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@1768b82d]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:50:51.834 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:50:52.439 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:50:52.479 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:50:52.480 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:50:52.624 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:50:53.856 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:50:54.463 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.core.StandardContext.reload Le rechargement de ce contexte est terminé
+07-Sep-2021 00:53:05.158 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.undeploy Repli (undeploy) de l'application web ayant pour chemin de contexte [/OneRelease]
+07-Sep-2021 00:53:15.225 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+07-Sep-2021 00:53:21.074 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:53:21.448 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:53:21.486 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:53:21.486 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:53:21.695 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:53:23.115 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:53:23.379 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] has finished in [8 154] ms
+07-Sep-2021 00:56:44.221 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.undeploy Repli (undeploy) de l'application web ayant pour chemin de contexte [/OneRelease]
+07-Sep-2021 00:56:44.229 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.session.StandardManager.stopInternal Exception au déchargement des sessions vers le stockage persistant (persistent storage)
+ java.lang.IllegalStateException: java.io.FileNotFoundException: C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease\WEB-INF\lib\activation-1.1.jar (Le chemin d’accès spécifié est introuvable)
+	at org.apache.catalina.webresources.AbstractSingleArchiveResourceSet.getArchiveEntry(AbstractSingleArchiveResourceSet.java:101)
+	at org.apache.catalina.webresources.AbstractArchiveResourceSet.getResource(AbstractArchiveResourceSet.java:256)
+	at org.apache.catalina.webresources.StandardRoot.getResourceInternal(StandardRoot.java:281)
+	at org.apache.catalina.webresources.Cache.getResource(Cache.java:62)
+	at org.apache.catalina.webresources.StandardRoot.getResource(StandardRoot.java:216)
+	at org.apache.catalina.webresources.StandardRoot.getClassLoaderResource(StandardRoot.java:225)
+	at org.apache.catalina.loader.WebappClassLoaderBase.findClassInternal(WebappClassLoaderBase.java:2260)
+	at org.apache.catalina.loader.WebappClassLoaderBase.findClass(WebappClassLoaderBase.java:834)
+	at org.apache.catalina.loader.WebappClassLoaderBase.loadClass(WebappClassLoaderBase.java:1297)
+	at org.apache.catalina.loader.WebappClassLoaderBase.loadClass(WebappClassLoaderBase.java:1157)
+	at java.lang.Class.getDeclaredMethods0(Native Method)
+	at java.lang.Class.privateGetDeclaredMethods(Class.java:2701)
+	at java.lang.Class.getDeclaredMethod(Class.java:2128)
+	at java.io.ObjectStreamClass.getPrivateMethod(ObjectStreamClass.java:1629)
+	at java.io.ObjectStreamClass.access$1700(ObjectStreamClass.java:79)
+	at java.io.ObjectStreamClass$3.run(ObjectStreamClass.java:520)
+	at java.io.ObjectStreamClass$3.run(ObjectStreamClass.java:494)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.io.ObjectStreamClass.<init>(ObjectStreamClass.java:494)
+	at java.io.ObjectStreamClass.lookup(ObjectStreamClass.java:391)
+	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:1134)
+	at java.io.ObjectOutputStream.defaultWriteFields(ObjectOutputStream.java:1548)
+	at java.io.ObjectOutputStream.writeSerialData(ObjectOutputStream.java:1509)
+	at java.io.ObjectOutputStream.writeOrdinaryObject(ObjectOutputStream.java:1432)
+	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:1178)
+	at java.io.ObjectOutputStream.writeObject(ObjectOutputStream.java:348)
+	at org.apache.catalina.session.StandardSession.doWriteObject(StandardSession.java:1667)
+	at org.apache.catalina.session.StandardSession.writeObjectData(StandardSession.java:1065)
+	at org.apache.catalina.session.StandardManager.doUnload(StandardManager.java:315)
+	at org.apache.catalina.session.StandardManager.unload(StandardManager.java:267)
+	at org.apache.catalina.session.StandardManager.stopInternal(StandardManager.java:382)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:257)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:5327)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:257)
+	at org.apache.catalina.core.ContainerBase.removeChild(ContainerBase.java:834)
+	at org.apache.catalina.startup.HostConfig.undeploy(HostConfig.java:1434)
+	at org.apache.catalina.startup.HostConfig.checkResources(HostConfig.java:1360)
+	at org.apache.catalina.startup.HostConfig.check(HostConfig.java:1620)
+	at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:304)
+	at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:123)
+	at org.apache.catalina.core.ContainerBase.backgroundProcess(ContainerBase.java:1179)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1401)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1405)
+	at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.run(ContainerBase.java:1373)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.io.FileNotFoundException: C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease\WEB-INF\lib\activation-1.1.jar (Le chemin d’accès spécifié est introuvable)
+	at java.util.zip.ZipFile.open(Native Method)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:225)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:155)
+	at java.util.jar.JarFile.<init>(JarFile.java:166)
+	at java.util.jar.JarFile.<init>(JarFile.java:130)
+	at org.apache.tomcat.util.compat.JreCompat.jarFileNewInstance(JreCompat.java:164)
+	at org.apache.tomcat.util.compat.JreCompat.jarFileNewInstance(JreCompat.java:149)
+	at org.apache.catalina.webresources.AbstractArchiveResourceSet.openJarFile(AbstractArchiveResourceSet.java:307)
+	at org.apache.catalina.webresources.AbstractSingleArchiveResourceSet.getArchiveEntry(AbstractSingleArchiveResourceSet.java:97)
+	... 44 more
+
+07-Sep-2021 00:56:44.237 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d104b27]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@2811647c]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:56:44.237 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d104b27]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@562cab79]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:56:44.238 GRAVE [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.loader.WebappClassLoaderBase.checkThreadLocalMapForLeaks The web application [OneRelease] created a ThreadLocal with key of type [java.lang.ThreadLocal] (value [java.lang.ThreadLocal@4d104b27]) and a value of type [org.openxava.util.EmailNotifications.ModuleInfo] (value [org.openxava.util.EmailNotifications$ModuleInfo@2c5da6c5]) but failed to remove it when the web application was stopped. Threads are going to be renewed over time to try and avoid a probable memory leak.
+07-Sep-2021 00:56:54.286 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Déploiement du répertoire [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] de l'application web
+07-Sep-2021 00:57:00.318 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+07-Sep-2021 00:57:00.674 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.PackagesResourceConfig.init Scanning for root resource and provider classes in the packages:
+  org.webservice
+07-Sep-2021 00:57:00.732 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.logClasses Root resource classes found:
+  class org.webservice.EndPoint
+07-Sep-2021 00:57:00.734 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.api.core.ScanningResourceConfig.init No provider classes found.
+07-Sep-2021 00:57:00.951 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.server.impl.application.WebApplicationImpl._initiate Initiating Jersey application, version 'Jersey: 1.8-ea03 06/10/2011 03:17 PM'
+07-Sep-2021 00:57:02.210 AVERTISSEMENT [ContainerBackgroundProcessor[StandardEngine[Catalina]]] com.sun.jersey.spi.inject.Errors.processErrorMessages The following warnings have been detected with resource and/or provider classes:
+  WARNING: A HTTP GET method, public javax.ws.rs.core.Response org.webservice.EndPoint.verifyRESTService(java.io.InputStream), should not consume any entity.
+07-Sep-2021 00:57:02.496 INFOS [ContainerBackgroundProcessor[StandardEngine[Catalina]]] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\tomcat\webapps\OneRelease] has finished in [8 210] ms
