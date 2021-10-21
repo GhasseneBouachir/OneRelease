@@ -1,0 +1,43 @@
+package client;
+
+import java.rmi.*;
+import java.rmi.registry.*;
+
+import server.*;
+
+public class ProductClient {
+public ProductClient (String [] args) {
+	int A [][] = {{1,2,3},{1,2,3},{1,2,3}};
+	int B [][] = {{1,2,3},{1,2,3},{1,2,3}};
+		    try{
+			  if(System.getSecurityManager() == null) 
+				System.setSecurityManager(new RMISecurityManager());
+		          Registry reg = LocateRegistry.getRegistry("localhost",1099); 
+			  FabProduitMatriceInterface fabrique = (FabProduitMatriceInterface) reg.lookup("Fabrique");
+		          ProduitInterface prod1;
+		          prod1 = (ProduitInterface)fabrique.newProduit(A,B);
+		          int [][] result1 = prod1.getResultProduct();
+		          System.out.println("result:" +"\n");
+		          afficher(result1);
+		     }    
+		     catch (Exception e) {
+			  System.out.println ("Erreur d'acces a l'objet distant.");
+			  System.out.println (e.toString());
+		          }
+		}
+
+static void afficher(int [][]M) throws Exception{
+	if(M == null){
+		throw new Exception("La matrice est à null");
+	}
+	    for (int i = 0;i < M.length;i++)
+	    {
+	        for (int j = 0;j < M[0].length ;j++)
+	        {
+	            System.out.printf("%4d ",M[i][j] );
+	        }
+	       System.out.println();
+	    }
+	    System.out.println();
+}
+}

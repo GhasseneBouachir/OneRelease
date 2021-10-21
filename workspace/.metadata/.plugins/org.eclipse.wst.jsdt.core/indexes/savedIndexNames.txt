@@ -1,0 +1,6 @@
+INDEX VERSION 1.4+C:\Users\ghass\OneDrive\Bureau\OneRelease\openxava-6.2.1\workspace\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+2621459915.index
+562285667.index
+3927708721.index
+3900329912.index
+3770854272.index

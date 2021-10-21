@@ -1,0 +1,5 @@
+package org.onerelease.model;
+
+public class Epic {
+
+}

@@ -1,0 +1,13 @@
+package tpjava;
+
+public class Ex1TLC {
+
+	public static void main(String[] args) {
+		String a = new String("");
+		int i=0;
+		while(i<10) {
+			System.out.println("a");
+		}
+	}
+
+}

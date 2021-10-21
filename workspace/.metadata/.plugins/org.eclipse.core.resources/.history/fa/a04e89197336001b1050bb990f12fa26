@@ -1,0 +1,17 @@
+package tpjava;
+import java.util.*;
+import java.util.regex.Pattern;
+public class Regex {
+public static void main(String[] args)
+{ 	String pattern,chaine;
+	while(true)
+	{	Scanner sc = new Scanner(System.in);
+		System.out.println("saisir le regex");
+		pattern = sc.next();
+		System.out.println("saie la chaîne à tester");
+		chaine = sc.next();
+		System.out.println(Pattern.matches(pattern, chaine));
+	
+	}
+	} 
+}

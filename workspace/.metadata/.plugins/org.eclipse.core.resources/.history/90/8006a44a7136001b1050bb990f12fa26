@@ -1,0 +1,10 @@
+package tpjava;
+import java.util.regex.Pattern;
+public class Regex {
+public static void main(String[] args)
+{ 
+	String chaine1 = "Test regex Java pour if4 fst.";
+	System.out.println(Pattern.matches("[A-Za-z ]* if4 fst\\.",chaine1));
+	System.out.println(Pattern.matches("a*b*a*b*","baa"));
+} 
+}

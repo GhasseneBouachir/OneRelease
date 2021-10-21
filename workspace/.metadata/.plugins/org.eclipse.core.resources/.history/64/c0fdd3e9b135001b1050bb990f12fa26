@@ -1,0 +1,17 @@
+package tpjava;
+import java.util.regex.Pattern;
+
+public class Ex1TLC {
+
+	public static void main(String[] args) {
+		String a = new String("");
+		int i=0;
+		while(i<10) {
+			System.out.print(a+="a " + "match: ");
+			System.out.println(Pattern.matches("a*", a));
+			i++;
+			
+		}
+	}
+
+}

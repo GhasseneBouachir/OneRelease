@@ -1,0 +1,28 @@
+package tpjava;
+import java.util.regex.Pattern;
+
+public class Ex1TLC {
+
+	public static void main(String[] args) {
+		System.out.println("First part");
+		String a = new String("");
+		int i=0;
+		System.out.println( "\""+ a +"\"" + "matches a*: " + Pattern.matches("a*", a));
+		while(i<10) {
+			a+="a";
+			System.out.println("\""+ a +"\"" + "matches a*: " + Pattern.matches("a*", a));
+			i++;
+			
+		}
+		a = "";
+		System.out.println("second part");
+		while(true) {
+			a+="a";
+			System.out.println("\""+ a +"\"" + "matches a*: " + Pattern.matches("a*", a));
+			Thread.sleep(1000);
+		}
+	}
+	
+	
+
+}

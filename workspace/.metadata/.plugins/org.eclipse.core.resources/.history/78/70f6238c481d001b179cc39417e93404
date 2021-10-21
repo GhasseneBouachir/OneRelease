@@ -1,0 +1,10 @@
+package org.onerelease.model;
+
+import org.openxava.annotations.*;
+
+@View(name="Epic", members="name, reference, summary, creationDate, rank ; userStories; "
+		+ "  Description [ description ]; "
+		)
+public class Epic extends Ticket {
+
+}

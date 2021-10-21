@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="module_header" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="false" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="module_header"/>
+			<item value="menu"/>
+			<item value="position"/>
+			<item value="699"/>
+			<item value="getRegularModules"/>
+			<item value="getmod"/>
+			<item value="left"/>
+			<item value="module"/>
+			<item value="top"/>
+			<item value="package org.onerelease.model;"/>
+			<item value="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDov"/>
+			<item value="&#x09;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDov"/>
+			<item value="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDov…wIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+PC9nPj"/>
+			<item value="&#x09;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDov…wIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+PC9nPj"/>
+			<item value="data:image/svg+xml;base64,P"/>
+		</list>
+		<list key="replacehistory">
+			<item value="top"/>
+			<item value="UP"/>
+			<item value="DOWN"/>
+			<item value="avatarUrls"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="284" key="DIALOG_WIDTH"/>
+		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
+		<item value="391" key="DIALOG_HEIGHT"/>
+		<item value="752" key="DIALOG_X_ORIGIN"/>
+		<item value="171" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>

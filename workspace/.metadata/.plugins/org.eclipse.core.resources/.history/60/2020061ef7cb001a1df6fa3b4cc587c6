@@ -1,0 +1,6 @@
+package tEST;
+
+public class C {
+	C(String m);
+}
+

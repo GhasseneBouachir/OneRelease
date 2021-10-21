@@ -1,0 +1,223 @@
+package org.onerelease.model;
+
+import java.util.*;
+
+import javax.persistence.*;
+import javax.ws.rs.*;
+
+import org.onerelease.actions.FunctionalityAnalysis.*;
+import org.onerelease.calculators.*;
+import org.onerelease.enumeration.*;
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+import org.openxava.model.*;
+
+@Views({@View(name="PeerReview" ,members = " "
+		+ "ticket;   "
+		+ "Review [ "
+		+ " authorOfDelevirableReviwed; peerReviwer;  meetingDate ; " + "  peerReviewType;  "
+		+ " verifier ;  completionDate, otherReviewNeeded;" + " peerReviewAnalysis "
+		+ "] DefectsMesures [# "
+		+ " numberOfMajorDefects,  numberOfMinorDefetcs, totalDefectsFound; "
+		+ " numberOfCorrectedDefects, numberOfNotCorrectedDefects;" + "numberofAcceptedCorrections;  ]  "
+//		+ "Appraisal [ verifier ;  completionDate, otherReviewNeeded;" + " peerReviewAnalysis  ]"
+		+ "  logSheet  ")
+})
+@Entity
+public class PeerReview extends Identifiable {
+
+	
+	@OneToOne
+	@DefaultValueCalculator(value = createFuncionalityAnalysis.class)
+	@ReferenceView("TicketUnderFunctionalityAnalysis")
+	private Ticket ticket;
+
+	@ManyToOne(optional = true)
+	@ReferenceView("CollaboratorUnderPeerReview")
+	@NoModify
+	private Collaborator authorOfDelevirableReviwed;
+
+	@ManyToOne(optional = true)
+	@ReferenceView("CollaboratorUnderPeerReview")
+	@DescriptionsList(depends="this.authorOfDelevirableReviwed",// showReferenceView=true,
+        descriptionProperties="lastName, firstName", condition="${id} != ?")
+	private Collaborator peerReviwer; 
+
+	@Calculation(" numberOfMajorDefects + numberOfMinorDefetcs ")
+	private int totalDefectsFound;
+
+	@Column
+	private int numberOfMajorDefects;
+
+	@Column
+	private int numberOfMinorDefetcs;
+
+	@Column
+	private int numberOfNotCorrectedDefects;
+
+	@Column
+	private int numberOfCorrectedDefects;
+
+	@Column
+	private int numberofAcceptedCorrections;
+
+	@Column
+	private Date meetingDate;
+
+	@Column
+	private PeerReviewType peerReviewType;
+
+	@ManyToOne(optional = true)
+	@ReferenceView("CollaboratorUnderPeerReview")
+	@DescriptionsList(depends="this.authorOfDelevirableReviwed, this.peerReviwer", // showReferenceView=true,
+    descriptionProperties="lastName, firstName", condition="${id} != ? and ${id}!=?")
+	private Collaborator verifier;
+
+	@Column
+	private Date completionDate;
+
+	@Column
+	private Boolean otherReviewNeeded;
+
+	@Column(length=500)
+	@Stereotype("MEMO")
+	private String peerReviewAnalysis;
+
+	@CollectionView("PeerReviewLine")
+	@NewAction("PeerReviewLine.newPeerReviewLine")
+	@AsEmbedded
+	@OneToMany(mappedBy = "peerReview", cascade=CascadeType.ALL )
+//	 @ListProperties("num, idLog, severity")
+	private Collection<PeerReviewLine> logSheet;
+
+	public Collaborator getAuthorOfDelevirableReviwed() {
+		return authorOfDelevirableReviwed;
+	}
+
+
+	public Ticket getTicket() {
+		return ticket;
+	}
+
+	public void setTicket(Ticket ticket) {
+		this.ticket = ticket;
+	}
+
+	public Collaborator getPeerReviwer() {
+		return peerReviwer;
+	}
+
+	public void setPeerReviwer(Collaborator peerReviwer) {
+		this.peerReviwer = peerReviwer;
+	}
+
+	public int getTotalDefectsFound() {
+		return totalDefectsFound;
+	}
+
+	public void setTotalDefectsFound(int totalDefectsFound) {
+		this.totalDefectsFound = totalDefectsFound;
+	}
+
+	public int getNumberOfMajorDefects() {
+		return numberOfMajorDefects;
+	}
+
+	public void setNumberOfMajorDefects(int numberOfMajorDefects) {
+		this.numberOfMajorDefects = numberOfMajorDefects;
+	}
+
+	public int getNumberOfMinorDefetcs() {
+		return numberOfMinorDefetcs;
+	}
+
+	public void setNumberOfMinorDefetcs(int numberOfMinorDefetcs) {
+		this.numberOfMinorDefetcs = numberOfMinorDefetcs;
+	}
+
+	public int getNumberOfNotCorrectedDefects() {
+		return numberOfNotCorrectedDefects;
+	}
+
+	public void setNumberOfNotCorrectedDefects(int numberOfNotCorrectedDefects) {
+		this.numberOfNotCorrectedDefects = numberOfNotCorrectedDefects;
+	}
+
+	public int getNumberOfCorrectedDefects() {
+		return numberOfCorrectedDefects;
+	}
+
+	public void setNumberOfCorrectedDefects(int numberOfCorrectedDefects) {
+		this.numberOfCorrectedDefects = numberOfCorrectedDefects;
+	}
+
+	public int getNumberofAcceptedCorrections() {
+		return numberofAcceptedCorrections;
+	}
+
+	public void setNumberofAcceptedCorrections(int numberofAcceptedCorrections) {
+		this.numberofAcceptedCorrections = numberofAcceptedCorrections;
+	}
+
+	public Date getMeetingDate() {
+		return meetingDate;
+	}
+
+	public void setMeetingDate(Date meetingDate) {
+		this.meetingDate = meetingDate;
+	}
+
+	public PeerReviewType getPeerReviewType() {
+		return peerReviewType;
+	}
+
+	public void setPeerReviewType(PeerReviewType peerReviewType) {
+		this.peerReviewType = peerReviewType;
+	}
+
+	public Collaborator getVerifier() {
+		return verifier;
+	}
+
+	public void setVerifier(Collaborator verifier) {
+		this.verifier = verifier;
+	}
+
+	public Date getCompletionDate() {
+		return completionDate;
+	}
+
+	public void setCompletionDate(Date completionDate) {
+		this.completionDate = completionDate;
+	}
+
+	public Boolean getOtherReviewNeeded() {
+		return otherReviewNeeded;
+	}
+
+	public void setOtherReviewNeeded(Boolean otherReviewNeeded) {
+		this.otherReviewNeeded = otherReviewNeeded;
+	}
+
+	public String getPeerReviewAnalysis() {
+		return peerReviewAnalysis;
+	}
+
+	public void setPeerReviewAnalysis(String peerReviewAnalysis) {
+		this.peerReviewAnalysis = peerReviewAnalysis;
+	}
+
+	public Collection<PeerReviewLine> getLogSheet() {
+		return logSheet;
+	}
+
+	public void setLogSheet(Collection<PeerReviewLine> logSheet) {
+		this.logSheet = logSheet;
+	}
+
+	public void setAuthorOfDelevirableReviwed(Collaborator authorOfDelevirableReviwed) {
+		this.authorOfDelevirableReviwed = authorOfDelevirableReviwed;
+	}
+
+
+}

@@ -1,0 +1,35 @@
+package tEST;
+
+public class Inscription {
+		private String motDePasse;
+		private String email;
+		
+		
+		
+		public void logIn(String email, String pwd)
+		{
+			System.out.println("Email: " + email);
+			System.out.println("Mot de passe: " + pwd);
+		}
+	
+	public String getMotDePasse() {
+		return motDePasse;
+	}
+	public void setMotDePasse(String motDePasse) {
+		this.motDePasse = motDePasse;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+public static void main(String[] args) {
+		System.out.println("INSRIPTION");
+		Inscription inscription = new Inscription();
+		inscription.setEmail("test.test@gmail.com");
+		inscription.logIn(inscription.getEmail(), inscription.getMotDePasse());
+
+	}
+}
