@@ -8,6 +8,7 @@ import javax.validation.*;
 import javax.validation.metadata.*;
 
 import org.openxava.model.*;
+import org.openxava.model.meta.*;
 import org.openxava.util.*;
 import org.openxava.validators.ValidationException;
 import org.openxava.view.*;
@@ -26,7 +27,7 @@ public class SaveElementInCollectionAction extends CollectionElementViewBaseActi
 	
 	private boolean containerSaved = false;
 	
-	public void execute() throws Exception {
+	public void execute() throws Exception {	
 		Map containerKey = saveIfNotExists(getCollectionElementView().getParent());
 		if (XavaPreferences.getInstance().isMapFacadeAutoCommit()) {
 			getView().setKeyEditable(false); // To mark as saved
@@ -55,7 +56,7 @@ public class SaveElementInCollectionAction extends CollectionElementViewBaseActi
 	 */
 	protected void saveCollectionElement(Map containerKey) throws Exception {
 		if (getCollectionElementView().isEditable()) {
-			// Aggregate or entity reference used as aggregate
+			// Aggregate or entity reference used as aggregate 
 			boolean isEntity = isEntityReferencesCollection();
 			Map values = getValuesToSave();			
 			
@@ -77,9 +78,18 @@ public class SaveElementInCollectionAction extends CollectionElementViewBaseActi
 	
 	protected void create(Map values, boolean isEntity, Map containerKey) throws CreateException { 
 		validateMaximum(1);
-		String modelName = isEntity?getCollectionElementView().getParent().getModelName() + "." + getCollectionElementView().getModelName():getCollectionElementView().getModelName();
-		MapFacade.createAggregate(modelName, containerKey, getMetaCollection().getName(), values);
-		addMessage(isEntity?"entity_created_and_associated":"aggregate_created", getCollectionElementView().getModelName(), getCollectionElementView().getParent().getModelName());
+		if (isEntity) {
+			Map parentKey = new HashMap();
+			MetaCollection metaCollection = getMetaCollection();
+			parentKey.put(metaCollection.getMetaReference().getRole(), containerKey);
+			values.putAll(parentKey);
+			MapFacade.create(getCollectionElementView().getModelName(), values);
+			addMessage("entity_created_and_associated", getCollectionElementView().getModelName(), getCollectionElementView().getParent().getModelName());
+		}
+		else {
+			MapFacade.createAggregate(getCollectionElementView().getModelName(), containerKey, getMetaCollection().getName(), values);
+			addMessage("aggregate_created",	getCollectionElementView().getModelName(), getCollectionElementView().getParent().getModelName());
+		}
 	}
 
 	protected void associateEntity(Map keyValues) throws ValidationException, XavaException, ObjectNotFoundException, FinderException, RemoteException {		
@@ -95,7 +105,7 @@ public class SaveElementInCollectionAction extends CollectionElementViewBaseActi
 	 */
 	protected Map saveIfNotExists(View view) throws Exception {
 		if (getView() == view) {
-			if (view.isKeyEditable()) {
+			if (view.isKeyEditable()) {				
 				Map key = MapFacade.createNotValidatingCollections(getModelName(), view.getValues());
 				addMessage("entity_created", getModelName());
 				view.addValues(key);
@@ -109,15 +119,15 @@ public class SaveElementInCollectionAction extends CollectionElementViewBaseActi
 		else {
 			if (isKeyIncomplete(view)) { 
 				Map parentKey = saveIfNotExists(view.getParent());
-				Map key = Collections.EMPTY_MAP; 
-				if (isEntityReferencesCollection(view)) {
+				Map key = null;
+				if (isEntityReferencesCollection(view)) {	
 					Map values = view.getValues();
 					String containerReference = view.getMetaCollection().getMetaReference().getRole();
 					values.put(containerReference, parentKey);
 					key = MapFacade.createNotValidatingCollections(view.getModelName(), values);
 					addMessage("entity_created", view.getModelName()); 
 				}
-				else if (view.isRepresentsCollection()) { 
+				else {
 					key = MapFacade.createAggregateReturningKey( 
 						view.getModelName(),
 						parentKey, view.getMemberName(),
@@ -125,10 +135,6 @@ public class SaveElementInCollectionAction extends CollectionElementViewBaseActi
 					);
 					addMessage("aggregate_created", view.getModelName());
 				} 
-				else if (view.isRepresentsAggregate() && !view.getMetaModel().getAllMetaPropertiesKey().isEmpty()) { // A reference to an entity @AsEmbedded
-					view.getRoot().refresh();
-					key = view.getKeyValues();
-				}
 				view.addValues(key);
 				return key;										
 			}

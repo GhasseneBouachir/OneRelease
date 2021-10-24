@@ -275,18 +275,12 @@ if (!onlySections) {	// IF Not Only Sections
 				String viewName = viewObject + "_" + group.getName();
 				View subview = view.getGroupView(group.getName());			
 				context.put(request, viewName, subview);
-				if (view.isFlowLayout() && view.isVariousMembersInSameLine(group)) frameWidth = 50; 
-				
 %>
-			<%=closeDivForFrame(view)%>
-			<% if (view.isFlowLayout() && view.isVariousMembersInSameLine(group) && view.isFirstInLine(group)) { %>
-			<div class="ox-flow-layout-new-line"/>
-			<% } %>
+			<%=closeDivForFrame(view)%> 
 			<%=style.getFrameHeaderStartDecoration(frameWidth)%>
 			<%=style.getFrameTitleStartDecoration()%>
-			<% String labelId = Ids.decorate(request, "label_" + view.getPropertyPrefix() + group.getName()); 
-			String labelGroup = org.openxava.util.Is.empty(subview.getTitle()) ? group.getLabel(request) : subview.getTitle();%>
-			<span id="<%=labelId%>"><%=labelGroup%></span>
+			<% String labelId = Ids.decorate(request, "label_" + view.getPropertyPrefix() + group.getName()); %>
+			<span id="<%=labelId%>"><%=group.getLabel(request)%></span>
 			<%=style.getFrameTitleEndDecoration()%>
 			<%=style.getFrameActionsStartDecoration()%>
 <% 

@@ -10,6 +10,9 @@ import javax.servlet.http.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.*;
+
 import org.apache.commons.logging.*;
 import org.openxava.hibernate.*;
 import org.openxava.jpa.*;
@@ -19,9 +22,6 @@ import org.openxava.tab.impl.*;
 import org.openxava.util.*;
 import org.openxava.util.jxls.*;
 import org.openxava.web.*;
-
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.*;
 
 /**
  * To generate automatically reports from list mode. <p>
@@ -44,10 +44,9 @@ public class GenerateReportServlet extends HttpServlet {
 		private boolean labelAsHeader = false;
 		private transient HttpServletRequest request;  
 		private boolean format = false;	// format or no the values. If format = true, all values to the report are String
-		private Integer columnCountLimit;
-		private boolean formatBigDecimal = true; 
-
-		public TableModelDecorator(HttpServletRequest request, TableModel original, List metaProperties, Locale locale, boolean labelAsHeader, boolean format, Integer columnCountLimit, boolean formatBigDecimal) throws Exception { 
+		private Integer columnCountLimit; 
+		
+		public TableModelDecorator(HttpServletRequest request, TableModel original, List metaProperties, Locale locale, boolean labelAsHeader, boolean format, Integer columnCountLimit) throws Exception { 
 			this.request = request;
 			this.original = original;
 			this.metaProperties = metaProperties;
@@ -56,9 +55,7 @@ public class GenerateReportServlet extends HttpServlet {
 			this.labelAsHeader = labelAsHeader;			
 			this.format = format;
 			this.columnCountLimit = columnCountLimit;
-			this.formatBigDecimal = formatBigDecimal; 
 		}
-
 
 		private boolean calculateWithValidValues() {
 			Iterator it = metaProperties.iterator();
@@ -81,8 +78,8 @@ public class GenerateReportServlet extends HttpServlet {
 			return columnCountLimit == null?original.getColumnCount():columnCountLimit;
 		}
 
-		public String getColumnName(int c) {
-			return labelAsHeader?getMetaProperty(c).getQualifiedLabel(locale):Strings.change(getMetaProperty(c).getQualifiedName(), ".", "_"); 
+		public String getColumnName(int c) {			
+			return labelAsHeader?getMetaProperty(c).getLabel(locale):Strings.change(getMetaProperty(c).getQualifiedName(), ".", "_");
 		}
 
 		public Class getColumnClass(int c) {						
@@ -117,7 +114,7 @@ public class GenerateReportServlet extends HttpServlet {
 				return p.format(r, locale); 
 			}
 
-			if (formatBigDecimal && r instanceof BigDecimal) {
+			if (r instanceof BigDecimal) {
 				return formatBigDecimal(r, locale); 
 			}
 			
@@ -165,6 +162,13 @@ public class GenerateReportServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 		try {				
+			Locales.setCurrent(request); 
+			SessionData.setCurrent(request); 
+			if (Users.getCurrent() == null) { // for a bug in websphere portal 5.1 with Domino LDAP
+				Users.setCurrent((String)request.getSession().getAttribute("xava.user"));
+			}						
+			request.getParameter("application"); // for a bug in websphere 5.1 
+			request.getParameter("module"); // for a bug in websphere 5.1
 			Tab tab = (Tab) request.getSession().getAttribute("xava_reportTab");
 			int [] selectedRowsNumber = (int []) request.getSession().getAttribute("xava_selectedRowsReportTab");
 			Map [] selectedKeys = (Map []) request.getSession().getAttribute("xava_selectedKeysReportTab");
@@ -174,6 +178,9 @@ public class GenerateReportServlet extends HttpServlet {
 			request.getSession().removeAttribute("xava_columnCountLimitReportTab");
 			
 			setDefaultSchema(request);
+			String user = (String) request.getSession().getAttribute("xava_user");
+			request.getSession().removeAttribute("xava_user");
+			Users.setCurrent(user);
 			String uri = request.getRequestURI();				
 			if (uri.endsWith(".pdf")) {
 				InputStream is;
@@ -182,7 +189,7 @@ public class GenerateReportServlet extends HttpServlet {
 				synchronized (tab) {
 					tab.setRequest(request);
 					parameters.put("Title", tab.getTitle());				
-					parameters.put("Organization", getOrganization(request)); 
+					parameters.put("Organization", getOrganization());
 					parameters.put("Date", getCurrentDate());
 					for (String totalProperty: tab.getTotalPropertiesNames()) { 								
 						parameters.put(totalProperty + "__TOTAL__", getTotal(request, tab, totalProperty));
@@ -216,8 +223,8 @@ public class GenerateReportServlet extends HttpServlet {
 			else if (uri.endsWith(".xls")) {    
                 synchronized (tab) {
                 	tab.setRequest(request);
-                    JxlsWorkbook wb = new JxlsWorkbook(getTableModel(request, tab, selectedRows, true, false, columnCountLimit, false), 
-                            getFileName(tab));                	
+                    JxlsWorkbook wb = new JxlsWorkbook(getTableModel(request, tab, selectedRows, true, false, columnCountLimit), 
+                            getFileName(tab));
                     JxlsSheet sheet = wb.getSheet(0);
                     int lastRow = sheet.getLastRowNumber();
                     JxlsStyle sumStyle = wb.addStyle(JxlsConstants.FLOAT)
@@ -264,15 +271,7 @@ public class GenerateReportServlet extends HttpServlet {
 
 	private String getFileName(Tab tab) { 
 		String now = new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
-		String fileName = tab.getTitle() + " " + now;
-		byte[] bytes = fileName.getBytes();
-		String encoding = XSystem.getEncoding();
-		try {
-			fileName = new String(bytes, encoding); 
-		} catch (UnsupportedEncodingException e) {
-			log.warn(XavaResources.getString("filename_not_encoded", encoding)); 
-		} 
-		return fileName;
+		return tab.getTitle() + " " + now;
 	}
 
 	private Object getTotal(HttpServletRequest request, Tab tab, String totalProperty) {
@@ -284,7 +283,7 @@ public class GenerateReportServlet extends HttpServlet {
 		String hibernateDefaultSchemaTab = (String) request.getSession().getAttribute("xava_hibernateDefaultSchemaTab");
 		if (hibernateDefaultSchemaTab != null) {
 			request.getSession().removeAttribute("xava_hibernateDefaultSchemaTab");
-			XHibernate.setDefaultSchema(hibernateDefaultSchemaTab); 
+			XHibernate.setDefaultSchema(hibernateDefaultSchemaTab);
 			
 		}
 		String jpaDefaultSchemaTab = (String) request.getSession().getAttribute("xava_jpaDefaultSchemaTab");
@@ -294,14 +293,8 @@ public class GenerateReportServlet extends HttpServlet {
 		}
 	}
 
-	protected String getOrganization(HttpServletRequest request) throws MissingResourceException, XavaException { 
-		try {
-			return ReportParametersProviderFactory.getInstance(request).getOrganization(); 
-		}
-		catch (Exception ex) { 
-			log.warn(XavaResources.getString("organization_name_error"), ex); 
-			return "";
-		}
+	protected String getOrganization() throws MissingResourceException, XavaException {
+		return ReportParametersProviderFactory.getInstance().getOrganization();
 	}
 	
 	private InputStream getReport(HttpServletRequest request, HttpServletResponse response, Tab tab, TableModel tableModel, Integer columnCountLimit) throws ServletException, IOException {
@@ -333,7 +326,7 @@ public class GenerateReportServlet extends HttpServlet {
 		return widths;
 	}
 
-	private TableModel getTableModel(HttpServletRequest request, Tab tab, int [] selectedRows, boolean labelAsHeader, boolean format, Integer columnCountLimit, boolean formatBigDecimal) throws Exception {
+	private TableModel getTableModel(HttpServletRequest request, Tab tab, int [] selectedRows, boolean labelAsHeader, boolean format, Integer columnCountLimit) throws Exception {
 		TableModel data = null;
 		if (selectedRows != null && selectedRows.length > 0) {
 			data = new SelectedRowsXTableModel(tab.getTableModel(), selectedRows);
@@ -341,17 +334,12 @@ public class GenerateReportServlet extends HttpServlet {
 		else {
 			data = tab.getAllDataTableModel();
 		}
-		return new TableModelDecorator(request, data, tab.getMetaProperties(), Locales.getCurrent(), labelAsHeader, format, columnCountLimit, formatBigDecimal);
-	}	
-	
-	private TableModel getTableModel(HttpServletRequest request, Tab tab, int [] selectedRows, boolean labelAsHeader, boolean format, Integer columnCountLimit) throws Exception {
-		return getTableModel(request, tab, selectedRows, labelAsHeader, format, columnCountLimit, true);
+		return new TableModelDecorator(request, data, tab.getMetaProperties(), Locales.getCurrent(), labelAsHeader, format, columnCountLimit);
 	}
 	
 	private static Object formatBigDecimal(Object number, Locale locale) { 
 		NumberFormat nf = NumberFormat.getNumberInstance(locale);
 		nf.setMinimumFractionDigits(2);
-		nf.setGroupingUsed(false); 
 		return nf.format(number);
 	}
 

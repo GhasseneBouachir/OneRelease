@@ -131,14 +131,7 @@ public class Emails {
     {
     	new Thread(new BackgroundSender(fromEmail, toEmail, subject, content)).start();
     }
-    
-    /**
-     * @sincd 6.5.1 
-     */
-    public static void send(String toEmail, String subject, String content, Attachment... attachments) throws AddressException, MessagingException { 
-    	send(XavaPreferences.getInstance().getSMTPFromEmail(), toEmail, subject, content, attachments);    	
-    }
-    
+
     public static void send(String fromEmail, String toEmail,
 			String subject, String content, Attachment... attachments)
 		throws AddressException, MessagingException {

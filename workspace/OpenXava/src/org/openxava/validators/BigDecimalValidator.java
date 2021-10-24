@@ -1,11 +1,10 @@
 package org.openxava.validators;
 
-import java.math.BigDecimal;
+import java.math.*;
+import java.util.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openxava.util.Messages;
-import org.openxava.util.Strings;
+import org.apache.commons.logging.*;
+import org.openxava.util.*;
 
 /**
  * To validate the size of integer digits and fraction digits parts. <p>
@@ -21,19 +20,29 @@ public class BigDecimalValidator implements IPropertyValidator {
     public void validate(Messages errors, Object value, String propertyName, String modelName) throws Exception {
     	if (value == null) return;
         BigDecimal bigDecimal = (BigDecimal) value;
-        if (bigDecimal.signum() == 0) return;
         
-        int decimalLength = bigDecimal.scale();
-        int integerLength = bigDecimal.toBigInteger().toString().length();
-
-        if (integerLength > getMaximumIntegerDigits()) {
-        	int maximumValue = new Integer("1" + Strings.repeat(maximumIntegerDigits, "0")).intValue();
-        	errors.add("greater_than_the_awaited", propertyName, modelName, String.valueOf(maximumValue));
+        int maximumValue = new Integer("1" + Strings.repeat(maximumIntegerDigits, "0")).intValue();
+        //
+        StringTokenizer st = new StringTokenizer(bigDecimal.toString(), ".");
+        int amount = st.countTokens();
+        int integer = 0;
+        int fraction = 0;
+        
+        integer = Integer.parseInt(st.nextToken());
+        if (amount > 1){
+            fraction = Integer.parseInt(st.nextToken());
         }
-        if (decimalLength > getMaximumFractionDigits()) {
-        	errors.add("greater_number_fraction", String.valueOf(getMaximumFractionDigits()), String.valueOf(decimalLength));
+        //
+        if (integer > maximumValue){
+           errors.add("greater_than_the_awaited", propertyName, modelName, String.valueOf(maximumValue)); 
         }
-
+        //
+        if(fraction > 0){
+            int lengthFraction = String.valueOf(fraction).length();
+            if (lengthFraction > maximumFractionDigits){
+                errors.add("greater_number_fraction", String.valueOf(getMaximumFractionDigits()), String.valueOf(lengthFraction));
+            }
+        }
     }    
     
     public int getMaximumIntegerDigits() {

@@ -82,7 +82,6 @@ public class XHibernate {
 	final private static ThreadLocal currentSessionFactoryProperties = new ThreadLocal();
 	private static Map sessionFactories = new HashMap();
 	private static Properties defaultSessionFactoryProperties;
-	private static String hibernateDefaultSchemaPropertyName; 
 	
 
 	/**
@@ -366,18 +365,10 @@ public class XHibernate {
 		setSessionFactoryProperties(properties);		
 	}
 	
-	private static String getHibernateDefaultSchemaPropertyName() {
-		if (hibernateDefaultSchemaPropertyName == null) {
-			// Not get from getSessionFactory() in order to PDF generation works when Hibernate connection does not work
-			Configuration cfg = createConfiguration(getConfigurationFile());
-			String dialect = cfg.getProperty("hibernate.dialect");
-			// Saving in hibernateDefaultSchemaPropertyName only works when all the hibernate.cfg.xml files goes against the same type of database
-			// For supporting different database vendor for each configuration we should turn hibernateDefaultSchemaPropertyName into a Map.  
-			if (dialect != null && dialect.toLowerCase().contains("mysql")) hibernateDefaultSchemaPropertyName = "hibernate.default_catalog";
-			else if (!Is.emptyString(cfg.getProperty("hibernate.default_catalog"))) hibernateDefaultSchemaPropertyName = "hibernate.default_catalog";
-			else hibernateDefaultSchemaPropertyName = "hibernate.default_schema";			
-		}
-		return hibernateDefaultSchemaPropertyName;
+	private static String getHibernateDefaultSchemaPropertyName() { 
+		String dialect = (String) getSessionFactory().getProperties().get("hibernate.dialect"); 
+		if (dialect != null && dialect.toLowerCase().contains("mysql")) return "hibernate.default_catalog";
+		return "hibernate.default_schema";
 	}
 
 	

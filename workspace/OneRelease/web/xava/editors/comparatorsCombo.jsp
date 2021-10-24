@@ -47,8 +47,7 @@ if (propertyKey == null) {
 		String collection = request.getParameter("collection"); 
 		String collectionArgv = Is.emptyString(collection)?"":"collection="+collection;
 		script = new StringBuilder(script.replace(")\"", "); "))
-				    .append("var valueField = $(this).parent().next().find('input');")
-				    .append("if (valueField == null || valueField.is(':hidden') || this.options[this.selectedIndex].value.indexOf('range') < 0 && valueField.val() !== '') { ")
+				    .append("if (this.options[this.selectedIndex].value.indexOf('range') < 0) { ") 
 				    .append("openxava.executeAction('")
 				    .append(request.getParameter("application"))	
 	 			    .append("', '")

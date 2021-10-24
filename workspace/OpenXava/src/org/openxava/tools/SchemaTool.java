@@ -1,7 +1,6 @@
 package org.openxava.tools;
 
 import java.io.*;
-import java.sql.*;
 import java.util.*;
 
 import javax.persistence.*;
@@ -11,7 +10,6 @@ import org.apache.commons.io.*;
 import org.apache.commons.logging.*;
 import org.hibernate.boot.*;
 import org.hibernate.boot.registry.*;
-import org.hibernate.internal.*;
 import org.hibernate.service.*;
 import org.hibernate.tool.hbm2ddl.*;
 import org.hibernate.tool.schema.*;
@@ -28,7 +26,6 @@ public class SchemaTool {
 	
 	private static Log log = LogFactory.getLog(SchemaTool.class);	
 	private boolean commitOnFinish = true;
-	private boolean onlySequences = false; 
 	private Collection<Class> annotatedClasses = null;
 	
 	public static void main(String[] args) throws Exception {
@@ -86,13 +83,12 @@ public class SchemaTool {
 				}
 			}
 
-			String schema = (String) factoryProperties.get("hibernate.default_catalog"); 
-			if (Is.emptyString(schema)) {
-				schema = (String) factoryProperties.get("hibernate.default_schema"); 
+			if (Is.empty(factoryProperties.get("hibernate.default_catalog"))) {
+				Object schema = factoryProperties.get("hibernate.default_schema"); 
 				if (schema != null) {
 					serviceRegistryBuilder.applySetting("hibernate.default_schema", schema); 
 				}
-			}			
+			}
 			
 			if (!Is.empty(factoryProperties.get("hibernate.connection.url"))) {
 				String username = PersistenceXml.getPropetyValue(XPersistence.getPersistenceUnit(), "hibernate.connection.username");
@@ -125,8 +121,6 @@ public class SchemaTool {
 	
 			String fileName = Files.getOpenXavaBaseDir() + "ddl-" + UUID.randomUUID() + ".sql";
 			File file = new File(fileName);
-			java.sql.Connection connection = ((SessionImpl) XPersistence.getManager().getDelegate()).connection(); 
-	    	boolean supportsSchemasInIndexDefinitions = supportsSchemasInIndexDefinitions(connection);
 	    	XPersistence.commit();			
 	    	if (update) {
 				SchemaUpdate schemaUpdate = new SchemaUpdate();
@@ -134,7 +128,6 @@ public class SchemaTool {
 				schemaUpdate.execute(EnumSet.of(TargetType.SCRIPT), metadata.buildMetadata());
 				Collection<String> scripts = FileUtils.readLines(file);
 		    	for (String script: scripts) {
-		    		script = addSchema(script, supportsSchemasInIndexDefinitions, schema); 
 		    		log.info(XavaResources.getString("executing") + ": " + script);
 		    		try {
 		    			Query query = XPersistence.getManager().createNativeQuery(script); 
@@ -154,8 +147,6 @@ public class SchemaTool {
 				schemaExport.createOnly(EnumSet.of(TargetType.SCRIPT), metadata.buildMetadata());
 				Collection<String> scripts = FileUtils.readLines(file);
 				for (String script: scripts) {
-					if (onlySequences && !script.startsWith("create sequence ")) continue;
-					script = addSchema(script, supportsSchemasInIndexDefinitions, schema); 
 					if (console) {
 						System.out.print(script); 
 						System.out.println(';');
@@ -179,19 +170,6 @@ public class SchemaTool {
 
 	}
 	
-	private boolean supportsSchemasInIndexDefinitions(Connection connection) throws SQLException { 
-		DatabaseMetaData metaData = connection.getMetaData();
-		if ("PostgreSQL".equals(metaData.getDatabaseProductName())) return false;
-		return metaData.supportsSchemasInIndexDefinitions();
-	}
-	
-	private String addSchema(String script, boolean supportsSchemasInIndexDefinitions, String schema) { 
-		if (!supportsSchemasInIndexDefinitions || Is.emptyString(schema)) return script;
-		// Needed at least for AS/400 where supportsSchemasInIndexDefinitions is true 
-		// but the dialect does to prefix the FK on alter table, something that AS/400 requires
-		return script.replace("add constraint FK", "add constraint " + schema + ".FK");
-	}
-
 	public boolean isCommitOnFinish() {
 		return commitOnFinish;
 	}
@@ -203,16 +181,6 @@ public class SchemaTool {
 	public void addAnnotatedClass(Class annotatedClass) {
 		if (annotatedClasses == null) annotatedClasses = new ArrayList<Class>(); 
 		annotatedClasses.add(annotatedClass);		
-	}
-
-	/** @since 6.2.2 */
-	public boolean isOnlySequences() {
-		return onlySequences;
-	}
-
-	/** @since 6.2.2 */
-	public void setOnlySequences(boolean onlySequences) {
-		this.onlySequences = onlySequences;
 	}
 	
 }

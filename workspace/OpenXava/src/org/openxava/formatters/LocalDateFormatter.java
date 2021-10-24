@@ -2,15 +2,13 @@ package org.openxava.formatters;
 
 import java.time.*;
 import java.time.format.*;
-
 import javax.servlet.http.*;
-
 import org.openxava.util.*;
 
 /**
  * LocalDate formatter with multilocale support. <p>
  * 
- * Although it does some refinement for Spanish, Catalan, Polish, Croatian and French, 
+ * Although it does some refinement for Spanish, Catalan, Polish and French, 
  * it supports formatting on locale basis.<br>
  *  
  * @since 6.1 
@@ -29,8 +27,6 @@ public class LocalDateFormatter implements IFormatter {
 		DateTimeFormatter.ofPattern("d.M.yy").withResolverStyle(ResolverStyle.SMART),
 		DateTimeFormatter.ofPattern("d.M.yyyy").withResolverStyle(ResolverStyle.SMART)
 	};
-	
-	private static DateTimeFormatter dotFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy"); // Only for some locales like "hr"
 	
 	public String format(HttpServletRequest request, Object date) {
 		if (date == null) return "";
@@ -64,28 +60,14 @@ public class LocalDateFormatter implements IFormatter {
 			"fr".equals(Locales.getCurrent().getLanguage());
 	}
 	
-	private boolean isDotFormat() { 
-		return "hr".equals(Locales.getCurrent().getLanguage());
-	}	
-	
 	private DateTimeFormatter getFormatter() {
 		if (isExtendedFormat()) return extendedFormatter;
-		if (isDotFormat()) return dotFormatter; 
-		return getStandardFormatter(); 	
+		return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locales.getCurrent());		
 	}
 	
 	private DateTimeFormatter[] getFormatters() {
-		if (isExtendedFormat() || isDotFormat()) return extendedFormatters; 
-		return new DateTimeFormatter [] { 
-			DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locales.getCurrent()),
-			getStandardFormatter()
-		};
-	}
-	
-	private DateTimeFormatter getStandardFormatter() { 
-		return DateTimeFormatter 
-			.ofPattern(Dates.getLocalizedDatePattern(Locales.getCurrent()))
-			.withResolverStyle(ResolverStyle.SMART);		
+		if (isExtendedFormat()) return extendedFormatters;
+		return new DateTimeFormatter [] { getFormatter() };
 	}
 
 }

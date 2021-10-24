@@ -3,13 +3,6 @@
 	<name>Addons</name>
 	<comment></comment>
 	<projects>
-		<project>InvoiceDemo</project>
-		<project>OneRelease</project>
-		<project>OpenXava</project>
-		<project>OpenXavaPlantilla</project>
-		<project>OpenXavaTemplate</project>
-		<project>OpenXavaTest</project>
-		<project>RemoteSystemsTempFiles</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

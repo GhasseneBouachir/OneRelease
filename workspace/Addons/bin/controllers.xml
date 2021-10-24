@@ -88,20 +88,7 @@
 	</controller>
 	
 	<controller name="Module">
-		<extends controller="Navigation"/>
-		<extends controller="Print"/>
-		<action name="save" mode="detail"
-			by-default="if-possible"
-			class="org.openxava.actions.SaveAction"
-			image="save.gif"
-			icon="content-save"
-			keystroke="Control S"/>
-			
-		<action name="refresh" mode="detail"			
-			class="org.openxava.actions.SearchAction"
-			image="refresh.gif"
-			icon="refresh"
-			keystroke="control B"/>			
+		<extends controller="Typical"/>
 	</controller>
 	
 	<controller name="Role">
@@ -178,9 +165,6 @@
 		<extends controller="Navigation"/>
 		<extends controller="NewOnlyInList"/>
 		<extends controller="Print"/>
-		
-		<action name="init" hidden="true" on-init="true"
-			class="com.openxava.naviox.actions.InitOrganizationAction"/>	
 				
 		<action name="createNewOrganization" mode="detail" takes-long="true"
 			class="com.openxava.naviox.actions.CreateNewOrganizationAction"/>

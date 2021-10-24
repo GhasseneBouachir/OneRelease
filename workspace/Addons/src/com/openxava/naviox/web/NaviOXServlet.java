@@ -9,7 +9,7 @@ import org.openxava.util.*;
 import org.openxava.web.*;
 import org.openxava.web.style.*;
 
-import com.openxava.naviox.impl.*;
+import com.openxava.phone.web.*;
 
 /**
  * 
@@ -19,13 +19,11 @@ public class NaviOXServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String [] uri = request.getRequestURI().split("/");
-		if (uri.length < 3) {
+		if (uri.length < 4) {
 			response.getWriter().print(XavaResources.getString(request, "module_name_missing"));
 			return;
 		}
-		String applicationName = MetaModuleFactory.getApplication(); 
-		String moduleName = uri[uri.length - 1]; 
-		String url = Browsers.isMobile(request)?"/p/" + moduleName:"/naviox/index.jsp?application=" + applicationName + "&module=" + moduleName;
+		String url = Browsers.isMobile(request)?"/p/" + uri[3]:"/naviox/index.jsp?application=" + uri[1] + "&module=" + uri[3];
 		RequestDispatcher dispatcher = request.getRequestDispatcher(url);		
 		
 		Style.setPotalInstance(XavaStyle.getInstance()); // We manage style in NaviOX as in the portal case, to override the style defined in xava.properties and by device 

@@ -9,8 +9,6 @@ import org.openxava.tab.meta.*;
 import org.openxava.util.*;
 import org.openxava.web.meta.xmlparse.*;
 
-import com.lowagie.text.pdf.interfaces.*;
-
 /**
  * 
  * @author Javier Paniza
@@ -151,7 +149,7 @@ public class MetaWebEditors {
 		return (MetaEditor) getEditorsByName().get(name);
 	}	
 		
-	private synchronized static Map getEditorsByType() throws XavaException { // synchronized needed for starting as first module a module with list that starts in detail (wihout records)
+	private static Map getEditorsByType() throws XavaException {
 		if (editorsByType == null) {
 			init();
 			EditorsParser.setupEditors();
@@ -159,7 +157,7 @@ public class MetaWebEditors {
 		return editorsByType;
 	}
 	
-	private synchronized static Map getEditorsByReferenceModel() throws XavaException { // synchronized needed for starting as first module a module with list that starts in detail (wihout records) 
+	private static Map getEditorsByReferenceModel() throws XavaException { 
 		if (editorsByReferenceModel == null) {
 			init();
 			EditorsParser.setupEditors();
@@ -167,7 +165,7 @@ public class MetaWebEditors {
 		return editorsByReferenceModel;
 	}
 	
-	private synchronized static Map getEditorsByCollectionModel() throws XavaException { // synchronized needed for starting as first module a module with list that starts in detail (wihout records)  
+	private static Map getEditorsByCollectionModel() throws XavaException {  
 		if (editorsByCollectionModel == null) {
 			init();
 			EditorsParser.setupEditors();
@@ -175,7 +173,7 @@ public class MetaWebEditors {
 		return editorsByCollectionModel;
 	}
 	
-	private synchronized static Map getEditorsByTabModel() throws XavaException { // synchronized needed for starting as first module a module with list that starts in detail (wihout records)   
+	private static Map getEditorsByTabModel() throws XavaException {   
 		if (editorsByTabModel == null) {
 			init();
 			EditorsParser.setupEditors();
@@ -184,7 +182,7 @@ public class MetaWebEditors {
 	}	
 	
 	
-	private synchronized static Map getEditorsByStereotype() throws XavaException { // synchronized needed for starting as first module a module with list that starts in detail (wihout records)
+	private static Map getEditorsByStereotype() throws XavaException {
 		if (editorsByStereotype == null) {
 			init();
 			EditorsParser.setupEditors();								
@@ -192,7 +190,7 @@ public class MetaWebEditors {
 		return editorsByStereotype;
 	}
 	
-	private synchronized static Map getEditorsByModelProperty() throws XavaException { // synchronized needed for starting as first module a module with list that starts in detail (wihout records)		
+	private static Map getEditorsByModelProperty() throws XavaException {		
 		if (editorsByModelProperty == null) {
 			init();
 			EditorsParser.setupEditors();			
@@ -200,7 +198,7 @@ public class MetaWebEditors {
 		return editorsByModelProperty;
 	}
 	
-	private synchronized static Map getEditorsByName() throws XavaException { // synchronized needed for starting as first module a module with list that starts in detail (wihout records)
+	private static Map getEditorsByName() throws XavaException {
 		if (editorsByName == null) {
 			init();
 			EditorsParser.setupEditors();

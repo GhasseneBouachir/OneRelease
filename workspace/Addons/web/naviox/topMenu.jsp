@@ -22,9 +22,9 @@
 Collection modulesList = null;
 boolean bookmarkModules = false;
 %>
+<%@ include file="getModulesList.jsp" %>
 		<ul> 
 <%
-modulesList = modules.getRegularModules(request); 
 for (Iterator it= modulesList.iterator(); it.hasNext();) {
 	MetaModule module1 = (MetaModule) it.next();
 	String selected = module1.getName().equals(modules.getCurrent(request))?"selected":""; 

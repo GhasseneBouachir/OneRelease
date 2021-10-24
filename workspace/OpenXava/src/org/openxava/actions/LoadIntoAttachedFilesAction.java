@@ -42,7 +42,7 @@ public class LoadIntoAttachedFilesAction extends GenerateIdForPropertyBaseAction
 			}
 		}
 		
-		trackModification(filesNames.toString());
+		trackModification(filesNames.toString()); 
 	}
 	
 	private void trackModification(String fileName) {  

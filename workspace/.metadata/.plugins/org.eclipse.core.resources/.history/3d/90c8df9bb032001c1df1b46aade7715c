@@ -1,0 +1,7 @@
+package org.onerelease.model;
+
+import org.openxava.model.*;
+
+public class Epic extends Identifiable {
+
+}

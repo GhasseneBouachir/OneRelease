@@ -4,8 +4,11 @@ import java.lang.reflect.*;
 import java.rmi.*;
 import java.util.*;
 
+
+
 import org.apache.commons.logging.*;
 import org.openxava.util.*;
+import org.openxava.validators.*;
 
 /**
  * @author Javier Paniza
@@ -24,20 +27,18 @@ public class POJOPropertiesContainerAdapter implements IPropertiesContainer {
 			return propertiesManager.executeGets(properties);	
 		}
 		catch (Exception ex) {
-			throw new PropertiesContainerException("get_properties_error", ex.getLocalizedMessage());
+			log.error(ex.getMessage(), ex);
+			throw new RemoteException(XavaResources.getString("get_properties_error", ex.getLocalizedMessage()));
 		}
 	}
 
-	public void executeSets(Map properties) throws javax.validation.ValidationException, RemoteException {
+	public void executeSets(Map properties) throws ValidationException, RemoteException {
 		try {
 			propertiesManager.executeSets(properties);	
 		}
 		catch (InvocationTargetException ex) {
-			if (ex.getTargetException() instanceof org.openxava.validators.ValidationException) {
-				throw (org.openxava.validators.ValidationException) ex.getTargetException(); 
-			}
-			if (ex.getTargetException() instanceof javax.validation.ValidationException) {
-				throw (javax.validation.ValidationException) ex.getTargetException(); 
+			if (ex.getTargetException() instanceof ValidationException) {
+				throw (ValidationException) ex.getTargetException(); 
 			}
 			log.error(ex.getMessage(), ex);
 			throw new RemoteException(XavaResources.getString("set_properties_error", ex.getLocalizedMessage()));			

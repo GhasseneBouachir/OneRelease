@@ -42,7 +42,6 @@
  en-cada-fila (true|false) "false"
  procesar-elementos-seleccionados (true|false) "false"
  disponible-en-nuevo (true|false) "true"
- pierde-datos-cambiados (true|false) "false"
 >
 
 <!ELEMENT usa-objeto EMPTY>
@@ -72,4 +71,4 @@
  clase CDATA #IMPLIED
  contexto (comun|swing|web) "comun"
 >
-<!ELEMENT controladores (var-entorno*, objeto*, controlador*)>
+<!ELEMENT controladores (var-entorno*, objeto*, controlador+)>

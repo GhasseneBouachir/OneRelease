@@ -11,7 +11,7 @@ public class FilterAction extends FilterTabBaseAction {
 	
 	public void execute() throws Exception {
 		getTab().filter(); 
-		if (configurationId == 0) getTab().createConfiguration();
+		if (configurationId == 0) getTab().saveConfiguration();
 		else getTab().setConfigurationId(getConfigurationId());
 	}
 

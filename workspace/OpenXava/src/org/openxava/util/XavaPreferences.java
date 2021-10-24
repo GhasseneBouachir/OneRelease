@@ -108,6 +108,8 @@ public class XavaPreferences {
 		return getProperties().getProperty("smtpFromEmail", getSMTPUserID());
 	}
 
+
+	
 	/**
 	 * @since 4.7
 	 */
@@ -179,11 +181,6 @@ public class XavaPreferences {
 	public String getStyleCSS() {
 		return getProperties().getProperty("styleCSS", "terra.css").trim(); 
 	}
-	
-	/** @since 6.3 */
-	public String getThemes() { 
-		return getProperties().getProperty("themes", ""); 
-	}	
 
 	public String getLiferay51StyleClass() {
 		return getProperties().getProperty("liferay51StyleClass",
@@ -218,14 +215,6 @@ public class XavaPreferences {
 	public boolean isMapFacadeAsEJB() {
 		return "true".equalsIgnoreCase(getProperties().getProperty(
 				"mapFacadeAsEJB", "false").trim());
-	}
-	
-	/**
-	 * @since 6.4
-	 */
-	public boolean isEnterMovesToNextField() { 
-		return "true".equalsIgnoreCase(getProperties().getProperty(
-				"enterMovesToNextField", "false").trim());
 	}
 
 	/**
@@ -290,12 +279,6 @@ public class XavaPreferences {
 		}
 		return pageRowCount;
 	}
-	
-	/** @since 6.4.2 */
-	public int getApplicationPort() { 
-		return Integer.parseInt(getProperties().getProperty("applicationPort", "8080"));
-	}
-
 
 	public void setDuplicateComponentWarnings(boolean duplicateComponentWarnings) {
 		this.duplicateComponentWarnings = duplicateComponentWarnings;

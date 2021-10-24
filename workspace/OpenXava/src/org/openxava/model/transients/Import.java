@@ -5,7 +5,6 @@ import java.util.*;
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
-import org.openxava.util.*;
 
 /**
  * 
@@ -22,20 +21,6 @@ public class Import implements java.io.Serializable {
 	
 	@ElementCollection @EditOnly
 	private Collection<ImportColumn> columns;
-	
-	/**
-	 * @since 6.3.2
-	 */
-	public static String encodeSeparators(String text) { 
-		return text.replace(XavaPreferences.getInstance().getCSVSeparator(), "__SPRTR__"); 
-	}
-
-	/**
-	 * @since 6.3.2
-	 */	
-	public static String decodeSeparators(String text) { 
-		return text.replace("__SPRTR__", XavaPreferences.getInstance().getCSVSeparator()); 
-	}
 	
 	public Collection<ImportColumn> getColumns() {
 		return columns;

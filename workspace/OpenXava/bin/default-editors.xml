@@ -41,8 +41,8 @@
 	</editor>	
 	
 	<editor name="TextField" url="textEditor.jsp">
-		<list-formatter class="org.openxava.formatters.HTMLFilterListFormatter" />
 		<for-type type="java.lang.String" />
+		<list-formatter class="org.openxava.formatters.HTMLFilterListFormatter" />
 	</editor>	
 
 
@@ -99,7 +99,6 @@
 	</editor>
 
 	<editor name="Enum" url="validValuesEditor.jsp">
-		<list-formatter class="org.openxava.formatters.EnumListFormatter"/>
 		<for-type type="java.lang.Enum" />
 	</editor>
 
@@ -335,8 +334,8 @@
 	</editor>
 	
 	<editor url="chartColumnNameEditor.jsp" always-reload="true">
-		<property name="showOnlyNumericColumns" value="true" />
 		<for-model-property model="ChartColumn" property="name" />
+		<property name="showOnlyNumericColumns" value="true" />
 	</editor>
 	
 	<editor url="chartTypeEditor.jsp">

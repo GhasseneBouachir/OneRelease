@@ -3,7 +3,6 @@ package org.openxava.actions;
 import java.util.*;
 import org.openxava.session.*;
 import org.openxava.util.*;
-import org.openxava.validators.*;
 import org.openxava.view.*;
 
 /**
@@ -19,12 +18,7 @@ public class RemoveImageFromGalleryAction extends ViewBaseAction {
 	public void execute() throws Exception {
 		String galleryOid = getView().getValueString(property);
 		Gallery gallery = Gallery.find(galleryOid);
-		if (getView().getMetaProperty(property).isRequired() && gallery.getImagesOids().size() < 2) {
-			getView().setValue(property, null);
-		}
-		else {
-			gallery.removeImage(fileId);
-		}
+		gallery.removeImage(fileId);
 		trackModification(galleryOid); 
 	}
 	

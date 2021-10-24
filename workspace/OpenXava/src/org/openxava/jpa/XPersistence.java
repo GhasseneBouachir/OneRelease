@@ -257,10 +257,8 @@ public class XPersistence {
 	}
 	
 	private static String getHibernateDefaultSchemaPropertyName() { 
-		Map<String, Object> properties = getEntityManagerFactory().getProperties();
-		String dialect = (String) properties.get("hibernate.dialect");
+		String dialect = (String) getEntityManagerFactory().getProperties().get("hibernate.dialect");
 		if (dialect != null && dialect.toLowerCase().contains("mysql")) return "hibernate.default_catalog";
-		if (!Is.emptyString((String)properties.get("hibernate.default_catalog"))) return "hibernate.default_catalog";
 		return "hibernate.default_schema";
 	}
 	

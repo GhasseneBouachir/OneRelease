@@ -6,7 +6,6 @@
 <%@page import="org.openxava.util.Locales"%>
 <%@page import="org.openxava.util.XavaPreferences"%>
 <%@page import="org.openxava.web.style.XavaStyle"%>
-<%@page import="org.openxava.web.style.Themes"%> 
 <%@page import="com.openxava.naviox.util.Organizations"%>
 <%@page import="org.openxava.util.Users"%>
 <%@page import="com.openxava.naviox.util.NaviOXPreferences"%>
@@ -16,24 +15,19 @@
 <jsp:useBean id="modules" class="com.openxava.naviox.Modules" scope="session"/>
 
 <%
-if ("true".equals(request.getParameter("init"))) {
-	context.resetModule(request);
-}
-String windowId = context.getWindowId(request);
-context.setCurrentWindowId(windowId);
 String app = request.getParameter("application");
 String module = context.getCurrentModule(request);
+Locales.setCurrent(request);
 modules.setCurrent(request.getParameter("application"), request.getParameter("module"));
 String oxVersion = org.openxava.controller.ModuleManager.getVersion();
 String title = (String) request.getAttribute("naviox.pageTitle");
 if (title == null) title = modules.getCurrentModuleDescription(request); 
-boolean hasModules = modules.hasModules(request); 		
+boolean hasModules = modules.hasModules(); 		
 org.openxava.controller.ModuleManager manager = (org.openxava.controller.ModuleManager) context
 		.get(app, module, "manager", "org.openxava.controller.ModuleManager");
 manager.setSession(session);
 manager.setApplicationName(request.getParameter("application"));
-manager.setModuleName(module); // In order to show the correct description in head 
-boolean isFirstSteps = com.openxava.naviox.Modules.FIRST_STEPS.equals(module);
+manager.setModuleName(module); // In order to show the correct description in head
 %>
 
 <!DOCTYPE html>
@@ -41,7 +35,7 @@ boolean isFirstSteps = com.openxava.naviox.Modules.FIRST_STEPS.equals(module);
 <head>
 	<title><%=title%></title>
 	<link href="<%=request.getContextPath()%>/xava/style/layout.css?ox=<%=oxVersion%>" rel="stylesheet" type="text/css">
-    <link href="<%=request.getContextPath()%>/xava/style/<%=Themes.getCSS(request)%>?ox=<%=oxVersion%>" rel="stylesheet" type="text/css"> 
+    <link href="<%=request.getContextPath()%>/xava/style/<%=XavaPreferences.getInstance().getStyleCSS()%>?ox=<%=oxVersion%>" rel="stylesheet" type="text/css"> 
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/xava/style/materialdesignicons.css?ox=<%=oxVersion%>">
 	<script type='text/javascript' src='<%=request.getContextPath()%>/xava/js/dwr-engine.js?ox=<%=oxVersion%>'></script>
 	<script type='text/javascript' src='<%=request.getContextPath()%>/dwr/interface/Modules.js?ox=<%=oxVersion%>'></script>
@@ -49,52 +43,25 @@ boolean isFirstSteps = com.openxava.naviox.Modules.FIRST_STEPS.equals(module);
 </head>
 
 <body <%=XavaStyle.getBodyClass(request)%>>
-	
-	<div id="main"> 
-				
-		
-		
-		<div class="module-wrapper">
-			<div id="module_header">
-			
-			<% if (hasModules) { %>
+	<% if (hasModules) { %>
 			<jsp:include page="topMenu.jsp"/>
 		<% } %>
-			<%--   	<% if (!isFirstSteps) { %>
-				<a id="module_header_menu_button" href="javascript:naviox.showModulesList('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>')">
-					<i class="mdi mdi-menu"></i></a>
-				<% } %>	
-				<span id="module_title">
-					<%
-					if (hasModules && !isFirstSteps) {
-					%>
-					<span id="module_extended_title">
-						<%
-						String organizationName = modules.getOrganizationName(request);
-						if (!Is.emptyString(organizationName)) {
-						%> 
-						<%=organizationName%> - 
-						<%
-						}
-						%>						
-						<%=modules.getApplicationLabel(request)%> -
-					</span>	 
-					<%
-					}
-					%>
-					
-					<%String moduleTitle = hasModules?modules.getCurrentModuleLabel():modules.getCurrentModuleDescription(request);%>
-					<%=moduleTitle%>
-				</span>	
-				<a href="javascript:naviox.bookmark()" title="<xava:message key='<%=modules.isCurrentBookmarked(request)?"unbookmark_module":"bookmark_module"%>'/>"> 
-					<i id="bookmark" class='mdi mdi-star<%=modules.isCurrentBookmarked(request)?"":"-outline"%>'></i> 
-				</a>--%>
+	<div id="main"> 
+				
+		<div class="module-wrapper">
+			<div id="module_header">
+				<%String moduleTitle = hasModules?modules.getCurrentModuleLabel():modules.getCurrentModuleDescription(request);%>
+				<span id="module_title"><%=moduleTitle%></span> 
+				<a href="javascript:naviox.bookmark()" title="<xava:message key='<%=modules.isCurrentBookmarked()?"unbookmark_module":"bookmark_module"%>'/>">
+					<i id="bookmark" class='mdi mdi-star<%=modules.isCurrentBookmarked()?"":"-outline"%>'></i>
+				</a>
 				<div id="sign_in_out">
 					<%
 					if (Is.emptyString(NaviOXPreferences.getInstance().getAutologinUser())) {
 						String userName = Users.getCurrent();
 						String currentModule = request.getParameter("module");
-						boolean showSignIn = userName == null && !currentModule.equals("SignIn");						
+						boolean showSignIn = userName == null && !currentModule.equals("SignIn");
+						
 						if (showSignIn) {
 							String selected = "SignIn".equals(currentModule)?"selected":"";
 					%>

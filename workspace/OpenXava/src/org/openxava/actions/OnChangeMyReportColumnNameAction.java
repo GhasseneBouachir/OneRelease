@@ -46,6 +46,7 @@ public class OnChangeMyReportColumnNameAction extends OnChangeMyReportColumnBase
 		
 		if (java.util.Date.class.equals(property.getType())) {
 			setComparator(property);
+			showDateValue();
 			return;
 		}
 		
@@ -82,8 +83,8 @@ public class OnChangeMyReportColumnNameAction extends OnChangeMyReportColumnBase
 		}
 		else if (java.util.Date.class.isAssignableFrom(property.getType()) && 
 			!property.getType().equals(java.sql.Time.class)) 
-		{ 			 			
-			getView().setValueNotifying("comparator", comparatorValue); 
+		{ 			
+			getView().setValue("comparator", DATE_COMPARATOR + ":" + comparatorValue); 			
 		}
 		else {			
 			getView().setValue("comparator", OTHER_COMPARATOR + ":" + comparatorValue); 			

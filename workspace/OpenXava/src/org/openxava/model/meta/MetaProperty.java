@@ -1,22 +1,33 @@
 package org.openxava.model.meta;
 
-import java.math.*;
-import java.rmi.*;
-import java.sql.*;
-import java.text.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.rmi.RemoteException;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.format.*;
 import java.util.*;
 
-import javax.servlet.*;
+import javax.servlet.ServletRequest;
 
-import org.apache.commons.logging.*;
-import org.openxava.calculators.*;
-import org.openxava.mapping.*;
-import org.openxava.model.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openxava.calculators.ICalculator;
+import org.openxava.calculators.IHibernateIdGeneratorCalculator;
+import org.openxava.mapping.ModelMapping;
+import org.openxava.mapping.PropertyMapping;
+import org.openxava.model.IModel;
 import org.openxava.util.*;
-import org.openxava.util.meta.*;
+import org.openxava.util.meta.MetaSet;
+import org.openxava.util.meta.MetaSetsContainer;
 import org.openxava.validators.*;
-import org.openxava.validators.meta.*;
+import org.openxava.validators.meta.MetaValidator;
+import org.openxava.validators.meta.MetaValidatorFor;
+import org.openxava.validators.meta.MetaValidators;
 
 
 /**
@@ -49,6 +60,7 @@ public class MetaProperty extends MetaMember implements Cloneable {
 	private boolean mappingSet;
 	private PropertyMapping mapping;
 	private DateFormat timeFormat = new SimpleDateFormat("HH:mm"); // 24 hours for all locales
+	private boolean _transient;
 	private String requiredMessage = "required";
 	private String label;
 	private String qualifiedLabel;
@@ -125,7 +137,7 @@ public class MetaProperty extends MetaMember implements Cloneable {
 	}
 	
 	public String getQualifiedLabel(Locale locale) throws XavaException {
-		if (!Is.emptyString(qualifiedLabel)) return qualifiedLabel;
+		if (!Is.emptyString(qualifiedLabel)) return qualifiedLabel; 
 		String labelId = getId();
 		boolean tabReferenceLabel = isTabReferenceLabel(labelId);
 		if (!Is.emptyString(label) && !tabReferenceLabel) return label;
@@ -267,7 +279,6 @@ public class MetaProperty extends MetaMember implements Cloneable {
 			java.lang.Long.class.equals(getType()) ||
 			long.class.equals(getType()) ||
 			java.math.BigDecimal.class.equals(getType()) ||
-			java.math.BigInteger.class.equals(getType()) || 
 			java.lang.Short.class.equals(getType()) ||
 			short.class.equals(getType()) ||
 			java.lang.Float.class.equals(getType()) ||
@@ -553,7 +564,7 @@ public class MetaProperty extends MetaMember implements Cloneable {
 	public boolean isCalculated() {
 		return getMetaCalculator() != null;
 	}
-			
+	
 	public boolean isPersistent() throws XavaException {
 		return getMapping() != null;
 	}
@@ -858,7 +869,7 @@ public class MetaProperty extends MetaMember implements Cloneable {
 				if (emptyString) return null;
 				java.util.Date date = null;
 				try {
-					date = Dates.getDateTimeFormatForParsing(locale).parse(value); 
+					date = Dates.getDateTimeFormat(locale).parse(value); 
 				}
 				catch (ParseException ex) {
 					date = DateFormat.getDateInstance(DateFormat.SHORT, locale).parse(value);
@@ -1115,6 +1126,13 @@ public class MetaProperty extends MetaMember implements Cloneable {
 		
 	public int hashCode() {		
 		return getQualifiedName().hashCode();
+	}
+	
+	public boolean isTransient() {
+		return _transient;
+	}
+	public void setTransient(boolean _transient) {
+		this._transient = _transient;
 	}
 	
 	private Class getEnumClass() { // Enum

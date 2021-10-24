@@ -24,8 +24,8 @@ public class CreateEpic extends SaveElementInCollectionAction {
 		fields.setProjectKey("HEL");
 		fields.setSummary(getCollectionElementView().getValueString("summary"));
 		fields.setIssueTypeName(IssueType.ISSUE_TYPE_EPIC);
-		 fields.setCustomfield("customfield_10011", getCollectionElementView().getValueString("name"));
-    	if(getCollectionElementView().getValue("reference") == null)
+//		 fields.setCustomfield("customfield_10011", getCollectionElementView().getValueString("name"));
+		if(getCollectionElementView().getValue("reference") == null)
     		{
     		creationEpic = true;
 			fields.setDescription("Epic created from one release");

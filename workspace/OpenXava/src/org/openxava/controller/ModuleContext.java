@@ -25,7 +25,7 @@ public class ModuleContext implements java.io.Serializable {
 	private transient Map<String, Map> contexts = null; 
 	private transient Map globalContext = null; 
 	private String lastUsedWindowId; 
-	private String windowIdForNextTime = null;
+	private String windowIdForNextTime = null; 
 
 	/**
 	 * Return a object associated to the specified module
@@ -193,7 +193,12 @@ public class ModuleContext implements java.io.Serializable {
 			return getGlobalContext();
 		}
 
-		if (currentWindowId.get() == null) currentWindowId.set(lastUsedWindowId);
+		synchronized (this) { // Without this CustomerWithSectionTest fails when executed several time. Not completely sure.
+			// I don't know if the below "null".equals(currentWindowId.get()) is needed, 
+			// 		I suspect is related with CustomerWithSectionTest failing when executed several time
+			if (currentWindowId.get() == null || "null".equals(currentWindowId.get())) currentWindowId.set(lastUsedWindowId);  
+			else lastUsedWindowId = currentWindowId.get();			
+		}
 		
 		String id = application + "/" + module + "/" + currentWindowId.get();
 		
@@ -247,7 +252,7 @@ public class ModuleContext implements java.io.Serializable {
 		}
 		return allContexts;
 	}
-		
+	
 	public String getWindowId(HttpServletRequest request) {
 		// If we change this method we should try with Customer module: 
 		//		New, change image, open Customer module in other browser tab, it should show the list, not the detail
@@ -258,9 +263,9 @@ public class ModuleContext implements java.io.Serializable {
 		if (alreadyInPageWindowId != null) {
 			return alreadyInPageWindowId;
 		}
-		String windowId = Servlets.getCookie(request, "XAVA_WINDOW_ID");
+		String windowId = Servlets.getCookie(request, "XAVA_WINDOW_ID"); 
 		if (Is.emptyString(windowId)) {
-			if (windowIdForNextTime != null) {								
+			if (windowIdForNextTime != null) {				
 				windowId = windowIdForNextTime;
 			}
 			else {
@@ -272,31 +277,21 @@ public class ModuleContext implements java.io.Serializable {
 		return windowId;
 	}
 	
-	public void setCurrentWindowId(HttpServletRequest request) {
-		String windowId = request.getHeader("xavawindowid");
-		if (Is.emptyString(windowId) || "null".equals(windowId)) {
-			windowId = request.getParameter("windowId");
-		}
-		// Fixes occasional loss of window id
-		if (Is.emptyString(windowId) || "null".equals(windowId)) {
-			windowId = getWindowId(request);
-		}
-		setCurrentWindowId(windowId);
+	public static void setCurrentWindowId(HttpServletRequest request) {
+		setCurrentWindowId(request.getHeader("xavawindowid"));  
 	}
 	
-	public void setCurrentWindowId(String id) {
-		String windowId = "null".equals(id)?null:id;
-		currentWindowId.set(windowId);
-		if (windowId != null) lastUsedWindowId = windowId;
+	public static void setCurrentWindowId(String id) {
+		currentWindowId.set("null".equals(id)?null:id); 
 	}
 	
 	public static void cleanCurrentWindowId() {
-		currentWindowId.remove(); 
+		currentWindowId.set(null); 
 	}
 
 	
-	public void dontGenerateNewWindowIdNextTime() { 
-		windowIdForNextTime = lastUsedWindowId;   
+	public void dontGenerateNewWindowIdNextTime() {
+		windowIdForNextTime = lastUsedWindowId; 
 	}
 
 }

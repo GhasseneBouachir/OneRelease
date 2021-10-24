@@ -15,8 +15,7 @@ import org.openxava.util.*;
 abstract public class BaseAllModulesNamesProvider implements IAllModulesNamesProvider {
 
 	public Collection<String> getAllModulesNames(MetaApplication app) {
-		Collection<String> allModulesNames = new HashSet<String>(app.getModulesNames());
-		allModulesNames.remove("FirstSteps"); 
+		Collection<String> allModulesNames = new HashSet<String>(app.getModulesNames());  
 		for (String className: AnnotatedClassParser.getManagedClassNames()) {
 			if (moduleForClass(className)) {
 				allModulesNames.add(Strings.lastToken(className, "."));

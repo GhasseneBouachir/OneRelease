@@ -3,8 +3,6 @@ package org.openxava.formatters;
 import java.text.ParseException;
 import java.util.Calendar;
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.logging.*;
 import org.openxava.util.Is;
 
 /**
@@ -12,9 +10,6 @@ import org.openxava.util.Is;
  */
 
 public class TimeBaseFormatter implements IFormatter {	
-
-	private final static Log log = LogFactory.getLog(TimeBaseFormatter.class);
-	
 	public String format(HttpServletRequest request, Object time) {
 		return time==null?"":time.toString();
 	}
@@ -33,7 +28,6 @@ public class TimeBaseFormatter implements IFormatter {
 		public long millis() {
 			Calendar cal = Calendar.getInstance();
 			cal.set(1970, 1, 1, hours, minutes, seconds);
-			cal.set(Calendar.MILLISECOND, 0); 
 			return cal.getTimeInMillis();
 		}
 		
@@ -46,7 +40,7 @@ public class TimeBaseFormatter implements IFormatter {
 		
 	public Object parse(HttpServletRequest request, String string) throws ParseException {
 		
-		if(Is.emptyString(string)) return null; 
+		if(Is.emptyString(string)) return new TimeData(0,0,0);
 		
 		try {
 		    if(string.matches("^([0-9]{1,2}):([0-9]{1,2})$")) {
@@ -99,7 +93,7 @@ public class TimeBaseFormatter implements IFormatter {
 		        }
             }
 		} catch (Exception ex) {
-			log.warn(ex.getMessage(), ex); 
+		    ex.printStackTrace();
 		}
 		throw new ParseException("bad_time_format",-1);
 	}

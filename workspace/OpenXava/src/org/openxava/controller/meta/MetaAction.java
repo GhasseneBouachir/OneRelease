@@ -45,7 +45,6 @@ public class MetaAction extends MetaControllerElement implements Cloneable {
 	private boolean inEachRow; 
 	private boolean processSelectedItems;
 	private boolean availableOnNew; 
-	private boolean losesChangedData; 
 	
 	public MetaAction() {
 	}
@@ -245,7 +244,6 @@ public class MetaAction extends MetaControllerElement implements Cloneable {
 		return getConfirmMessage(Locale.getDefault());
 	}
 	
-	
 	/** @param argv  Since 4m5 */
 	public String getConfirmMessage(Locale locale, String... argv) {
 		if (!isConfirm()) return "";
@@ -360,15 +358,5 @@ public class MetaAction extends MetaControllerElement implements Cloneable {
 	public void setAvailableOnNew(boolean availableOnNew) {
 		this.availableOnNew = availableOnNew;
 	}
-	
-	/** @since 6.3 */
-	public boolean isLosesChangedData() { 
-		return losesChangedData;
-	}
 
-	/** @since 6.3 */	
-	public void setLosesChangedData(boolean losesChangedData) {
-		this.losesChangedData = losesChangedData;
-	}
-	
 }

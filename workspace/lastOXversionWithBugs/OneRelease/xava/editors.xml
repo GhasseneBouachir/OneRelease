@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE editors SYSTEM "dtds/editors.dtd">
+
+<editors>
+		<editor name="DiagramEditor" url="diagramEditor.jsp"
+		frame="true">
+				
+		        <for-stereotype stereotype="DIAGRAM"/>
+<!-- <for-type type="java.lang.String"/> -->
+		</editor>
+						
+</editors>

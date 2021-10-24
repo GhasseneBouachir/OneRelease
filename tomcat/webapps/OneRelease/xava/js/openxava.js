@@ -14,8 +14,7 @@ openxava.init = function(application, module, initUI) {
 		}
 		$(openxava.staticInit);
 	}
-	openxava.initStrokeActions(application, module);
-	openxava.dataChanged = false; 
+	openxava.initStrokeActions(application, module); 
 }
 
 openxava.ajaxRequest = function(application, module, firstRequest, inNewWindow) {
@@ -126,7 +125,7 @@ openxava.refreshPage = function(result) {
 				errors = true;
 				break;
 			}			
-		}
+		}  
 		if (result.showDialog){
 			openxava.initBeforeShowDialog(); 
 			dialog.attr("application", result.application);
@@ -140,7 +139,7 @@ openxava.refreshPage = function(result) {
 			dialog.dialog('widget').css('margin-left', '20px'); 
 			dialog.dialog('widget').css('margin-right', '20px'); 
 			dialog.dialog('option', 'height', 'auto');
-			dialog.dialog('option', 'position', { my: "center top", at: "center top+" + openxava.dialogLevel * 40, of: window, collision: "fit" } ); 
+			dialog.dialog('option', 'position', { my: "center", at: "center", of: window, collision: "fit" } ); 			
 			dialog.dialog('option', 'zIndex', 99999 );
 			if (result.dialogTitle.indexOf("!x:") === 0) {
 				dialog.dialog('option', 'title', result.dialogTitle.substring(3));
@@ -185,7 +184,6 @@ openxava.refreshPage = function(result) {
 	openxava.showMessages(result); 
 	openxava.resetRequesting(result);
 	openxava.propertiesUsedInCalculationsChange(result);
-	openxava.dataChanged = result.dataChanged; 
 	$('#xava_loading').hide();
 	$('#xava_loading2').hide();
 	if (result.postJS != null) {
@@ -193,7 +191,7 @@ openxava.refreshPage = function(result) {
 	}
 	document.body.style.cursor='auto';
 	if (openxava.postRefreshPage != null) openxava.postRefreshPage(); 
-	openxava.setUrlParam(result.urlParam);
+	openxava.setUrlParam(result.urlParam); 
 }
 
 openxava.initUI = function(application, module, currentRow, viewSimple) { 
@@ -208,37 +206,6 @@ openxava.initUI = function(application, module, currentRow, viewSimple) {
 	openxava.initViewSimple(application, module, viewSimple);
 	openxava.initTooltips();
 	openxava.initPlaceholder();
-	openxava.listenChanges(); 
-	openxava.initFocusKey();
-  	$('#xava_save_list_configuration').fadeIn(1000, 'swing'); 
-}
-
-
-openxava.initFocusKey = function() { } 
-
-openxava.setEnterAsFocusKey = function() {
-	var focusables = $('input:focusable[tabindex="1"], select:focusable[tabindex="1"], textarea:focusable[tabindex="1"]');
-	focusables.on('keypress',function(e) {
-		if(e.which === 13 && !$(e.target).is("textarea")) {
-			e.preventDefault();
-			var i = focusables.index($(this));
-			var next = focusables[i + 1];
-			next.focus();
-			if ($(next).is("input")) next.select();
-		}
-	});
-}
-
-openxava.listenChanges = function() { 
-	// WARNING: IF YOU CHANGE THIS PASS DateCalendarTest.txt
-	$("." + openxava.editorClass).change(function() {
-		  if (!$(this).data('changedCancelled')) {
-			openxava.dataChanged = true;			
-		  }
-		  else {
-		  	$(this).removeData('changedCancelled');
-		  }
-	});
 }
 
 openxava.stylizeEditorsWithError = function(application, module, editorsWithError, editorsWithoutError) { 
@@ -291,9 +258,9 @@ openxava.initBeforeShowDialog = function() {
 
 openxava.initWindowId = function() { 
 	$(window).bind('beforeunload',function(){
-		document.cookie = "XAVA_WINDOW_ID=" + $("#xava_window_id").val() + ";SameSite=Strict"; 
+		document.cookie = "XAVA_WINDOW_ID=" + $("#xava_window_id").val(); 
 	});		
-	document.cookie="XAVA_WINDOW_ID=;SameSite=Strict";	
+	document.cookie="XAVA_WINDOW_ID=";   
 	dwr.engine.setHeaders({ xavawindowid: $("#xava_window_id").val() }); 
 }
 
@@ -335,10 +302,6 @@ openxava.showMessages = function(result) {
 	var errorsIsEmpty = openxava.getElementById(result.application, result.module, "errors_table") == null;
 	if (!messagesIsEmpty) openxava.effectShow(result.application, result.module, "messages");
 	if (!errorsIsEmpty) openxava.effectShow(result.application, result.module, "errors");
-}
-
-openxava.hideErrors = function(application, module) {  
-	$("#"+openxava.decorateId(application, module, "errors")).fadeOut();
 }
 
 openxava.initSelectedRows = function() { 
@@ -438,7 +401,8 @@ openxava.initLists = function(application, module) {
 			Tab.setColumnWidth(event.target.id, $(event.target).closest("th").index() - 2, $(event.target).width());
 		}
 	});				
-	openxava.resetListsSize(application, module); 
+	openxava.setListsSize(application, module, "list", openxava.listAdjustment); 
+	openxava.setListsSize(application, module, "collection", openxava.collectionAdjustment);
 	$('.xava_sortable_column').sorttable({ 
 		placeholder: 'xava_placeholder',
 	    helperCells: null,
@@ -461,31 +425,17 @@ openxava.initLists = function(application, module) {
 	    	ui.item.startPos = ui.item.index(); 
 	    },		
 	    stop: function( event, ui ) {
-	    	var table = $(event.target).closest("table");
-	    	var tableId = table.attr("id");
+	    	var tableId = $(event.target).closest("table").attr("id");
 	    	View.moveCollectionElement(tableId, ui.item.startPos - 1, ui.item.index() - 1);
-	    	openxava.renumberCollection(table);
 	    }	
 	});
 	openxava.watchColumnsSearch();
-	$('.xava_filter input').focus(function() { // If changed to change event, revise ModuleTestBase.setCollectionCondition()
+	$('.xava_filter input').keypress(function() { 
 		$(this).parent().parent().find(".xava_comparator").fadeIn();
-	});	
-}
-
-openxava.renumberCollection = function(table) { 
-	table.find("tr").each(function(rowIndex) {
-		$(this).find("a").each(function() {
-			var newHref = $(this).attr("href")
-				.replace(new RegExp("'row=\\d+,viewObject=", "g"), "'row=" + (rowIndex - 1) + ",viewObject=")
-			$(this).attr("href", newHref);
-		});
 	});
-}
-
-openxava.resetListsSize = function(application, module) {
-	openxava.setListsSize(application, module, "list", openxava.listAdjustment); 
-	openxava.setListsSize(application, module, "collection", openxava.collectionAdjustment);
+	$('.xava_filter input').change(function() { // If changed, revise ModuleTestBase.setCollectionCondition()
+		$(this).parent().parent().find(".xava_comparator").fadeIn();
+	});
 }
 
 openxava.setListsSize = function(application, module, type, adjustment) {
@@ -743,14 +693,6 @@ openxava.setPageRowCount = function(application, module, collection, select) {
 	openxava.executeAction(application, module, '', false, "List.setPageRowCount", "rowCount=" + select.value + ",collection=" + collection)
 }
 
-openxava.executeActionConfirmLosesChangedData = function(application, module, confirmMessage, takesLong, action, argv, range, alreadyProcessed, inNewWindow) { 
-	if (openxava.dataChanged) {
-		if (!confirm(openxava.confirmLoseChangesMessage)) return;
-		openxava.dataChanged = false;
-	}
-	openxava.executeAction(application, module, confirmMessage, takesLong, action, argv, range, alreadyProcessed, inNewWindow);
-}
-
 openxava.executeAction = function(application, module, confirmMessage, takesLong, action, argv, range, alreadyProcessed, inNewWindow) { 
 	if (confirmMessage != "" && !confirm(confirmMessage)) return;
 	if (takesLong) { 
@@ -848,24 +790,19 @@ openxava.onFocus = function(application, module, property) {
 }
 
 openxava.throwPropertyChanged = function(application, module, property) {
-	if (openxava.isRequesting(application, module)) return;
-	var f = $('#' + property);
-	if (!f.data('changedCancelled')) {
-		document.throwPropertyChange = true;
-		var form = openxava.getForm(application, module);
-		form[openxava.decorateId(application, module, "xava_focus_forward")].value = "true";	
-		form[openxava.decorateId(application, module, "xava_previous_focus")].value=property;
-		form[openxava.decorateId(application, module, "xava_changed_property")].value=property;
-		setTimeout ('openxava.requestOnChange("' + application + '", "' + module + '")', 100);
-	}
+	if (openxava.isRequesting(application, module)) return;	
+	document.throwPropertyChange = true;
+	var form = openxava.getForm(application, module);
+	form[openxava.decorateId(application, module, "xava_focus_forward")].value = "true";	
+	form[openxava.decorateId(application, module, "xava_previous_focus")].value=property;
+	form[openxava.decorateId(application, module, "xava_changed_property")].value=property;
+	setTimeout ('openxava.requestOnChange("' + application + '", "' + module + '")', 100);	
 }
 
 openxava.calculate = function(application, module, propertyId, scale) {
 	var calculation = $('#' + propertyId + "_CALCULATION_").val();
-	if (calculation == null) return;
 	var value = eval(calculation).toFixed(scale).replace(".", openxava.decimalSeparator);
 	$('#' + propertyId).val(value);
-	$('#' + propertyId).blur(); 	
 	$('#' + propertyId).change(); 
 }
 
@@ -1095,24 +1032,22 @@ openxava.hideFrame = function(id) {
 
 openxava.onChangeComparator = function(id,idConditionValue,idConditionValueTo,labelFrom,labelInValues) {
 	var comparator = openxava.getFormValue(document.getElementById(id));
-	var valueInput = $('#' + idConditionValue); 
-	var valueInputTo = $('#' + idConditionValueTo); 
 	var br = $('#' + id).prev();
 	if (br.is('br')) br.remove();
 	
 	if ("range_comparator" == comparator){
-		valueInput.show().next().show();
-		valueInputTo.show().next().show();
+		$('#' + idConditionValue).show().next().show();
+		$('#' + idConditionValueTo).show().next().show();
 		document.getElementById(idConditionValue).placeholder = labelFrom;
 	}
 	else if ("empty_comparator" == comparator || "not_empty_comparator" == comparator) {
 		$('#' + id).before('<br/>');
-		valueInput.hide().next().hide();
-		valueInputTo.hide().next().hide();
+		$('#' + idConditionValue).hide().next().hide();
+		$('#' + idConditionValueTo).hide().next().hide();
 	}
 	else{
-		valueInput.show().next().show();
-		valueInputTo.hide().next().hide();		
+		$('#' + idConditionValue).show().next().show();
+		$('#' + idConditionValueTo).hide().next().hide();		
 		if ("in_comparator" == comparator || "not_in_comparator" == comparator) {
 			document.getElementById(idConditionValue).placeholder = labelInValues;
 		} 		
@@ -1120,24 +1055,6 @@ openxava.onChangeComparator = function(id,idConditionValue,idConditionValueTo,la
 			document.getElementById(idConditionValue).placeholder = "";
 		}
 	}
-
-	if (openxava.browser.htmlUnit) return;
-	if ("year_comparator" == comparator || "year_month_comparator" == comparator || "month_comparator" == comparator) {
-		var fp = valueInput.parent()[0]._flatpickr;
-		fp.destroy();
-		valueInput.off("change");		
-		valueInput.parent().removeClass("xava_date");		
-		valueInput.val("");
-		valueInput.addClass("xava_date_disabled");
-		valueInput.parent().find('a').hide();
-	}
-	else if (valueInput.hasClass("xava_date_disabled")) {
-		valueInput.val("");
-		valueInput.removeClass("xava_date_disabled");
-		valueInput.parent().addClass("xava_date");
-		valueInput.parent().find('a').show();
-		openxava.initEditors();
-	}	
 }
 
 openxava.onChangeCheckBox = function(cb,row,application,module,tabObject){
@@ -1226,21 +1143,9 @@ openxava.markRowAsCut = function(collectionId, rowId) {
 
 
 openxava.fadeIn = function(selector, duration) { 
-	// jQuery fadeIn() not work under certain race conditions
-	$(selector).css("opacity", "0"); 
-	$(selector).show(); 
-	$(selector).fadeTo(duration, 1);
+	$(selector).fadeIn(duration);
 }
 
 openxava.show = function(selector) { 
 	$(selector).show();
 }
-
-// Instead of $.getScript() because of cache
-openxava.getScript = function( url ) {
-  return jQuery.ajax( {
-    dataType: "script",
-    cache: true,
-    url: url
-  });
-};

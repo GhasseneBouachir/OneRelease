@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 import org.openxava.annotations.*;
 import org.openxava.model.*;
-import lombok.*;
 
 /**
  * Esto es un ejemplo de una entidad.
@@ -15,14 +14,38 @@ import lombok.*;
  * Siéntete libre de renombrarla, modificarla o borrarla a tu gusto.
  */
 
-@Entity @Getter @Setter
+@Entity
 public class TuPrimeraEntidad extends Identifiable {
 	
 	@Column(length=50) @Required
-	String descripcion;
+	private String descripcion;
 	
-	LocalDate fecha;
+	private LocalDate fecha;
 	
-	BigDecimal importe;
+	private BigDecimal importe;
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public LocalDate getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(LocalDate fecha) {
+		this.fecha = fecha;
+	}
+
+	public BigDecimal getImporte() {
+		return importe;
+	}
+
+	public void setImporte(BigDecimal importe) {
+		this.importe = importe;
+	}
 	
 }

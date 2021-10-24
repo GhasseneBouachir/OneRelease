@@ -2,7 +2,6 @@
 
 <%@page import="org.openxava.view.meta.MetaView"%>
 <%@page import="org.openxava.view.View"%>
-<%@ page import="org.openxava.web.Ids"%>
 
 <jsp:useBean id="context" class="org.openxava.controller.ModuleContext" scope="session"/>
 <jsp:useBean id="style" class="org.openxava.web.style.Style" scope="request"/>
@@ -28,14 +27,11 @@ int activeSection = view.getActiveSection();
 	while (itSections.hasNext()) {
 		MetaView section = (MetaView) itSections.next();
 		View sectionView = view.getSectionView(i);
-		String sectionName = sectionView.getTitle().equals("") ? section.getLabel(request) : sectionView.getTitle();
 		String collectionCountLabel = sectionView.getLabelDecoration();
-		String labelId = Ids.decorate(request, "label_" + sectionView.getViewObject() + "_sectionName");
 		if (activeSection == i) {
 	%>        
 			<%=style.getActiveSectionTabStartDecoration(i == 0, !itSections.hasNext())%>
-			<span id="<%=labelId%>"><%=sectionName%></span> 
-			<span id="<xava:id name='<%=sectionView.getViewObject() + "_collectionSize"%>'/>"><%=collectionCountLabel%></span> 
+			<%=section.getLabel(request)%> <span id="<xava:id name='<%=sectionView.getViewObject() + "_collectionSize"%>'/>"><%=collectionCountLabel%></span> 
 			<%=style.getActiveSectionTabEndDecoration()%>
     <%
 		}
@@ -46,8 +42,7 @@ int activeSection = view.getActiveSection();
 				String viewObjectArgv = "xava_view".equals(viewObject)?"":",viewObject=" + viewObject;
 				%>
 				<xava:link action='Sections.change' argv='<%="activeSection=" + i + viewObjectArgv%>' cssClass='<%=style.getSectionLink()%>' cssStyle='<%=style.getSectionLinkStyle()%>'>
-				<span id="<%=labelId%>"><%=sectionName%></span>
-				<span id="<xava:id name='<%=sectionView.getViewObject() +  "_collectionSize"%>'/>"><%=collectionCountLabel%></span>
+				<%=section.getLabel(request)%> <span id="<xava:id name='<%=sectionView.getViewObject() +  "_collectionSize"%>'/>"><%=collectionCountLabel%></span>
 				</xava:link>				
 			<%=style.getSectionTabEndDecoration()%>	
   	<%   	

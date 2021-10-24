@@ -55,7 +55,6 @@ elementCollectionEditor.removeRow = function(application, module, element, rowIn
 	if (hasTotals) {
 		openxava.executeAction(application, module, "", false, "ElementCollection.refreshTotals");
 	}	
-	openxava.initEditors();
 }
 
 elementCollectionEditor.renumber = function(row, rowIndex) { 
@@ -69,8 +68,8 @@ elementCollectionEditor.renumber = function(row, rowIndex) {
 		.replace(token1, token2)
 		.replace(new RegExp("this, \\d+", "g"), "this, " + rowIndex)
 		.replace(new RegExp("keyProperty=(.*)\\.\\d+\\.", "g"), "keyProperty=$1." + rowIndex + ".");
-	row.html(rowHtml);
-	if ($(row).css("display") !== 'none') { // is:visible/hidden not work on mobile (removing one record removes all until end)
+	row.html(rowHtml);	
+	if ($(row).is(":visible")) { 
 		elementCollectionEditor.renumber(row.next(), rowIndex + 1);
 	}
 }

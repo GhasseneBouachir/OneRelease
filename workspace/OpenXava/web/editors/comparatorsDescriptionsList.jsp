@@ -47,16 +47,14 @@ DescriptionsCalculator calculator = new DescriptionsCalculator();
 String model = request.getParameter("model");
 if (model == null) model = request.getParameter("modelo");
 MetaTab metaTab = MetaComponent.get(model).getMetaTab();
-String filterClass = request.getParameter("filter");
-IFilter filter = Is.emptyString(filterClass)?null:(IFilter) Class.forName(filterClass).newInstance();
-if (filter == null && metaTab.getMetaFilter() != null && metaTab.getMetaFilter().getFilter() != null) {
-	filter = metaTab.getMetaFilter().getFilter();
-}
-if (filter != null) {
-	if (filter instanceof IRequestFilter) {
-		((IRequestFilter) filter).setRequest(request);
+if (metaTab.getMetaFilter() != null){
+	if (metaTab.getMetaFilter().getFilter() != null) {
+		IFilter filter = metaTab.getMetaFilter().getFilter();
+		if (filter instanceof IRequestFilter) {
+			((IRequestFilter) filter).setRequest(request);
+		}
+		calculator.setParameters(null, filter);
 	}
-	calculator.setParameters(null, filter);
 }
 calculator.setModel(model);
 String condition = metaTab.getBaseCondition();
@@ -107,15 +105,13 @@ String collectionArgv = Is.emptyString(collection)?"":"collection="+collection;
 <%
 	java.util.Iterator it = descriptions.iterator();
 	String selectedDescription = "";	
-	String valuePrefix = value.split(Tab.DESCRIPTIONS_LIST_SEPARATOR)[0] + Tab.DESCRIPTIONS_LIST_SEPARATOR; 
 	while (it.hasNext()) {
 		KeyAndDescription cl = (KeyAndDescription) it.next();	
 		String selected = "";
 		String description = formatter==null?cl.getDescription().toString():formatter.format(request, cl.getDescription());
 		// Intead of asking index < 0 it would better to use a specific parameter such as descriptionInKey or so
-		String keyPrefix = cl.getKey() + Tab.DESCRIPTIONS_LIST_SEPARATOR;
-		Object key = keyPrefix + description;
-		if (keyPrefix.equals(valuePrefix)) { 
+		Object key =cl.getKey() + Tab.DESCRIPTIONS_LIST_SEPARATOR + description;
+		if (Is.equalAsStringIgnoreCase(value, key)) {
 			selected = "selected"; 
 			selectedDescription = description;
 		} 		

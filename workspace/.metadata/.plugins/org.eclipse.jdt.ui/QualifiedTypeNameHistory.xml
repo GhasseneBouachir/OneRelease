@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="org.openxava.actions.SearchAction"/>
-<fullyQualifiedTypeName name="org.openxava.annotations.SearchListCondition"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.SearchAction"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.Condition"/>
 <fullyQualifiedTypeName name="org.openxava.actions.OnChangeElementCollectionBaseAction"/>
@@ -11,9 +9,7 @@
 <fullyQualifiedTypeName name="javax.persistence.OneToMany"/>
 <fullyQualifiedTypeName name="javax.persistence.ManyToOne"/>
 <fullyQualifiedTypeName name="org.onerelease.model.Entreprise"/>
-<fullyQualifiedTypeName name="org.openxava.annotations.Views"/>
 <fullyQualifiedTypeName name="org.onerelease.model.Employee"/>
-<fullyQualifiedTypeName name="javax.persistence.Entity"/>
 <fullyQualifiedTypeName name="java.lang.System"/>
 <fullyQualifiedTypeName name="org.openxava.calculators.ICalculator"/>
 <fullyQualifiedTypeName name="org.onerelease.enumeration.TicketStatus"/>
@@ -49,7 +45,6 @@
 <fullyQualifiedTypeName name="javax.persistence.OneToOne"/>
 <fullyQualifiedTypeName name="javax.persistence.Transient"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.View"/>
-<fullyQualifiedTypeName name="org.openxava.annotations.AsEmbedded"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.ReferenceView"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.DescriptionsList"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.Required"/>
@@ -60,4 +55,9 @@
 <fullyQualifiedTypeName name="javax.persistence.CascadeType"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.CollectionView"/>
 <fullyQualifiedTypeName name="org.openxava.annotations.SaveAction"/>
+<fullyQualifiedTypeName name="org.openxava.annotations.Views"/>
+<fullyQualifiedTypeName name="javax.persistence.Entity"/>
+<fullyQualifiedTypeName name="javax.annotation.Nullable"/>
+<fullyQualifiedTypeName name="org.openxava.annotations.AsEmbedded"/>
+<fullyQualifiedTypeName name="javax.persistence.PreUpdate"/>
 </qualifiedTypeNameHistroy>

@@ -39,8 +39,6 @@ String collectionClass = subview.isEditable()?"class='" + style.getElementCollec
 boolean sortable = subview.isCollectionSortable();
 String removeSelectedAction = subview.getRemoveSelectedCollectionElementsAction();
 boolean suppressRemoveAction = removeSelectedAction != null && "".equals(removeSelectedAction);
-boolean labelOnEachCell = "true".equals(request.getParameter("labelOnEachCell"));
-boolean hideTotals = "true".equals(request.getParameter("hideTotals"));
 %>
 <div <%=collectionClass%>>
 <% if (resizeColumns && scrollSupported) { %> 
@@ -162,7 +160,7 @@ for (int f=0; f < rowCount; f++) {
 	for (int columnIndex = 0; it.hasNext(); columnIndex++) { 
 		MetaProperty p = (MetaProperty) it.next();
 		String align =p.isNumber() && !p.hasValidValues()?"vertical-align: middle;text-align: right; ":"vertical-align: middle; "; 
-		String cellStyle = style.getListCellStyle() + align;
+		String cellStyle = style.getListCellStyle() + align; 
 		int columnWidth = subview.getCollectionColumnWidth(columnIndex);
 		String width = columnWidth<0 || !resizeColumns?"":"width: " + columnWidth + "px";
 		String referenceName = null;
@@ -186,9 +184,7 @@ for (int f=0; f < rowCount; f++) {
 		}
 %>
 	<td class="<%=cssCellClass%> <%=style.getElementCollectionDataCell()%>" style="<%=cellStyle%>; padding-right: 0px">
-		<% if (labelOnEachCell) { %>
-			<span class="<%=style.getLabel()%>"><%=p.getQualifiedLabel(request)%></span>
-		<% } %>
+	
 		<div class="<xava:id name='<%=idCollection%>'/>_col<%=columnIndex%>" style="overflow: hidden; <%=width%>" <%=lastRowEvent%>>
 		<nobr> 
 		<% if (!subview.isCollectionMembersEditables()) {%>
@@ -217,9 +213,7 @@ for (int f=0; f < rowCount; f++) {
 }
 %>
 </tr>
-<% if (!hideTotals) { %> 
-	<jsp:include page="collectionTotals.jsp" />
-<% } %> 
+<jsp:include page="collectionTotals.jsp" />
 <% if (sortable) { %></tbody><% } %>
 </table>
 <% if (resizeColumns && scrollSupported) { %>

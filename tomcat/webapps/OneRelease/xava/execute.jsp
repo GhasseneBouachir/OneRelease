@@ -23,6 +23,7 @@ if (browser == null) {
 	browser = request.getHeader("user-agent");
 	request.setAttribute("xava.portlet.user-agent", browser);
 }
+Locales.setCurrent(request);
 
 org.openxava.controller.ModuleManager manager = (org.openxava.controller.ModuleManager) context.get(request, "manager", "org.openxava.controller.ModuleManager");
 manager.setSession(session);
@@ -101,5 +102,4 @@ if (!(loadingModulePage && manager.isCoreViaAJAX(request))) {
 if ("true".equals(request.getParameter("firstRequest")) && manager.isCoreViaAJAX(request)) { 
 	manager.executeBeforeLoadPage(request, errors, messages);
 }
-if (manager.isDetailMode()) view.setRequest(request);   
 %>

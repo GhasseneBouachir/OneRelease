@@ -9,8 +9,8 @@ import org.openxava.util.*;
 /**
  * Date formatter with multilocale support. <p>
  * 
- * Although it does some refinement in Spanish, Catalan, Polish, Croatian and French case, 
- * it support formatting on locale basis.<br>
+ * Although it does some refinement in Spanish case, it support formatting
+ * on locale basis.<br>
  *  
  * @author Javier Paniza
  */
@@ -24,8 +24,6 @@ public class DateFormatter implements IFormatter {
 		new SimpleDateFormat("ddMMyy"),
 		new SimpleDateFormat("dd.MM.yy")				
 	};
-
-	private static DateFormat dotDateFormat = new SimpleDateFormat("dd.MM.yyyy"); // Only for some locales like "hr"
 	
 	public String format(HttpServletRequest request, Object date) {
 		if (date == null) return "";
@@ -60,19 +58,14 @@ public class DateFormatter implements IFormatter {
 			"fr".equals(Locales.getCurrent().getLanguage());
 	}
 	
-	private boolean isDotFormat() { 
-		return "hr".equals(Locales.getCurrent().getLanguage());
-	}	
-	
 	private DateFormat getDateFormat() {
 		if (isExtendedFormat()) return extendedDateFormat;
-		if (isDotFormat()) return dotDateFormat; 	
-		return new SimpleDateFormat(Dates.getLocalizedDatePattern(Locales.getCurrent())); 
+		return DateFormat.getDateInstance(DateFormat.SHORT, Locales.getCurrent());		
 	}
 	
 	private DateFormat[] getDateFormats() {
-		if (isExtendedFormat() || isDotFormat()) return extendedDateFormats; 
-		return new DateFormat [] { DateFormat.getDateInstance(DateFormat.SHORT, Locales.getCurrent()) };  
+		if (isExtendedFormat()) return extendedDateFormats;
+		return new DateFormat [] { getDateFormat() };
 	}
 		
 }

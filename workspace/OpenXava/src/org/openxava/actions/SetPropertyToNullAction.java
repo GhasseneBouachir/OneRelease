@@ -1,6 +1,5 @@
 package org.openxava.actions;
 
-import org.openxava.util.*;
 
 /**
  * 
@@ -12,12 +11,7 @@ public class SetPropertyToNullAction extends ViewBaseAction {
 	private String property; 
 	
 	public void execute() throws Exception {
-		try {
-			getView().setValue(property, null);
-		}
-		catch (ElementNotFoundException ex) { 
-			// For @ElementCollection
-		}
+		getView().setValue(property, null); 
 	}
 
 	public String getProperty() {

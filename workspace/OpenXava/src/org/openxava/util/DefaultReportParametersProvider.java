@@ -10,12 +10,12 @@ import javax.servlet.http.*;
  * Create on 11/03/2011 (12:42:24)
  * @author Ana Andres
  */
-public class DefaultReportParametersProvider implements IRequestReportParametersProvider {
+public class DefaultReportParametersProvider implements IReportParametersProvider, IRequestReportParametersProvider{
 	private transient HttpServletRequest request;
 	
 	public String getOrganization() {
 		Locale locale = XavaResources.getLocale(request);
-		if (Labels.existsExact("xava.organization", locale)) { 
+		if (Labels.exists("xava.organization", locale)) {
 			return Labels.get("xava.organization", locale);
 		}		
 		else {

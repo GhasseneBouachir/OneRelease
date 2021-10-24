@@ -3,9 +3,14 @@ package org.openxava.model;
 import java.util.*;
 import java.rmi.*;
 import javax.ejb.*;
+import javax.rmi.*;
+
+
+
 import org.apache.commons.logging.*;
 import org.openxava.component.*;
 import org.openxava.ejbx.*;
+import org.openxava.jpa.*;
 import org.openxava.model.impl.*;
 import org.openxava.model.meta.*;
 import org.openxava.util.*;
@@ -916,7 +921,7 @@ public class MapFacade {
 			XavaException, SystemException 
 	{
 		Assert.arg(modelName, keyValues, collectionName, collectionElementKeyValues);
-		try {
+		try {log.info("hello"+modelName+"," +keyValues+"," +collectionName+","+ collectionElementKeyValues);
 			getImpl(modelName).removeCollectionElement(Users.getCurrentUserInfo(), modelName, keyValues, collectionName, collectionElementKeyValues);
 		}
 		catch (RemoteException ex) {

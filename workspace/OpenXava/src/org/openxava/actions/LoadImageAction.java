@@ -20,12 +20,7 @@ public class LoadImageAction extends ViewBaseAction implements IProcessLoadedFil
 			FileItem fi = (FileItem)i.next();
 			String fileName = fi.getName();			
 			if (!Is.emptyString(fileName)) { 
-				try {
-					getView().setValue(property, fi.get());
-				}
-				catch (ElementNotFoundException ex) { 
-					// It can happen in @ElementCollection
-				}
+				getView().setValue(property, fi.get()); 
 			}			
 		}		
 	}

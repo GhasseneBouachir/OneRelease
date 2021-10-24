@@ -133,9 +133,6 @@ if (parameterValuesStereotypes != null || parameterValuesProperties != null) {
 			parameterValueKey = parameterValueKey.substring(5);
 			v = view;
 		}
-		else if (parameterValueKey != null && view.isMemberFromElementCollection(parameterValueKey)) {
-			v = view;
-		}		
 		else {
 			v = view.getRoot();
 		}
@@ -180,9 +177,9 @@ if (editable) {
 				selectedDescription = description;
 				selectedKey = cl.getKey().toString();
 			} 		
-			values.append("{\"label\":\""); 
+			values.append("{label:\"");
 			values.append(description.replaceAll("'", "&apos;").replaceAll("\"", "&Prime;")); 
-			values.append("\",\"value\":\""); 
+			values.append("\",value:\"");
 			values.append(cl.getKey().toString().replaceAll("'", "&apos;").replaceAll("\"", "&Prime;")); 
 			values.append("\"}");
 			if (it.hasNext()) values.append(",");
@@ -192,7 +189,7 @@ if (editable) {
 		maxDescriptionLength += 5;
 		selectedDescription = selectedDescription.replaceAll("\"", "&quot;"); 
 	%>
-	<span class="<%=style.getDescriptionsList()%> <%=style.getEditor()%>">
+	<span class="<%=style.getDescriptionsList()%>">
 	<%-- The JavaScript code depends on the order of the next elements --%>
 	<input name="<%=propertyKey%>__CONTROL__" type="text" tabindex="1" class="xava_select <%=style.getEditor()%>" size="<%=maxDescriptionLength%>" <%=script%> title="<%=title%>" 
 		data-values='<%=values%>' value="<%=selectedDescription%>"/>

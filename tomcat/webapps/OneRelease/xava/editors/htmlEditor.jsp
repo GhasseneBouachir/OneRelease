@@ -1,5 +1,3 @@
-<jsp:useBean id="style" class="org.openxava.web.style.Style" scope="request"/> 
-
 <%
 boolean editable="true".equals(request.getParameter("editable"));
 
@@ -18,9 +16,7 @@ else {
 	String fvalue = (String) request.getAttribute(propertyKey + ".fvalue");
 %>
 <input type="hidden" name="<%=propertyKey%>" tabindex="1" value='<%=org.openxava.util.Strings.change(fvalue, "'", "&#39;")%>'>
-<div class="<%=style.getReadOnlyHtmlText()%>"> 
 <%=fvalue%>
-</div> 
 <%
 }
 %>

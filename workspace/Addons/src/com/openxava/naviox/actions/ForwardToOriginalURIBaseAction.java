@@ -21,7 +21,7 @@ abstract public class ForwardToOriginalURIBaseAction extends ViewBaseAction impl
 		else {
 			int idx = originalURI.indexOf("/", 1);			
 			if (!originalURI.endsWith("/SignIn") && idx > 0 && idx < originalURI.length()) {
-				forwardURI = originalURI.startsWith("/" + MetaModuleFactory.getApplication())?originalURI.substring(idx):originalURI;
+				forwardURI = originalURI.substring(idx);
 			}
 			else {
 				forwardURI = "/";

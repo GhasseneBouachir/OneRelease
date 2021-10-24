@@ -26,7 +26,6 @@ public class ConfigureImportAction extends TabBaseAction
 	private static Log log = LogFactory.getLog(ConfigureImportAction.class);  
 		 
 	private String[] nextControllers = new String [] { "Import" }; 
-	private Collection<MetaProperty> metaProperties; 
 	
 	public void execute() throws Exception {
 		String fileName = "UNKNOWN";
@@ -59,7 +58,7 @@ public class ConfigureImportAction extends TabBaseAction
 			log.error(XavaResources.getString("import_error", fileName, ex.getMessage()), ex);
 			addError("import_error", fileName, ex.getMessage()); 
 			cancel();
-		}
+		}		
 	}
 	
 	private boolean configureImport(String data) { 
@@ -105,11 +104,11 @@ public class ConfigureImportAction extends TabBaseAction
 						text.append(formatNumber(cell.getNumericCellValue()));
 					}
 					else {
-						text.append(Import.encodeSeparators(cell.toString())); 
+						text.append(cell);
 					}
 				}
 				
-				text.append(XavaPreferences.getInstance().getCSVSeparator()); 
+				text.append(';');
 			}
 			text.append('\n');
 		}			
@@ -117,8 +116,8 @@ public class ConfigureImportAction extends TabBaseAction
 	}
 
 	private String formatNumber(double number) { 
-		if (number % 1 == 0) return Long.toString(new Double(number).longValue()); 
-		return Import.encodeSeparators(NumberFormat.getNumberInstance(Locales.getCurrent()).format(number)); 
+		if (number % 1 == 0) return Integer.toString(new Double(number).intValue()); 
+		return NumberFormat.getNumberInstance(Locales.getCurrent()).format(number); 
 	}
 
 	private String formatDate(Date date) throws Exception { 
@@ -135,27 +134,10 @@ public class ConfigureImportAction extends TabBaseAction
 
 	private void fillNamesInAppValidValues() {
 		View columnsView = getView().getSubview("columns");
-		for (MetaProperty property: getMetaProperties()) {  
+		for (MetaProperty property: getTab().getMetaTab().getMetaModel().getMetaPropertiesPersistents()) {
 			columnsView.addValidValue("nameInApp", property.getName(), property.getLabel()); 
 		}
 	}
-	
-	private Collection<MetaProperty> getMetaProperties() { 
-		if (metaProperties == null) {
-			MetaModel metaModel = getTab().getMetaTab().getMetaModel();
-			metaProperties = new ArrayList<>(metaModel.getMetaPropertiesPersistents());
-			for (MetaReference ref: metaModel.getMetaReferences()) {	
-				for (MetaProperty key: ref.getMetaModelReferenced().getAllMetaPropertiesKey()) {
-					MetaProperty qualifiedKey = key.cloneMetaProperty();
-					qualifiedKey.setName(ref.getName() + "." + qualifiedKey.getName());
-					qualifiedKey.setLabel(Strings.firstUpper( (Labels.get(key.getName()) + " " + XavaResources.getString("of") + " "  + ref.getLabel()).toLowerCase()));
-					metaProperties.add(qualifiedKey);
-				}
-			}		
-		}
-		return metaProperties;
-	}
-
 
 	private void fillHeaders(Scanner scanner, Collection<ImportColumn> columns) {
 		String header = scanner.nextLine(); 
@@ -175,7 +157,7 @@ public class ConfigureImportAction extends TabBaseAction
 	
 	private void setProperties(Collection<ImportColumn> columns) {
 		MetaModel metaModel = getTab().getMetaTab().getMetaModel();
-		Collection<MetaProperty> properties = new ArrayList<MetaProperty>(getMetaProperties()); 
+		Collection<MetaProperty> properties = new ArrayList<MetaProperty>(metaModel.getMetaPropertiesPersistents());
 		int distance = 0;
 		Collection<ImportColumn> remainingColumns = columns;
 		while (!remainingColumns.isEmpty() && distance < 8) {
@@ -210,7 +192,6 @@ public class ConfigureImportAction extends TabBaseAction
 		int count = Math.min(fields.length, columns.size());
 		for (int i=0; i<count; i++) {
 			String field = Strings.unquote(fields[i]);
-			field = Import.decodeSeparators(field); 
 			if (lineNumber == 1) columns.get(i).setSampleContent1(field);
 			else columns.get(i).setSampleContent2(field); // line 2
 		}
@@ -228,6 +209,5 @@ public class ConfigureImportAction extends TabBaseAction
 	public String getCustomView() {
 	    return DEFAULT_VIEW;
 	}
-
 
 }

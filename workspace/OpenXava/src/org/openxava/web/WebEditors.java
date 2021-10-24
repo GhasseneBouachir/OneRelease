@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openxava.filters.meta.*;
 import org.openxava.formatters.*;
 import org.openxava.model.meta.MetaMember;
 import org.openxava.model.meta.MetaModel;
@@ -225,12 +224,11 @@ public class WebEditors {
 		String customEditor = metaTab.getEditor();
 		if (!Is.emptyString(customEditor)) editors.add(customEditor);
 		for (MetaEditor metaEditor: MetaWebEditors.getMetaEditorsFor(metaTab)) {
-			if (Is.emptyString(customEditor) || !"List".equals(metaEditor.getName())) {
-				editors.add(metaEditor.getName());
-			}
+			if (Is.emptyString(customEditor) || !"List".equals(metaEditor.getName())) editors.add(metaEditor.getName()); 
 		}
 		return editors;
 	}
+
 	
 	public static String getUrl(String editor, MetaTab metaTab) throws ElementNotFoundException, XavaException { 
 		if (!Is.emptyString(editor)) {
@@ -320,13 +318,7 @@ public class WebEditors {
 		String defaultURL = "";
 		MetaModel metaModel = MetaModel.get(tabModelName);
 		String reference = Strings.noLastTokenWithoutLastDelim(qualifiedName, ".");
-		MetaReference metaReference = null;
-		try {
-			metaReference =  metaModel.getMetaReference(reference);
-		}
-		catch (ElementNotFoundException ex) {
-			return "";
-		}
+		MetaReference metaReference = metaModel.getMetaReference(reference);
 		metaModel = metaReference.getMetaModel();
 		Collection<MetaView> metaViews = metaModel.getMetaViews();
 		for (MetaView metaView : metaViews){
@@ -356,8 +348,7 @@ public class WebEditors {
 					+ "&descriptionProperty=" + metaDescriptionsList.getDescriptionPropertyName()
 					+ "&descriptionProperties=" + metaDescriptionsList.getDescriptionPropertiesNames()
 					+ "&parameterValuesProperties=" + metaReference.getParameterValuesPropertiesInDescriptionsList(metaView)
-					+ "&condition=" + refineURLParam(metaDescriptionsList.getCondition())
-					+ "&filter=" + getFilterClass(metaDescriptionsList) 
+					+ "&condition=" + refineURLParam(metaDescriptionsList.getCondition()) 
 					+ "&orderByKey=" + metaDescriptionsList.isOrderByKey()
 					+ "&order=" + metaDescriptionsList.getOrder();
 				if (forTabs.contains(tabName)) return url;
@@ -365,11 +356,6 @@ public class WebEditors {
 			}
 		}
 		return defaultURL;
-	}
-
-	private static String getFilterClass(MetaDescriptionsList metaDescriptionsList) {
-		MetaFilter metaFilter = metaDescriptionsList.getMetaFilter();
-		return metaFilter == null?"":metaFilter.getClassName();
 	}
 
 	private static String refineURLParam(String condition) {

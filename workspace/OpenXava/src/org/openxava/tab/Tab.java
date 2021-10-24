@@ -10,7 +10,7 @@ import java.util.stream.*;
 
 import javax.servlet.http.*;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.*;
 import org.openxava.application.meta.*;
@@ -45,21 +45,20 @@ public class Tab implements java.io.Serializable, Cloneable {
 		private String condition; 
 		private String [] conditionComparators;
 		private String [] conditionValues;
-		private String [] conditionValuesTo;
+		private String [] conditionValuesTo;  
 		private boolean descendingOrder = false;
 		private boolean descendingOrder2 = false; 
 		private String orderBy;	
 		private String orderBy2;
 		private String propertiesNames;
 		private transient List<MetaProperty> metaPropertiesNotCalculated;
-		private long weight; // To sort: Default, with name ordered by last used (new or existing), without name ordered by last used (new or existing)
-		private Boolean all; 
+		private long weight; // To sort: Default, with name ordered by last used (new or existing), without name ordered by last used (new or existing) 
 		
 		private String translateCondition(String condition) {
 			// IF YOU CHANGE THIS CODE TEST IT WITH ignoreAccentsForStringArgumentsInConditions true and false
 			try { 
 				condition = removeBaseConditionAndDefaultOrder(condition); 
-				if (isAll(condition)) return Labels.get("all"); 
+				if (Is.empty(condition) || condition.trim().equals("1=1")) return Labels.get("all"); 
 				String result = condition + " ";
 				if (conditionValues != null) {
 					result = result.replaceAll("\\([\\?,*]+\\)", "(?)"); // Groups: (?,?,?) --> (?)
@@ -139,18 +138,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 				log.error(XavaResources.getString("list_condition_translation_error", condition), ex);
 				return condition;
 			}
-		}
-		
-		public boolean isAll() { 
-			if (all == null) { 
-				String condition = removeBaseConditionAndDefaultOrder(this.condition); 
-				all = isAll(condition); 
-			}
-			return all;
-		}
-		
-		private boolean isAll(String conditionWithoutBaseConditionAndDefaultOrder) {
-			return Is.empty(conditionWithoutBaseConditionAndDefaultOrder) || conditionWithoutBaseConditionAndDefaultOrder.trim().equals("1=1");
 		}
 				
 		private String removeBaseConditionAndDefaultOrder(String condition) { 
@@ -436,8 +423,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 	private String orderBy2;
 	private String groupBy; 
 	private String condition;
-	private String lastCondition;
-	private Object [] lastKey;
 	private String[] conditionComparators;
 	private String[] conditionValues;
 	private String[] conditionValuesTo;	// to the range: conditionValues like 'from' and conditionValuesTo like 'to'
@@ -485,7 +470,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 	private String editor;   
 	private Messages errors;
 	private String defaultCondition;
-	private Collection<MetaProperty> metaPropertiesBeforeGrouping;
+	private Collection<MetaProperty> metaPropertiesBeforeGrouping; 
 	
 	public static void setRefiner(Object newRefiner) {
 		refiner = newRefiner;
@@ -507,7 +492,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 			if (Is.emptyString(getModelName())) return Collections.EMPTY_LIST;
 			metaProperties = getMetaTab().getMetaProperties();
 			setPropertiesLabels(metaProperties);
-		}		
+		}				
 		return metaProperties;
 	}
 	
@@ -777,7 +762,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		IXTableModel tableModel = null;
 		EntityTab tab = EntityTabFactory.create(getMetaTab());
 		usesConverters = tab.usesConverters();
-		search(tab); 		
+		tab.search(getCondition(), getKey());		
 		tableModel = tab.getTable();
 		
 		// To load data, thus it's possible go directly to other page than first
@@ -790,20 +775,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 		return tableModel;
 	}
 	
-	private void search(EntityTab tab) throws Exception { 
-		String condition = getCondition();
-		Object [] key = getKey();
-		if (Is.emptyString(groupBy)) {
-			this.lastCondition = condition;
-			this.lastKey = key;
-		}
-		else if (!Is.emptyString(lastCondition)) {
-			condition =  condition.replace(" group by ", " and " + removeOrder(lastCondition) + " group by ");
-			key = ArrayUtils.addAll(key, lastKey);
-		}
-		tab.search(condition, key);		
-	}
-	
 	/**
 	 * A table model with load all data at once. <p>
 	 * 
@@ -812,7 +783,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 	public IXTableModel getAllDataTableModel() throws Exception {								
 		EntityTab tab = EntityTabFactory.createAllData(getMetaTab());
 		usesConverters = tab.usesConverters();
-		search(tab); 		
+		tab.search(getCondition(), getKey());		
 		return tab.getTable();
 	}	
 	
@@ -858,7 +829,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		setFilteredConditionValues(); 
 		
 		MetaProperty pOrder = null;
-		MetaProperty pOrder2 = null;			
+		MetaProperty pOrder2 = null;		
 		if (!(conditionValues == null || conditionValues.length == 0)) {
 			for (int i = 0; i < this.conditionValues.length; i++) {
 				MetaProperty p = (MetaProperty) getMetaPropertiesNotCalculated().get(i);
@@ -941,7 +912,8 @@ public class Tab implements java.io.Serializable, Cloneable {
 						comparatorsToWhere.add(this.conditionComparators[i]);
 						metaPropertiesKey.add(p);
 						continue;
-					}										 
+					}
+					ModelMapping mapping = getMetaTab().getMetaModel().getMapping();										 
 					sb.append(decorateConditionProperty(p, i));
 					sb.append(' ');
 					sb.append(convertComparator(p, this.conditionComparators[i]));
@@ -1039,7 +1011,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		
 		if (pOrder != null) {				
 			if (sb.length() == 0) sb.append(" 1=1 ");
-			sb.append(" order by ");
+			sb.append(" order by ");								
 			sb.append("${");
 			sb.append(pOrder.getQualifiedName()); 
 			sb.append('}');
@@ -1075,13 +1047,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 		}
 
 		return sb.toString();
-	}
-
-	private String removeOrder(String condition) { 
-		if (condition == null) return null;
-		int idx = condition.indexOf(" order by ");
-		if (idx >= 0) return condition.substring(0, idx);
-		return condition;
 	}
 
 	private String buildEmptyCondition(String property, boolean isPropertyString) {
@@ -1194,7 +1159,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 	}
 
 	private Object [] getKey() throws XavaException {
-		if (conditionValuesToWhere == null || conditionValuesToWhere.length == 0) {
+		if (conditionValuesToWhere == null || conditionValuesToWhere.length == 0) { 
 			return filterKey(null);
 		}
 		Collection key = new ArrayList();
@@ -1625,13 +1590,19 @@ public class Tab implements java.io.Serializable, Cloneable {
 	public void groupBy(String property) {
 		groupBy = property;
 		condition = null;
-		if (Is.emptyString(groupBy)) resetGroupByPropertiesAndCondition();		
+		if (Is.emptyString(groupBy)) resetGroupByProperties();
 		else setGroupByProperties();
 	}
 
-	private void resetGroupByPropertiesAndCondition() {
-		applyConfiguration(); // Thus, we restore properties and condition 
-		metaPropertiesBeforeGrouping = null;		
+	private void resetGroupByProperties() {
+		StringBuffer properties = new StringBuffer();
+		for (MetaProperty metaProperty: getMetaPropertiesBeforeGrouping()) {
+			String propertyName = metaProperty.getQualifiedName();
+			if (properties.length() > 0) properties.append(","); 
+			properties.append(propertyName);
+		}
+		setPropertiesNames(properties.toString());
+		metaPropertiesBeforeGrouping = null;
 	}
 
 	private void setGroupByProperties() {
@@ -1671,15 +1642,8 @@ public class Tab implements java.io.Serializable, Cloneable {
 		return groupBy==null?"":groupBy;
 	}
 	
-	
-	private Collection<MetaProperty> getMetaPropertiesBeforeGrouping() {
+	public Collection<MetaProperty> getMetaPropertiesBeforeGrouping() {
 		return metaPropertiesBeforeGrouping == null?getMetaProperties():metaPropertiesBeforeGrouping;
-	}
-	
-	public Collection<MetaProperty> getMetaPropertiesGroupBy() { 
-		return getMetaPropertiesBeforeGrouping().stream()
-			.filter(p -> !p.isCalculated())
-			.collect(Collectors.toList());
 	}
 	
 	public void orderBy(String property) {
@@ -1826,7 +1790,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		String conditionComparator = request.getParameter(prefix + "0");
 		Collection conditionComparators = new ArrayList();
 		for (int i=1; conditionComparator != null; i++) {
-			conditionComparators.add(Strings.removeXSS(conditionComparator)); 
+			conditionComparators.add(conditionComparator);
 			conditionComparator = request.getParameter(prefix + i);
 		}
 		String [] result = new String[conditionComparators.size()];
@@ -1892,8 +1856,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		this.titleArguments = valores;
 	}
 	
-	/** @since 6.5 */
-	public void createConfiguration() {   
+	public void saveConfiguration() {  
 		if (!Is.empty(groupBy)) return; 
 		if (configurations.isEmpty()) {			
 			addDefaultConfiguration(); 
@@ -1911,16 +1874,11 @@ public class Tab implements java.io.Serializable, Cloneable {
 		if (configurations.containsKey(newConfiguration.getId())) {
 			newConfiguration = configurations.get(newConfiguration.getId());
 		}
-		newConfiguration.weightUp(); 
-		configuration = newConfiguration;
-	}
-
-	
-	public void saveConfiguration() {  
-		createConfiguration();
-		if (!configurations.containsKey(configuration.getId())) {
-			configurations.put(configuration.getId(), configuration);
+		else {			
+			configurations.put(newConfiguration.getId(), newConfiguration);
 		}
+		newConfiguration.weightUp();
+		configuration = newConfiguration;
 		saveConfigurationPreferences(false);
 	}
 		
@@ -1974,11 +1932,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 			log.warn(XavaResources.getString("warning_save_preferences_tab"),ex); 
 		}		
 	}
-	
-	/** @since 6.5 */
-	public int getConfigurationsCount() { 
-		return configurations.size();
-	}
 
 	public Collection<Configuration> getConfigurations() {  
 		List<Configuration> result = new ArrayList(configurations.values());  
@@ -1995,9 +1948,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 	
 	public void setConfigurationName(String newName) { 
 		if (configuration == null) return;
-		if (!configurations.containsKey(configuration.getId())) {
-			configurations.put(configuration.getId(), configuration);
-		}
 		configuration.setName(newName);
 		saveConfigurationPreferences(true);
 	}
@@ -2047,12 +1997,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 	public String getConfigurationName() throws XavaException {
 		if (configuration != null) return configuration.getName(); 
 		return Labels.get("all");
-	}
-	
-	/** @since 6.5 */
-	public boolean isAllConfiguration() { 
-		if (configuration != null) return configuration.isAll();
-		return true;
 	}
 
 	/**
@@ -2150,9 +2094,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		configuration.setConditionComparators(insertEmptyString(configuration.getConditionComparators(), index));
 		configuration.setPropertiesNames(getPropertiesNamesAsString());
 		applyConfiguration(); 
-		if (configuration.isAll() || configuration.hasCustomName()) { 
-			saveConfigurationPreferences(false);
-		} 
+		saveConfigurationPreferences(false);
 	}
 	
 	private String [] growWithEmptyStrings(String [] original, int size) { 
@@ -2190,9 +2132,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		configuration.setConditionComparators(growWithEmptyStrings(configuration.getConditionComparators(), size));
 		configuration.setPropertiesNames(getPropertiesNamesAsString());
 		applyConfiguration();
-		if (configuration.isAll() || configuration.hasCustomName()) { 
-			saveConfigurationPreferences(false);
-		}
+		saveConfigurationPreferences(false);
 	}
 	
 		
@@ -2204,7 +2144,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 	 */
 	public void setLabel(String propertyName, String label) { 
 		if (labels == null) labels = new HashMap<String, String>();
-		labels.put(propertyName, label==null?"":label.trim()); 
+		labels.put(propertyName, label); 
 		saveUserPreferences(); 
 		resetAfterChangeProperties(); 
 	}
@@ -2212,6 +2152,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 	public void removeProperty(int index) throws XavaException {
 		removeProperty(getMetaProperties().get(index).getQualifiedName());		
 	}	
+
 
 	public void removeProperty(String propertyName) throws XavaException {
 		int idx = indexOf(getMetaPropertiesNotCalculated(), propertyName); 
@@ -2225,9 +2166,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 			configuration.setConditionComparators(remove(configuration.getConditionComparators(), idx));
 		}
 		configuration.setPropertiesNames(getPropertiesNamesAsString());
-		if (configuration.isAll() || configuration.hasCustomName()) { 
-			saveConfigurationPreferences(false);
-		} 
+		saveConfigurationPreferences(false);
 	}
 	
 	private String [] remove(String [] array, int idx) {  
@@ -2260,9 +2199,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 		move(configuration.getConditionComparators(), fromForNotCalculatedProperties, toForNotCalculatedProperties);
 		
 		configuration.setPropertiesNames(getPropertiesNamesAsString());
-		if (configuration.isAll() || configuration.hasCustomName()) { 
-			saveConfigurationPreferences(false);
-		} 
+		saveConfigurationPreferences(false);
 	}
 	
 	private void move(Object [] array, int from, int to) { 
@@ -2286,9 +2223,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 			configuration.setConditionComparators(restoreValues(oldProperties, newProperties, configuration.getConditionComparators()));
 			configuration.setPropertiesNames(getPropertiesNamesAsString());			
 			applyConfiguration();
-			if (configuration.isAll() || configuration.hasCustomName()) { 
-				saveConfigurationPreferences(false);
-			} 
+			saveConfigurationPreferences(false);
 		} 
 		removeUserPreferences(); 
 	}
@@ -2368,7 +2303,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 			persistentRowsHidden = preferences.getBoolean(ROWS_HIDDEN, rowsHidden);
 			rowsHidden = persistentRowsHidden; 
 			filterVisible = preferences.getBoolean(FILTER_VISIBLE, filterVisible); 
-			pageRowCount = Math.min(preferences.getInt(PAGE_ROW_COUNT, pageRowCount), 50);
+			pageRowCount = Math.min(preferences.getInt(PAGE_ROW_COUNT, pageRowCount), 50); 
 			columnWidths = loadMapFromPreferences(preferences, columnWidths, COLUMN_WIDTH, true);
 			labels = loadMapFromPreferences(preferences, labels, COLUMN_LABEL, false);
 			defaultCondition = getCondition();
@@ -2380,17 +2315,16 @@ public class Tab implements java.io.Serializable, Cloneable {
 			log.warn(XavaResources.getString("warning_load_preferences_tab"),ex);
 		}
 	}
-		
-	private Map loadMapFromPreferences(Preferences preferences, Map map, String prefix, boolean toInt) throws Exception { 
+	
+	private Map loadMapFromPreferences(Preferences preferences, Map map, String prefix, boolean toInt) { 
 		if (map!= null) map.clear();
-		for (String key: preferences.keys()) {
-			if (!key.startsWith(prefix)) continue;
-			String value = preferences.get(key, null);
+		for (MetaProperty property: getMetaProperties()) {
+			String value = preferences.get(prefix + property.getQualifiedName(), null);
 			if (value != null) {
 				if (map == null) map = new HashMap();
-				map.put(key.substring(prefix.length()), toInt?Integer.parseInt(value):value);
+				map.put(property.getQualifiedName(), toInt?Integer.parseInt(value):value);
 			}
-		}
+		}		
 		return map;
 	}
 
@@ -2405,11 +2339,10 @@ public class Tab implements java.io.Serializable, Cloneable {
 		for (String confName: configurationsPreferences.childrenNames()) {
 			if (confName.equals(CURRENT_CONFIGURATION_NODE)) continue; 
 			Preferences pref = configurationsPreferences.node(confName);
-			if (pref.getBoolean(CONFIGURATION_REMOVED, false)) continue;
+			if (pref.getBoolean(CONFIGURATION_REMOVED, false)) continue; 
 			Configuration conf = new Configuration();
-			conf.setName(pref.get(CONFIGURATION_NAME, null));
+			conf.setName(pref.get(CONFIGURATION_NAME, null)); 
 			conf.setCondition(pref.get(CONFIGURATION_CONDITION, ""));
-			if (!conf.hasCustomName() && !conf.isDefault()) continue; // To not load configurations without name that were generated prior v6.5. This is not tested in the suite.
 			conf.setConditionComparators(StringUtils.splitPreserveAllTokens(pref.get(CONFIGURATION_CONDITION_COMPARATORS, ""), "|"));
 			conf.setConditionValues(StringUtils.splitPreserveAllTokens(pref.get(CONFIGURATION_CONDITION_VALUES, ""), "|"));
 			conf.setConditionValuesTo(StringUtils.splitPreserveAllTokens(pref.get(CONFIGURATION_CONDITION_VALUES_TO, ""), "|")); 
@@ -2454,9 +2387,7 @@ public class Tab implements java.io.Serializable, Cloneable {
 	}
 
 	private String removeNonexistentProperties(String properties) {
-		if (propertiesExists(properties)) {
-			return properties; // It is the usual case, so we save the below code most times
-		}
+		if (propertiesExists(properties)) return properties; // It is the usual case, so we save the below code most times
 		StringBuffer sb = new StringBuffer();
 		for (String property: properties.split(",")) {
 			if (propertyExists(property)) {
@@ -2752,16 +2683,8 @@ public class Tab implements java.io.Serializable, Cloneable {
 			for (int i = 0; i < size; i++) {
 				filterConditionValues[i] = "";
 				MetaProperty metaProperty = (MetaProperty) metaPropertiesNC.get(i);
-				if (metaProperty.getQualifiedName().equals(property)) {
-					if (value == null) filterConditionValues[i] = null;
-					else {
-						try {
-							filterConditionValues[i] = metaProperty.format(value, Locales.getCurrent());
-						}
-						catch (ClassCastException ex) { // For the case of a numeric id for the description field of a descriptions list
-							filterConditionValues[i] = value.toString();
-						}
-					}
+				if (metaProperty.getName().equals(property)) {
+					filterConditionValues[i] = value==null?null:metaProperty.format(value, Locales.getCurrent()); 
 					filtered = true;
 				}				
 			}
@@ -2917,27 +2840,10 @@ public class Tab implements java.io.Serializable, Cloneable {
 	 * @since 4.8
 	 */
 	public boolean isTotalCapable(MetaProperty p) {   
-		return !p.isCalculated() && p.isNumber() && !p.hasValidValues() && !isFromCollection(p); 
+		return !p.isCalculated() && p.isNumber() && !p.hasValidValues();
 	}
-
-	/**
-	 * @since 6.4
-	 */
-	public boolean isOrderCapable(MetaProperty p) {    
-		return !p.isCalculated() && !isFromCollection(p);
-	}	
-
-	/**
-	 * @since 6.4
-	 */	
-	public boolean isFromCollection(MetaProperty p) { 
-		String qualifiedName = p.getQualifiedName();
-		int idx = qualifiedName.indexOf('.');
-		if (idx < 0) return false;
-		String rootName = qualifiedName.substring(0, idx);
-		return getMetaTab().getMetaModel().containsMetaCollection(rootName);
-	}
-
+	
+	
 	/**
 	 * @since 4.3
 	 */
@@ -3090,12 +2996,6 @@ public class Tab implements java.io.Serializable, Cloneable {
 		catch (CloneNotSupportedException ex) {
 			throw new RuntimeException(ex); // Never 
 		}
-	}
-
-	/** @since 6.5 */
-	public boolean isSaveConfigurationAllowed() {
-		if (configuration == null) return true;
-		return !configuration.hasCustomName();
 	}
 
 }

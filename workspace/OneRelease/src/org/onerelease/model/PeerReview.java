@@ -22,7 +22,7 @@ import org.openxava.model.*;
 		+ " numberOfMajorDefects,  numberOfMinorDefetcs, totalDefectsFound; "
 		+ " numberOfCorrectedDefects, numberOfNotCorrectedDefects;" + "numberofAcceptedCorrections;  ]  "
 //		+ "Appraisal [ verifier ;  completionDate, otherReviewNeeded;" + " peerReviewAnalysis  ]"
-		+ "  LogSheet[ logSheet ]  ")
+		+ "  LogSheet[# logSheet ]  ")
 })
 @Entity
 public class PeerReview extends Identifiable {
@@ -85,7 +85,7 @@ public class PeerReview extends Identifiable {
 	@Column(length=500)
 	@Stereotype("MEMO")
 	private String peerReviewAnalysis;
-
+	
 	@CollectionView("PeerReviewLine")
 	@NewAction("PeerReviewLine.newPeerReviewLine")
 	@EditAction("PeerReviewLine.editPeerReviewLine")

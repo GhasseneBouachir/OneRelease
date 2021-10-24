@@ -27,7 +27,6 @@ if (!Is.empty(value)) {
 String dataEmpty = "null".equals(value) || Is.empty(value) || !Is.empty(value) && filesIds != null && "".equals(filesIds)?"data-empty='true'":""; 
 String cssClass = request.getParameter("cssClass");
 cssClass = Is.emptyString(cssClass)?"":" " + cssClass;
-if (!editable) cssClass = cssClass + " ox-filepond-read-only";  
 boolean multiple = "true".equals(request.getParameter("multipleFiles"));
 String dataMultiple = multiple?"data-multiple='true'":"";
 boolean preview = !"false".equals(request.getParameter("imagePreview"));

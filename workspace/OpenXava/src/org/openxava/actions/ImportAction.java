@@ -38,14 +38,12 @@ public class ImportAction extends ViewBaseAction implements IChangeControllersAc
 				if (!Is.empty(column.getNameInApp())) {
 					View moduleView = getPreviousView();
 					MetaProperty p = moduleView.getMetaModel().getMetaProperty(column.getNameInApp());
-					String filteredValue = Strings.unquote(Import.decodeSeparators(rawValue)); 
-					Object value = WebEditors.parse(getRequest(), p, filteredValue, getErrors(), moduleView.getViewName()); 
+					Object value = WebEditors.parse(getRequest(), p, Strings.unquote(rawValue), getErrors(), moduleView.getViewName());
 					values.put(column.getNameInApp(), value);
 				}
 				x++;
 			}
 			try {
-				values = Maps.plainToTree(values); 
 				MapFacade.create(imp.getModelName(), values);
 				count++;
 			}
@@ -68,7 +66,7 @@ public class ImportAction extends ViewBaseAction implements IChangeControllersAc
 		MetaModel metaModel = MetaModel.get(imp.getModelName());
 		Collection<String> requiredMembers = new ArrayList(metaModel.getRequiredMemberNames());
 		for (ImportColumn column: imp.getColumns()) {
-			requiredMembers.remove(Strings.firstToken(column.getNameInApp(), ".")); 
+			requiredMembers.remove(column.getNameInApp());
 		}		
 		if (requiredMembers.isEmpty()) return true;
 		StringBuffer members = new StringBuffer(); 

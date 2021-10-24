@@ -22,7 +22,10 @@ abstract public class ParserBase extends XmlElementsNames {
 	protected int lang;
 	 			
 	private Element root;
+	private static DocumentBuilder documentBuilder;	
 	private String xmlFileURL;
+	
+	
 	
 	public ParserBase(String xmlFileURL) {
 		// assert(xmlFileURL)
@@ -88,12 +91,14 @@ abstract public class ParserBase extends XmlElementsNames {
 		}
 	}
 	
-	private DocumentBuilder getDocumentBuilder() throws ParserConfigurationException { 
-		DocumentBuilder	documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		documentBuilder.setEntityResolver(new XMLEntityResolver());
+	private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+		if (documentBuilder == null) {
+			documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			documentBuilder.setEntityResolver(new XMLEntityResolver());
+		}
 		return documentBuilder;
 	}	
-
+	
 	private void _parse(String xmlFileCompleteURL) throws XavaException {
 		try {						
 			Document doc = getDocumentBuilder().parse(xmlFileCompleteURL);			

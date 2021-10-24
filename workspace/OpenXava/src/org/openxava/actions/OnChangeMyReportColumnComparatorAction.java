@@ -4,6 +4,7 @@ import org.openxava.model.meta.*;
 import org.openxava.tab.*;
 import org.openxava.util.*;
 
+
 /**
  * 
  * @author Javier Paniza 
@@ -26,11 +27,9 @@ public class OnChangeMyReportColumnComparatorAction extends OnChangeMyReportColu
 			Tab.NOT_IN_COMPARATOR.equals(comparator)
 		) {
 			showStandardMembers();
-			getView().setValue("dateValue", null); 
 		}
 		else {
 			showDateValue();
-			getView().setValue("value", null); 
 		}
 		getView().setValue("comparator", DATE_COMPARATOR + ":" + comparator);
 	}

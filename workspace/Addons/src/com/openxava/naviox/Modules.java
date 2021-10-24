@@ -29,12 +29,9 @@ public class Modules implements Serializable {
 	private List<MetaModule> all;
 	private List<MetaModule> bookmarkModules = null;
 	private List<MetaModule> regularModules; 
-	private List<MetaModule> fixedModules;
-	private List<MetaModule> notInMenuModules; 
+	private List<MetaModule> fixedModules; 
 	
 	private MetaModule current;
-
-	
 
 	 
 
@@ -71,8 +68,8 @@ public class Modules implements Serializable {
 		}
 	}
 	
-	public boolean hasModules(HttpServletRequest request) {  
-		return (NaviOXPreferences.getInstance().isShowModulesMenuWhenNotLogged() || Users.getCurrent() !=null) && !getAll(request).isEmpty();  
+	public boolean hasModules() { 
+		return (NaviOXPreferences.getInstance().isShowModulesMenuWhenNotLogged() || Users.getCurrent() !=null) && !getAll().isEmpty(); 
 	}
 	
 	private MetaModule createWelcomeModule(MetaApplication app) {
@@ -109,11 +106,11 @@ public class Modules implements Serializable {
 	public String getCurrent(HttpServletRequest request) { 
 		try {
 			String current = ModulesHelper.getCurrent(request);
-			return current == null?getPreferences().get("current", NaviOXPreferences.getInstance().getInitialModule()):current; 
+			return current == null?getPreferences().get("current", FIRST_STEPS):current;
 		}
 		catch (Exception ex) {
 			log.warn(XavaResources.getString("current_module_problem"), ex); 
-			return NaviOXPreferences.getInstance().getInitialModule(); 
+			return FIRST_STEPS;
 		}
 	}
 
@@ -158,10 +155,10 @@ public class Modules implements Serializable {
 		return current == null?null:current.getName(); 
 	}
 
-	public void bookmarkCurrentModule(HttpServletRequest request) {  
+	public void bookmarkCurrentModule() { 
 		if (indexOf(fixedModules, current) >= 0) return; 
 		if (current != null && "Index".equals(current.getName())) return;
-		if (bookmarkModules == null) loadBookmarkModules(request); 	
+		if (bookmarkModules == null) loadBookmarkModules();	
 		int idx = indexOf(bookmarkModules, current); 
 		if (idx < 0) {
 			bookmarkModules.add(current);
@@ -170,8 +167,8 @@ public class Modules implements Serializable {
 		storeBookmarkModules();
 	}
 	
-	public void unbookmarkCurrentModule(HttpServletRequest request) {  
-		if (bookmarkModules == null) loadBookmarkModules(request); 	
+	public void unbookmarkCurrentModule() { 
+		if (bookmarkModules == null) loadBookmarkModules();	
 		int idx = indexOf(bookmarkModules, current); 
 		if (idx >= 0) {
 			bookmarkModules.remove(idx);
@@ -179,28 +176,28 @@ public class Modules implements Serializable {
 		storeBookmarkModules();
 	}
 	
-	public boolean isCurrentBookmarked(HttpServletRequest request) { 
-		return isBookmarked(request, current); 
+	public boolean isCurrentBookmarked() {
+		return isBookmarked(current);
 	}
 	
-	public boolean isBookmarked(HttpServletRequest request, MetaModule module) { 
-		if (bookmarkModules == null) loadBookmarkModules(request); 
+	public boolean isBookmarked(MetaModule module) {
+		if (bookmarkModules == null) loadBookmarkModules();
 		return indexOf(bookmarkModules, module) >= 0;
 	}
 		
-	private void loadFixedModules(HttpServletRequest request) {  
+	private void loadFixedModules() { 
 		String fixedModulesOnMenu = NaviOXPreferences.getInstance().getFixModulesOnTopMenu();
 		fixedModules = new ArrayList();
 		if (Is.emptyString(fixedModulesOnMenu)) return;
 		for (String moduleName: Strings.toCollection(fixedModulesOnMenu)) {
-			loadModule(request, fixedModules, moduleName); 												
+			loadModule(fixedModules, moduleName);												
 		}
 	}
 
-	private void loadModule(HttpServletRequest request, Collection<MetaModule> modules, String moduleName) {   
+	private void loadModule(Collection<MetaModule> modules, String moduleName) {  
 		try {
 			MetaModule module = MetaModuleFactory.create(moduleName);
-			if (!modules.contains(module) && isModuleAuthorized(request, module)) { 
+			if (!modules.contains(module) && isModuleAuthorized(module)) { 
 				modules.add(module);
 			}
 		}
@@ -209,13 +206,13 @@ public class Modules implements Serializable {
 		}
 	}
 
-	private void loadBookmarkModules(HttpServletRequest request) { 
+	private void loadBookmarkModules() {  
 		bookmarkModules = new ArrayList<MetaModule>();
-		loadModulesFromPreferences(request, bookmarkModules, "bookmark.", BOOKMARK_MODULES); 
-		bookmarkModules.removeAll(getFixedModules(request)); 
+		loadModulesFromPreferences(bookmarkModules, "bookmark.", BOOKMARK_MODULES);
+		bookmarkModules.removeAll(getFixedModules()); 
 	}
 	
-	private void loadModulesFromPreferences(HttpServletRequest request, List<MetaModule> modules, String prefix, int limit) {  
+	private void loadModulesFromPreferences(List<MetaModule> modules, String prefix, int limit) { 
 		try {
 			Preferences preferences = getPreferences();
 			for (int i = 0; i < limit; i++) { 
@@ -223,7 +220,7 @@ public class Modules implements Serializable {
 				if (applicationName == null) break;
 				String moduleName = preferences.get(prefix + "module." + i, null);
 				if (moduleName == null) break;				
-				loadModule(request, modules, moduleName); 
+				loadModule(modules, moduleName); 
 			}		
 		}
 		catch (Exception ex) {
@@ -240,12 +237,8 @@ public class Modules implements Serializable {
 					request.getRequestURI().startsWith(request.getContextPath() + "/p/") || 
 					request.getRequestURI().startsWith(request.getContextPath() + "/modules/"))) return true;
 			String [] uri = request.getRequestURI().split("/");
-			if (uri.length < 3) {
-				return false;			
-			}
-			String applicationName = MetaModuleFactory.getApplication(); 
-			String moduleName = uri[uri.length - 1]; 
-			return isModuleAuthorized(request, MetaModuleFactory.create(applicationName, moduleName)); 
+			if (uri.length < 4) return false;			
+			return isModuleAuthorized(request, MetaModuleFactory.create(uri[1], uri[3])); 
 		}
 		catch (Exception ex) {			
 			log.warn(XavaResources.getString("module_not_authorized"), ex); 
@@ -253,7 +246,14 @@ public class Modules implements Serializable {
 		}
 			
 	}
-		
+	
+	/**
+	 * @since 5.7
+	 */
+	public boolean isModuleAuthorized(String module) { 	
+		return isModuleAuthorized(null, module); 			
+	}
+	
 	/**
 	 * @since 5.7
 	 */
@@ -271,18 +271,16 @@ public class Modules implements Serializable {
 	public String getModuleURI(HttpServletRequest request, MetaModule module) { 
 		String organization = Organizations.getCurrent(request); 
 		String prefix = organization == null?"":"/o/" + organization;
-		return request.getContextPath() + prefix + "/m/" + module.getName();
-	}
-		
-	public boolean isModuleAuthorized(HttpServletRequest request, MetaModule module) {   
-		if (request != null && ModulesHelper.isPublic(request, module.getName())) return true; 
-		return Collections.binarySearch(getAll(request), module, comparator) >= 0; 
+		return "/" + module.getMetaApplication().getName() + prefix + "/m/" + module.getName();
 	}
 	
-	/** @since 6.5 */
-	public boolean isModuleInMenu(HttpServletRequest request, MetaModule module) { 	
-		if (!isModuleAuthorized(request, module)) return false;
-		return Collections.binarySearch(getNotInMenuModules(), module, comparator) < 0;
+	boolean isModuleAuthorized(MetaModule module) {
+		return isModuleAuthorized(null, module); 
+	}
+	
+	private boolean isModuleAuthorized(HttpServletRequest request, MetaModule module) {   
+		if (request != null && ModulesHelper.isPublic(request, module.getName())) return true; 
+		return Collections.binarySearch(getAll(), module, comparator) >= 0;
 	}
 	
 	private void storeBookmarkModules() { 
@@ -327,40 +325,32 @@ public class Modules implements Serializable {
 		return preferencesNodeName;
 	}
 	
-	public Collection getBookmarkModules(HttpServletRequest request) {  
-		if (bookmarkModules == null) loadBookmarkModules(request);
+	public Collection getBookmarkModules() { 
+		if (bookmarkModules == null) loadBookmarkModules();
 		return bookmarkModules;
 	}
 	
 	/** @since 6.0 */
-	public Collection getFixedModules(HttpServletRequest request) {  
-		if (fixedModules == null) loadFixedModules(request); 
+	public Collection getFixedModules() { 
+		if (fixedModules == null) loadFixedModules();
 		return fixedModules;
 	}
 	
-	public List getAll(HttpServletRequest request) { 
+	public List getAll() {
 		if (all == null) {			
-			all = ModulesHelper.getAll(request); 
+			all = ModulesHelper.getAll();
 			Collections.sort(all, comparator);
 		}
 		return all;
 	}
 	
-	private List<MetaModule> getNotInMenuModules() { 
-		if (notInMenuModules == null) {			
-			notInMenuModules = ModulesHelper.getNotInMenu(); 
-			Collections.sort(notInMenuModules, comparator);
-		}
-		return notInMenuModules;
-	}
-	
 	/** @since 6.0 */
-	public List getRegularModules(HttpServletRequest request) {  
-		if (getBookmarkModules(request).isEmpty() && getFixedModules(request).isEmpty()) return getAll(request);  
+	public List getRegularModules() { 
+		if (getBookmarkModules().isEmpty() && getFixedModules().isEmpty()) return getAll(); 
 		if (regularModules == null) {			
-			regularModules = new ArrayList(getAll(request)); 
-			regularModules.removeAll(getFixedModules(request)); 
-			regularModules.removeAll(getBookmarkModules(request)); 
+			regularModules = new ArrayList(getAll());
+			regularModules.removeAll(getFixedModules());
+			regularModules.removeAll(getBookmarkModules());
 		}
 		return regularModules;
 	}

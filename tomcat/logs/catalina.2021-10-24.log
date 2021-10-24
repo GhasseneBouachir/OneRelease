@@ -1,0 +1,7 @@
+24-Oct-2021 22:16:43.973 INFOS [Thread-5] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+24-Oct-2021 22:16:44.239 INFOS [Thread-5] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["ajp-nio-8009"]
+24-Oct-2021 22:16:44.504 INFOS [Thread-5] org.apache.catalina.core.StandardService.stopInternal Arrêt du service [Catalina]
+24-Oct-2021 22:16:44.504 INFOS [Thread-5] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+24-Oct-2021 22:16:44.504 INFOS [Thread-5] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["ajp-nio-8009"]
+24-Oct-2021 22:16:44.512 INFOS [Thread-5] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+24-Oct-2021 22:16:44.512 INFOS [Thread-5] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["ajp-nio-8009"]

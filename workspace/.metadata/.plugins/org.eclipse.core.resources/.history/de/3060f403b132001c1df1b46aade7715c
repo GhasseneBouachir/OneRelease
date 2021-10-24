@@ -1,0 +1,50 @@
+package org.onerelease.model;
+
+import java.math.*;
+import java.util.*;
+
+import javax.persistence.*;
+
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+import org.openxava.model.*;
+@Views({
+	@View(name="Epic", members="# reference, name,  summary; creationDate, rank ; userStories; "
+			+ "  Description [ description ]; "
+			)
+})
+public class Epic extends Identifiable {
+			@Column(length = 20)
+			private String name;
+
+			// @Hidden
+			@Column
+			@ReadOnly
+			private BigInteger rank;
+			
+			@Column(length = 10)
+		    @ReadOnly
+		    private String reference;
+			
+			@Column(length = 80)
+			@Required(message = "you have to specify the Summary")
+			private String summary;
+			
+			@Column
+			@Lob
+			@Stereotype("SIMPLE_HTML_TEXT")
+			private String description;
+			
+			@Required
+			@DefaultValueCalculator(CurrentDateCalculator.class)
+			private Date creationDate;
+			
+			@CollectionView("UserStory")
+			@RowAction("addTicketToSprint.assign")
+			@ListProperties("reference, summary, type, priority, status")
+			@SaveAction("Ticket.saveUserStory")
+			@OneToMany(mappedBy="subject")
+			@NewAction("Ticket.createUserStoryOnEpic")
+			@EditAction("Ticket.editUserStory")
+			private Collection<Ticket> userStories;
+}

@@ -32,10 +32,9 @@ public class JPAPersistenceProvider extends POJOPersistenceProviderBase {
 	protected Object find(Class pojoClass, Serializable key) {
 		try {
 			flush(); 
-			return XPersistence.getManager().find(pojoClass, key);  
-			// Don't refresh the returning entity because it produces big
-			// performance issues getting calculated collections
-			// It can be reproduced in detail mode of User in XavaPro, for example.
+			Object result = XPersistence.getManager().find(pojoClass, key);  
+			if (result != null) refreshIfManaged(result); 			
+			return result;
 		}
 		catch (EntityNotFoundException ex) {
 			// As in JPA specification find does not throw EntityNotFoundException
